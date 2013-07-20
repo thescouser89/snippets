@@ -305,7 +305,7 @@ e.g
    <code>destroy_planet</code> subroutine and then type <kbd>ilovejabba</kbd> into
    the console, the big bad green Death Star laser will etch <samp>Slug
    Lover!</samp> on the planet's surface.</p>
-`
+
 `pre` is preformatted text and is unusual in HTML tags that it takes notice of
 every character in it, including the white space (whereas other elements will
 ignore a consecutive space or a line-break, for example). It is most commonly
