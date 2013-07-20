@@ -195,6 +195,121 @@ The rowspan attribute is similar to colspan, except, obviously, it will span
 across rows rather than columns. Again, the cells that it spans should be
 removed. In this example, because it spans over the fourth row, there is only
 two cells in that row.
+
+### Columns
+
+```html
+<table>
+    <colgroup>
+        <col>
+        <col class="alternative">
+        <col>
+    </colgroup>
+    <tr>
+        <td>This</td>
+        <td>That</td>
+        <td>The other</td>
+    </tr>
+    <tr>
+        <td>Ladybird</td>
+        <td>Locust</td>
+        <td>Lunch</td>
+    </tr>
+</table>
+```
+In this example the styles of the CSS class “alternative” will be applied to
+the second column, or the second cell in every row.
+
+You can also use the span attribute in a similar way to rowspan and colspan.
+Using it with the colgroup tag will define the number of rows that the column
+group will belong to, for example `colgroup span="2"></colgroup>` would group
+the first two columns. Using span in the col tag is usually more useful, and
+could, for example, be applied to the above example like this:
+
+```html
+<table>
+    <colgroup>
+        <col>
+        <col span="2" class="alternative">
+    </colgroup>
+<!-- and so on -->
+```
+
+### Caption
+
+A brief and easy accessibility consideration is to apply a caption to the
+table. The caption element defines the caption and should be used straight
+after the opening table tag.
+
+```html
+<table>
+    <caption>Locust mating habits</caption>
+<!-- etc. -->
+```
+A caption will appear above the table by default, although using the CSS
+caption-side: bottom will, well, do what you would expect.
+
+### Headers and Footer
+thead, tfoot and tbody allow you to separate the table into header, footer and
+body, which can be handy when dealing with larger tables.
+
+Whereas thead needs to come first, tfoot can, in fact come before a tbody (and
+you can have more than one tbody, if it takes your fancy) although browsers
+will render the tfoot element at the bottom of the table.
+
+```html
+<table>
+    <thead>
+        <tr>
+            <td>Header 1</td>
+            <td>Header 2</td>
+            <td>Header 3</td>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td>Footer 1</td>
+            <td>Footer 2</td>
+            <td>Footer 3</td>
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr>
+            <td>Cell 1</td>
+            <td>Cell 2</td>
+            <td>Cell 3</td>
+        </tr>
+        <!-- etc. -->
+    </tbody>
+</table>
+```
+
+e.g
+<table>
+    <thead>
+        <tr>
+            <td>Header 1</td>
+            <td>Header 2</td>
+            <td>Header 3</td>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td>Footer 1</td>
+            <td>Footer 2</td>
+            <td>Footer 3</td>
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr>
+            <td>Cell 1</td>
+            <td>Cell 2</td>
+            <td>Cell 3</td>
+        </tr>
+        <!-- etc. -->
+    </tbody>
+</table>
+
 ## Forms
 ```html
 <form action="processingscript.php" method="post">
@@ -579,4 +694,73 @@ surrounding it.
         <li><a href="/about/">About us</a></li>
     </ul>
 </nav>
+```
+## Time, Mark, and Presentational
+
+### Time
+The text sandwiched in the middle of the opening and closing tag can be any
+format of date of time - the whole precise lot, or just one part, such as a day.
+It is made more helpful, however, by the datetime attribute, the value of which
+should be a machine-readable date and/or time.
+
+```html
+<p>Written by Doctor Who on <time datetime="2052-11-21">Thursday 21st November
+2052</time>.</p>
+```
+e.g
+<p>Written by Doctor Who on <time datetime="2052-11-21">Thursday 21st November
+2052</time>.</p>
+
+Valid datetime values can take the format of a year-month-day date (as above),
+of as a “fuzzy” date, such as “2052-11”, of a time, such as “09:30” (always
+using a 24-hour clock) or a combination, such as “2052-11-21 09:30”. This can
+also accommodate time zones and durations.
+
+If the textual content of the time element is already machine readable, you
+don’t need the datetime attribute but it is required if it isn’t.
+
+### Mark
+
+Text can be highlighted, as if with a marker pen, using mark:
+
+```html
+<p>He wants to play with his <mark>Legos</mark></p>
+```
+e.g
+<p>He wants to play with his <mark>Legos</mark></p>
+
+### Presentational
+
+`<hr>`
+: thematic break between paragraphs
+
+`<small>`
+: small print
+
+`<s>`
+: strikethrough
+
+`<u>`
+: underlined? unarticulated
+
+`<i>`
+: italic, alternate voice
+
+`<b>`
+: bold
+
+`<sub>`, `<sup>`
+: subscript and superscript
+
+
+## Conditional Comments
+Conditional comments, which are nothing more than simple HTML comments that IE
+(up to version 9) happens to take a peep at, are used to throw a chunk of HTML
+at these browsers and only these browsers.
+
+```html
+<!--[if IE gt 6]>… for IE versions greater than 6
+<!--[if IE gte 8]>… for IE versions greater than or equal to than 8
+<!--[if IE lt 7]>… for IE versions less than 7
+<!--[if IE lte 7]>… for IE versions less than or equal to 7
 ```
