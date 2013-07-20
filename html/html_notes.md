@@ -424,34 +424,130 @@ preceding that group in the drop-down list of visual browsers.
     </optgroup>
 </select>
 ```
-
-e.g
-<select name="country">
-    <optgroup label="Africa">
-        <option value="gam">Gambia</option>
-        <option value="mad">Madagascar</option>
-        <option value="nam">Namibia</option>
-    </optgroup>
-    <optgroup label="Europe">
-        <option value="fra">France</option>
-        <option value="rus">Russia</option>
-        <option value="uk">UK</option>
-    </optgroup>
-    <optgroup label="North America">
-        <option value="can">Canada</option>
-        <option value="mex">Mexico</option>
-        <option value="usa">USA</option>
-    </optgroup>
-</select>
-
 ### Navigating Fields
-
 Like links, form fields (and field sets) need to be navigated to without the
 use of a pointing device, such as a mouse. The same methods used in links to
 make this task easier can be used on form elements - tab stops and access keys.
 
 ```html
 <input name="firstName" accesskey="f" tabindex="1">
+```
+
+### Additional Input Types
+
+#### Search
+Used for a search query text box, this performs exactly as a standard text input
+should.
+
+```html
+<input type="search" name="search">
+```
+
+The main intention of the inclusion of this input type in the HTML5
+specification is one of style. As well as making your HTML clearer, you can also
+target this element with a CSS attribute selector:
+
+```css
+input[type=search] { background: url(magnifyingglass.png) right no-repeat)  }
+```
+
+#### Telephone, URL and email addresses
+```html
+<input type="tel" name="telephone_number">
+<input type="url" name="web_address">
+<input type="email" name="email_address">
+```
+
+You can use the :valid and :invalid CSS3 pseudo classes to style these fields
+depending on whether their content is considered valid.
+
+```css
+input[type=email]:valid { background: green }
+input[type=email]:invalid { background: red }
+```
+#### Numbers and Ranges
+A simple text box that also allows a user to directly type in a number, or
+cycle through numbers (usually using an up and down arrow to the side of the
+field), can be achieved with type="number".
+
+```html
+<input type="number" name="quantity" step="2" min="20" max="30">
+```
+You can use the :valid and :invalid pseudo classes in relation to this, too. If
+the user were to type “12”, for example, that would be invalid, because it
+isn’t between 20 and 30. If they typed “23” that would also be invalid because
+it isn’t a multiple of 2.
+
+An alternative to the digits-in-a-text-box approach can be achieved using
+type="range". By default, this should be displayed as a horizontal bar with a
+slider in the middle of it. The user can then adjust the slider left and right,
+the far left resulting in a value of “0” and the far right a value of “100”.
+This range can be adjusted using the min and max attributes.
+
+```html
+<input type="range" name="temperature" min="15" max="25" step="0.5" value="18.5">
+```
+
+#### Date and Time
+
+    type="datetime"
+    type="date"
+    type="month"
+    type="week"
+    type="time"
+    type="datetime-local"
+
+_step_, _min_, and _max_ attributes can be used with dates and times, too, as
+can the CSS pseudo classes to style according to validity.
+
+#### Color
+Finally, type="color" is designed to allow a user to select a color, sending a
+six-digit hex code as its value.
+
+```html
+<input name="color" type="color" value="#ff8800">
+```
+
+### Placeholder text
+The placeholder attribute can be used with text input fields (and their
+text-like cousins, such as type="email" and type="number") as well as textarea
+elements. It is intended as a hint, rather than a label, for which a label
+element should still be used.
+
+```html
+<label for="email_address">Email address</label>
+<input type="email" placeholder="you@somewhere.com" name="email_address" id="email_address">
+```
+
+### Autofocus
+You might want focus to land on a form field when a page loads. If you think of
+a search engine, for example, when you land on its home page you don’t normally
+need to click on the search box to start typing - you can do so straight away
+because it already has focus. The autofocus attribute is a quick way to achieve
+this effect.
+
+```html
+<input name="query" autofocus>
+```
+
+### Datalists
+
+A data list takes the form of a list of suggestions that accompanies a text
+field:
+
+```html
+<input name="country" list="country_name">
+<datalist id="country_name">
+    <option value="Afghanistan">
+    <option value="Albania">
+    <option value="Algeria">
+    <option value="Andorra">
+    <option value="Armenia">
+    <option value="Australia">
+    <option value="Austria">
+    <option value="Azerbaijan">
+    <!-- etc. -->
+</datalist>
 ```
 
 ## Span and Div
@@ -885,4 +981,66 @@ your web page.
 
 ```html
 <a href="#content">Skip to content</a>
+```
+
+## Embedded Content: Video, Audio, and Canvas
+
+Video
+: `<video src="kitties.mp4" controls></video>`
+or
+`<video src="kitties.mp4" width="300"
+        height="200" loop muted autoplay controls></video>`
+
+You can specify a placeholder image, which will be displayed before the video
+is played, with the poster attribute.
+
+```html
+<video src="kitties.mp4" poster="fluffy.jpg" controls></video>
+```
+
+### Fallback for video
+```html
+<video src="kitties.mp4" controls>
+    <img src="hahahaha.jpg" alt="Hilarious cat and caption saying 'soz'.">
+</video>
+```
+
+### Alternative content
+As already noted, it’s not only compatibility with the tag we need to worry
+about, but also compatibility with the source video itself. Luckily, more than
+one video source file can be offered up with the source element along with
+indications of the requirements of the file in the value of the type attribute.
+The browser will then take the first one it’s happy with.
+
+```html
+<video controls>
+    <source src="kitties.mp4" type="video/mp4; codecs='avc1, mp4a'">
+    <source src="kitties.webm" type="video/webm; codecs='vp8.0, vorbis'">
+    <p>Browser no likey HTML 5.</p>
+</video>
+```
+
+Here, a browser should figure out if it can handle the “video/mp4” MIME type
+and if it has the stated codec to decipher it. If it doesn’t, it should move on
+to the next and try again with the details set out in the second source
+element.
+
+### Audio
+```html
+<audio src="meow_mix.mp3" controls>
+    Your stupid browser doesn't support HTML 5 audio.
+</audio>
+```
+Alternative content can also be defined in exactly the same way as with the
+video and source tags.
+
+### Canvas
+A major addition to HTML5 is the canvas element. It is designed to provide a
+canvas onto which JavaScript can be used to paint all manner of dynamic images
+such as graphs, animated sprites, or daft cat pictures.
+
+```html
+<canvas id="wittykitty" width="800" height="450">
+    <!-- Fall-back content here, just like with video and audio -->
+</canvas>
 ```
