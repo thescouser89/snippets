@@ -57,3 +57,12 @@ _ordered_ lists. To list an item in that list, use the `<li>` tag.
     <li>hoho</li>
 </ul>
 ```
+## Links and Images
+
+Links
+: `<a href="http://www.htmldog.com">HTML Dog</a>` or `<a href="#moss">moss</a>.`
+The latter is to jump to a section with id _moss_.
+
+Images
+: `<img src="http://www.htm.com/1.gif" width="120" height="90" alt="HTML Dog">`
+The _alt_ text is used for accessibility consideration.
