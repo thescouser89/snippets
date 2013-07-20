@@ -9,7 +9,7 @@
     <li><a href="#links-and-images">Links and Images</a></li>
     <li><a href="#tables">Tables</a></li>
     <ul>
-      <li><a href="#tables:-rowspan-and-colspan">Tables: rowspan and colspan</a></li>
+      <li><a href="#tables-rowspan-and-colspan">Tables: rowspan and colspan</a></li>
       <li><a href="#columns">Columns</a></li>
       <li><a href="#caption">Caption</a></li>
       <li><a href="#headers-and-footer">Headers and Footer</a></li>
@@ -53,7 +53,7 @@
     <li><a href="#conditional-comments">Conditional Comments</a></li>
     <li><a href="#access-keys">Access Keys</a></li>
     <li><a href="#skipping-html">Skipping HTML</a></li>
-    <li><a href="#embedded-content:-video-audio-and-canvas">Embedded Content: Video, Audio, and Canvas</a></li>
+    <li><a href="#embedded-content-video-audio-and-canvas">Embedded Content: Video, Audio, and Canvas</a></li>
     <ul>
       <li><a href="#fallback-for-video">Fallback for video</a></li>
       <li><a href="#alternative-content">Alternative content</a></li>
