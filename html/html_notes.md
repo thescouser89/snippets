@@ -402,3 +402,75 @@ e.g
     <dt>Milk</dt>
     <dd>A white liquid produced by cows and used for human consumption.</dd>
 </dl>
+
+## Addresses, Definitions, Bi-directional, and Editorial
+_address_ should be used specifically for the contact details relating either to
+the entire web page (and so only used once) or to an article element
+
+```html
+<h3>Author contact details</h3>
+<address>
+<ul>
+    <li>0123-456-7890</li>
+    <li>author_dude@noplaceinteresting.com</li>
+    <li>http://www.noplaceinteresting.com/contactme/</li>
+</ul>
+</address>
+```
+e.g
+<h3>Author contact details</h3>
+<address>
+<ul>
+    <li>0123-456-7890</li>
+    <li>author_dude@noplaceinteresting.com</li>
+    <li>http://www.noplaceinteresting.com/contactme/</li>
+</ul>
+</address>
+
+_Definition terms_
+: _dfn_ is a definition term and is used to highlight the first use of a term.
+  Like abbr, the title attribute can be used to describe the term.
+
+```html
+<p>Bob's <dfn title="Dog">canine</dfn> mother and <dfn
+   title="Horse">equine</dfn> father sat him down and carefully explained that he
+   was an <dfn title="A mutation that combines two or more sets of chromosomes from
+   different species">allopolyploid</dfn> organism.</p>
+```
+e.g
+<p>Bob's <dfn title="Dog">canine</dfn> mother and <dfn
+   title="Horse">equine</dfn> father sat him down and carefully explained that he
+   was an <dfn title="A mutation that combines two or more sets of chromosomes from
+   different species">allopolyploid</dfn> organism.</p>
+
+Bi-directional text
+: _bdo_ can be used to reverse the direction of the text, and can be used to
+  display languages that read right to left. The value of the required attribute
+  _dir_ can be _ltr_ (left to right) or _rtl_ (right to left).
+
+```html
+<bdo dir="rtl">god lmth</bdo>
+```
+e.g
+<bdo dir="rtl">god lmth</bdo>
+
+
+Editorial
+: _ins_ and _del_ are used to display editorial insertions and deletions
+  respectively. Strictly speaking, they aren’t limited to text and can be used
+  over whole swathes of content but, typically, they are used in moderation just
+  like “Track Changes” feature in word processors tend to be.
+
+  They can have the attributes datetime to indicate when the edit was made and
+  cite, to point to a description as to why the edit has been made.
+
+```html
+<p>I have decided to <del datetime="2013-01-26">decrease</del> <ins
+   cite="http://www.icecreamforall.com/changeofpolicy/">increase</ins> the amount
+   of free ice cream that the State will provide for its citizens.</p>
+```
+e.g
+<p>I have decided to <del datetime="2013-01-26">decrease</del> <ins
+cite="http://www.icecreamforall.com/changeofpolicy/">increase</ins> the amount
+of free ice cream that the State will provide for its citizens.</p>
+
