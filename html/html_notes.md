@@ -57,6 +57,13 @@ _ordered_ lists. To list an item in that list, use the `<li>` tag.
     <li>hoho</li>
 </ul>
 ```
+e.g
+
+<ul>
+    <li>haha</li>
+    <li>hoho</li>
+</ul>
+
 ## Links and Images
 
 Links
@@ -199,25 +206,6 @@ two cells in that row.
     <p><input type="radio" name="areyou" value="asexual">Asexual</p>
 <form>
 ```
-e.g
-<form action="processingscript.php" method="post">
-    <input type="text">
-    <input type="password">
-    <input type="checkbox">
-    <input type="radio">
-    <input type="submit" value="Ooo. Look. Text on a button. Wow">.
-
-    <select>
-        <option>Option 1</option>
-        <option>Option 2</option>
-        <option value="third option">Option 3</option>
-    </select>
-
-    <p><input type="radio" name="areyou" value="male"> Male</p>
-    <p><input type="radio" name="areyou" value="female"> Female</p>
-    <p><input type="radio" name="areyou" value="hermaphrodite">e</p>
-    <p><input type="radio" name="areyou" value="asexual">Asexual</p>
-<form>
 
 When the form is submitted, the value of the selected option will be sent. This
 value will be the text between the selected opening and closing option tag
@@ -247,6 +235,9 @@ chunks of code.
 
 Abbreviation
 : `<p>This is about <abbr title="HyperText Markup Language">HTML</abbr></p>`
+
+e.g
+<p>This is about <abbr title="HyperText Markup Language">HTML</abbr></p>
 
 Quotations
 : _blockquote_ and _q_ are used for quotations.
@@ -290,8 +281,8 @@ e.g
 </figure>
 
 Citations
-: <p>According to <cite>the Bible</cite>, after six days God said <q>screw this
-for a lark, I'm having a nap</q>.</p>
+: `<p>According to <cite>the Bible</cite>, after six days God said <q>screw this
+for a lark, I'm having a nap</q>.</p>`
 
 <p>According to <cite>the Bible</cite>, after six days God said <q>screw this
 for a lark, I'm having a nap</q>.</p>
@@ -327,7 +318,6 @@ used for blocks of code, where spacing, such as indentations, can be relevant.
     &lt;p&gt;Some paragraph paragraph thing thing thingy.&lt;/p&gt;
 &lt;/div&gt;
 </code></pre>
-
 ```
 e.g
 <pre><code>
