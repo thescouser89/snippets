@@ -60,6 +60,7 @@
       <li><a href="#audio">Audio</a></li>
       <li><a href="#canvas">Canvas</a></li>
     </ul>
+    <li><a href="#html-tag-reference">HTML tag reference</a></li>
   </ul>
 </ul>
 </nav>
@@ -1109,3 +1110,6 @@ such as graphs, animated sprites, or daft cat pictures.
     <!-- Fall-back content here, just like with video and audio -->
 </canvas>
 ```
+## HTML tag reference
+<a
+href="http://htmldog.com/reference/htmltags/">http://htmldog.com/reference/htmltags/</a>
