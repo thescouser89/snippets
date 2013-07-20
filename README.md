@@ -1,4 +1,4 @@
-snippets
+Snippets
 ========
 
-Tiny snippets of code for my memory
+Tiny snippets of code for my memory...
