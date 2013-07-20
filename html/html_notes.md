@@ -199,6 +199,25 @@ two cells in that row.
     <p><input type="radio" name="areyou" value="asexual">Asexual</p>
 <form>
 ```
+e.g
+<form action="processingscript.php" method="post">
+    <input type="text">
+    <input type="password">
+    <input type="checkbox">
+    <input type="radio">
+    <input type="submit" value="Ooo. Look. Text on a button. Wow">.
+
+    <select>
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option value="third option">Option 3</option>
+    </select>
+
+    <p><input type="radio" name="areyou" value="male"> Male</p>
+    <p><input type="radio" name="areyou" value="female"> Female</p>
+    <p><input type="radio" name="areyou" value="hermaphrodite">e</p>
+    <p><input type="radio" name="areyou" value="asexual">Asexual</p>
+<form>
 
 When the form is submitted, the value of the selected option will be sent. This
 value will be the text between the selected opening and closing option tag
@@ -246,17 +265,35 @@ and it said:</p>
        in-line quotations.</p>
 </blockquote>
 ```
-Blockquotes work very well with _figure_ and _figurecaption_.
+e.g
+<p>So I said <q>I know as much
+about quotations as I do about pigeon fancying</q>. Luckily, I found HTML Dog
+and it said:</p>
 
+<blockquote cite="http://www.htmldog.com/guides/html/intermediate/text/">
+    <p>blockquote and q are used for quotations. blockquote is generally used
+       for standalone often multi-line quotations whereas q is used for shorter,
+       in-line quotations.</p>
+</blockquote>
+
+Blockquotes work very well with _figure_ and _figurecaption_.
 ```html
 <figure>
     <blockquote>[Big old quotation about evolution]</blockquote>
     <figcaption>Charles Darwin</figcaption>
 </figure>
 ```
+e.g
+<figure>
+    <blockquote>[Big old quotation about evolution]</blockquote>
+    <figcaption>Charles Darwin</figcaption>
+</figure>
 
 Citations
 : <p>According to <cite>the Bible</cite>, after six days God said <q>screw this
+for a lark, I'm having a nap</q>.</p>
+
+<p>According to <cite>the Bible</cite>, after six days God said <q>screw this
 for a lark, I'm having a nap</q>.</p>
 
 Code
@@ -272,6 +309,12 @@ Code
    Lover!</samp> on the planet's surface.</p>
 ```
 
+e.g
+<p>If you add the line <code><var>givevaderachuckle</var> = true;</code> to the
+   <code>destroy_planet</code> subroutine and then type <kbd>ilovejabba</kbd> into
+   the console, the big bad green Death Star laser will etch <samp>Slug
+   Lover!</samp> on the planet's surface.</p>
+`
 `pre` is preformatted text and is unusual in HTML tags that it takes notice of
 every character in it, including the white space (whereas other elements will
 ignore a consecutive space or a line-break, for example). It is most commonly
@@ -286,6 +329,13 @@ used for blocks of code, where spacing, such as indentations, can be relevant.
 </code></pre>
 
 ```
+e.g
+<pre><code>
+&lt;div id="intro"&gt;
+    &lt;h1&gt;Some heading&lt;/h1&gt;
+    &lt;p&gt;Some paragraph paragraph thing thing thingy.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
 
 ## Meta tags
 Meta tags don’t do anything to the content that is presented in the browser
