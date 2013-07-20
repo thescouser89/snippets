@@ -37,7 +37,7 @@ begin
           temp_file.puts(%Q|#{" " * (prev_hash_num - 1) * 2}</ul>|)
           prev_hash_num -= 1
         end
-        temp_file.puts(%Q|#{" " * hashes * 2}<li>##{line.lstrip.gsub(/#/, '').strip.gsub(/,\s?/, '-').gsub(/ /, '-').downcase}</li>|)
+        temp_file.puts(%Q|#{" " * hashes * 2}<li><a href="##{line.strip.gsub(/^#+/, '').strip.gsub(/,\s?/, '-').gsub(/ /, '-').downcase}">#{line.strip.gsub(/^#+/, '').strip}</a></li>|)
       end
     end
   end

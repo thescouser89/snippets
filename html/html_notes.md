@@ -1,64 +1,64 @@
 <nav id="insert_nav_document">
 <ul>
-  <li>#html-notes</li>
+  <li><a href="#html-notes">HTML notes</a></li>
   <ul>
-    <li>#tags-attributes-and-elements</li>
-    <li>#title</li>
-    <li>#paragraghs-emphasis-line-breaks</li>
-    <li>#headings-lists</li>
-    <li>#links-and-images</li>
-    <li>#tables</li>
+    <li><a href="#tags-attributes-and-elements">Tags, Attributes and Elements</a></li>
+    <li><a href="#title">Title</a></li>
+    <li><a href="#paragraghs-emphasis-line-breaks">Paragraghs, emphasis, line breaks</a></li>
+    <li><a href="#headings-lists">Headings, Lists</a></li>
+    <li><a href="#links-and-images">Links and Images</a></li>
+    <li><a href="#tables">Tables</a></li>
     <ul>
-      <li>#tables:-rowspan-and-colspan</li>
-      <li>#columns</li>
-      <li>#caption</li>
-      <li>#headers-and-footer</li>
+      <li><a href="#tables:-rowspan-and-colspan">Tables: rowspan and colspan</a></li>
+      <li><a href="#columns">Columns</a></li>
+      <li><a href="#caption">Caption</a></li>
+      <li><a href="#headers-and-footer">Headers and Footer</a></li>
     </ul>
-    <li>#forms</li>
+    <li><a href="#forms">Forms</a></li>
     <ul>
-      <li>#accessible-forms</li>
-      <li>#field-sets-and-legends</li>
-      <li>#option-groups</li>
-      <li>#navigating-fields</li>
-      <li>#additional-input-types</li>
+      <li><a href="#accessible-forms">Accessible Forms</a></li>
+      <li><a href="#field-sets-and-legends">Field sets and legends</a></li>
+      <li><a href="#option-groups">Option Groups</a></li>
+      <li><a href="#navigating-fields">Navigating Fields</a></li>
+      <li><a href="#additional-input-types">Additional Input Types</a></li>
       <ul>
-        <li>#search</li>
-        <li>#telephone-url-and-email-addresses</li>
-        <li>#numbers-and-ranges</li>
-        <li>#date-and-time</li>
-        <li>#color</li>
+        <li><a href="#search">Search</a></li>
+        <li><a href="#telephone-url-and-email-addresses">Telephone, URL and email addresses</a></li>
+        <li><a href="#numbers-and-ranges">Numbers and Ranges</a></li>
+        <li><a href="#date-and-time">Date and Time</a></li>
+        <li><a href="#color">Color</a></li>
       </ul>
-      <li>#placeholder-text</li>
-      <li>#autofocus</li>
-      <li>#datalists</li>
+      <li><a href="#placeholder-text">Placeholder text</a></li>
+      <li><a href="#autofocus">Autofocus</a></li>
+      <li><a href="#datalists">Datalists</a></li>
     </ul>
-    <li>#span-and-div</li>
-    <li>#abbreviation-quotations-and-code</li>
-    <li>#meta-tags</li>
-    <li>#definition-lists</li>
-    <li>#addresses-definitions-bi-directional-and-editorial</li>
-    <li>#sectioning</li>
+    <li><a href="#span-and-div">Span and Div</a></li>
+    <li><a href="#abbreviation-quotations-and-code">Abbreviation, quotations, and code</a></li>
+    <li><a href="#meta-tags">Meta tags</a></li>
+    <li><a href="#definition-lists">Definition lists</a></li>
+    <li><a href="#addresses-definitions-bi-directional-and-editorial">Addresses, Definitions, Bi-directional, and Editorial</a></li>
+    <li><a href="#sectioning">Sectioning</a></li>
     <ul>
-      <li>#articles</li>
-      <li>#headers-and-footers</li>
-      <li>#asides</li>
-      <li>#navigation</li>
+      <li><a href="#articles">Articles</a></li>
+      <li><a href="#headers-and-footers">Headers and Footers</a></li>
+      <li><a href="#asides">Asides</a></li>
+      <li><a href="#navigation">Navigation</a></li>
     </ul>
-    <li>#time-mark-and-presentational</li>
+    <li><a href="#time-mark-and-presentational">Time, Mark, and Presentational</a></li>
     <ul>
-      <li>#time</li>
-      <li>#mark</li>
-      <li>#presentational</li>
+      <li><a href="#time">Time</a></li>
+      <li><a href="#mark">Mark</a></li>
+      <li><a href="#presentational">Presentational</a></li>
     </ul>
-    <li>#conditional-comments</li>
-    <li>#access-keys</li>
-    <li>#skipping-html</li>
-    <li>#embedded-content:-video-audio-and-canvas</li>
+    <li><a href="#conditional-comments">Conditional Comments</a></li>
+    <li><a href="#access-keys">Access Keys</a></li>
+    <li><a href="#skipping-html">Skipping HTML</a></li>
+    <li><a href="#embedded-content:-video-audio-and-canvas">Embedded Content: Video, Audio, and Canvas</a></li>
     <ul>
-      <li>#fallback-for-video</li>
-      <li>#alternative-content</li>
-      <li>#audio</li>
-      <li>#canvas</li>
+      <li><a href="#fallback-for-video">Fallback for video</a></li>
+      <li><a href="#alternative-content">Alternative content</a></li>
+      <li><a href="#audio">Audio</a></li>
+      <li><a href="#canvas">Canvas</a></li>
     </ul>
   </ul>
 </ul>
