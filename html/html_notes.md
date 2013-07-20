@@ -74,6 +74,16 @@ Images
 : `<img src="http://www.htm.com/1.gif" width="120" height="90" alt="HTML Dog">`
 The _alt_ text is used for accessibility consideration.
 
+You can also use this:
+```html
+<figure>
+    <img src="obelisk.jpg">
+    <figcaption>Tixall Obelisk</figcaption>
+</figure>
+```
+Note that the img element doesn’t need an alt attribute IF the figcaption
+(that’s “figure caption”, in case you need it spelling out) does that job.
+
 ## Tables
 ```html
 <table>
@@ -474,3 +484,99 @@ e.g
 cite="http://www.icecreamforall.com/changeofpolicy/">increase</ins> the amount
 of free ice cream that the State will provide for its citizens.</p>
 
+## Sectioning
+
+Whereas _div_ elements can be used to contain sections, used primarily as
+scaffolding on which to hang CSS, they don’t hold a great deal of meaning.
+Sectioning involves a handful of tags that can be used to define specific parts
+of a page, such as articles, headers, footers, and navigation.
+
+### Articles
+An _article_ element can be used to mark up a standalone section of content. This
+could be used just once, if you think of a blog post as an article, for example,
+or a number of times, if you imagine replicating a traditional newspaper page
+with numerous articles.
+
+A _section_ element represents a more general section and could be used to split
+up an article, or to represent chapters, for example.
+
+```html
+<article>
+    <section id="intro">
+        <p>[An introduction]</p>
+    </section>
+    <section id="main_content">
+        <p>[Content]</p>
+    </section>
+    <section id="related">
+        <ul>
+            <li><a href="that.html">That related article</a></li>
+            <li><a href="this.html">This related article</a></li>
+        </ul>
+    </section>
+</article>
+```
+
+The HTML5 specifications suggest that you can use h1 elements at the start of
+each section, which would become a sub-heading of anything preceding that
+section (so, in the example above, if you had an h1 immediately following the
+opening article tag, an h1 immediately after an opening section tag would be a
+sub-heading of that initial h1). This screws backwards compatibility, however,
+and any user agents (including screen readers) that don’t understand this won’t
+apply properly structured heading levels. We suggest sticking to the headings
+levels you would use if you didn’t use sections (so h1, followed by h2, etc,
+regardless of the sectioning). This doesn’t break anything or detract from the
+meaning or semantics.
+
+### Headers and Footers
+_header_ and _footer_ provide further specialized, self-descriptive, sections.
+
+```html
+<body>
+<article>
+    <header>
+        <h1>Alternatively&hellip;</h1>
+        <p>[An introduction]</p>
+    </header>
+    <section id="main_content">
+        <p>[Content]</p>
+    </section>
+    <footer>
+        <p>[End notes]</p>
+    </footer>
+</article>
+<footer>
+    <p>[Copyright bumf]</p>
+</footer>
+</body>
+```
+
+### Asides
+
+An aside can be used to represent content that is related the content
+surrounding it.
+
+```html
+<section id="main_content">
+    <h1>Tixall</h1>
+    <p>[All about Tixall]</p>
+    <aside>
+        <h2>Tixall Obelisk</h2>
+        <p>[A short note about Tixall Obelisk]</p>
+    </aside>
+    <p>[Maybe a bit more about Tixall]</p>
+</section>
+```
+
+### Navigation
+
+```html
+<nav id="main_nav">
+    <ul>
+        <li><a href="/tutorials/">Tutorials</a></li>
+        <li><a href="/reference/">Reference</a></li>
+        <li><a href="/articles/">Articles</a></li>
+        <li><a href="/about/">About us</a></li>
+    </ul>
+</nav>
+```
