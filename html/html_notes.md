@@ -1,3 +1,68 @@
+<nav id="insert_nav_document">
+<ul>
+  <li>#html-notes</li>
+  <ul>
+    <li>#tags-attributes-and-elements</li>
+    <li>#title</li>
+    <li>#paragraghs-emphasis-line-breaks</li>
+    <li>#headings-lists</li>
+    <li>#links-and-images</li>
+    <li>#tables</li>
+    <ul>
+      <li>#tables:-rowspan-and-colspan</li>
+      <li>#columns</li>
+      <li>#caption</li>
+      <li>#headers-and-footer</li>
+    </ul>
+    <li>#forms</li>
+    <ul>
+      <li>#accessible-forms</li>
+      <li>#field-sets-and-legends</li>
+      <li>#option-groups</li>
+      <li>#navigating-fields</li>
+      <li>#additional-input-types</li>
+      <ul>
+        <li>#search</li>
+        <li>#telephone-url-and-email-addresses</li>
+        <li>#numbers-and-ranges</li>
+        <li>#date-and-time</li>
+        <li>#color</li>
+      </ul>
+      <li>#placeholder-text</li>
+      <li>#autofocus</li>
+      <li>#datalists</li>
+    </ul>
+    <li>#span-and-div</li>
+    <li>#abbreviation-quotations-and-code</li>
+    <li>#meta-tags</li>
+    <li>#definition-lists</li>
+    <li>#addresses-definitions-bi-directional-and-editorial</li>
+    <li>#sectioning</li>
+    <ul>
+      <li>#articles</li>
+      <li>#headers-and-footers</li>
+      <li>#asides</li>
+      <li>#navigation</li>
+    </ul>
+    <li>#time-mark-and-presentational</li>
+    <ul>
+      <li>#time</li>
+      <li>#mark</li>
+      <li>#presentational</li>
+    </ul>
+    <li>#conditional-comments</li>
+    <li>#access-keys</li>
+    <li>#skipping-html</li>
+    <li>#embedded-content:-video-audio-and-canvas</li>
+    <ul>
+      <li>#fallback-for-video</li>
+      <li>#alternative-content</li>
+      <li>#audio</li>
+      <li>#canvas</li>
+    </ul>
+  </ul>
+</ul>
+</nav>
 # HTML notes
 `<!DOCTYPE html>` tells the browser the flavor of HTML you are using. The stuff
 between `<body>` and `</body>`is the main content of the document that
