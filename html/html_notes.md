@@ -1,5 +1,4 @@
 # HTML notes
-
 `<!DOCTYPE html>` tells the browser the flavor of HTML you are using. The stuff
 between `<body>` and `</body>`is the main content of the document that
 will appear in the browser window.
@@ -9,7 +8,6 @@ wrap around content will close themselves (`<br>`). Using `<br/>` instead of
 `<br>` is a remnant of XHTML. HTML will be happy with any format.
 
 ## Tags, Attributes and Elements
-
 ```html
 <tag attribute="value">
     element
@@ -34,7 +32,6 @@ page. The information in the head element does not appear in the browser window.
 The title is also used when we create bookmarks.
 
 ## Paragraghs, emphasis, line breaks
-
 Paragraphs
 : `<p>haha</p>`
 
@@ -45,7 +42,6 @@ Line breaks
 : `<br>`
 
 ## Headings, Lists
-
 Headings go from _h1_ to _h6_.
 
 Lists start with the `<ul>` tag for _unordered_ lists, and `<ol>` for the
@@ -65,10 +61,38 @@ e.g
 </ul>
 
 ## Links and Images
-
 Links
 : `<a href="http://www.htmldog.com">HTML Dog</a>` or `<a href="#moss">moss</a>.`
 The latter is to jump to a section with id _moss_.
+
+Users who do not or cannot use pointing devices can tab through links and, as
+such, links should be in a logical tabbing order. The tabindex attribute allows
+you to define this order although if the HTML is linear, as it should be, a
+logical tabbing order should automatically fall into place.
+
+```html
+<ul>
+    <li><a href="here.html" tabindex="1">Here</a></li>
+    <li><a href="there.html" tabindex="3">There</a></li>
+    <li><a href="limbo.html" tabindex="2">Limbo</a></li>
+</ul>
+```
+
+If you have a link that isn’t self-descriptive, or the link destination could
+benefit from being explained in more detail, you can add information to a link
+using the title attribute.
+
+```html
+<p>I'm really bad at writing link text. <a href="inept.html" title="Why I'm
+   rubbish at writing link text: An explanation and an apology.">Click here</a> to
+   find out more.</p>
+```
+
+e.g
+<p>I'm really bad at writing link text. <a href="inept.html" title="Why I'm
+   rubbish at writing link text: An explanation and an apology.">Click here</a> to
+   find out more.</p>
+
 
 Images
 : `<img src="http://www.htm.com/1.gif" width="120" height="90" alt="HTML Dog">`
@@ -134,7 +158,6 @@ e.g
 </table>
 
 ### Tables: rowspan and colspan
-
 ```html
 <table>
     <tr>
@@ -197,7 +220,6 @@ removed. In this example, because it spans over the fourth row, there is only
 two cells in that row.
 
 ### Columns
-
 ```html
 <table>
     <colgroup>
@@ -236,7 +258,6 @@ could, for example, be applied to the above example like this:
 ```
 
 ### Caption
-
 A brief and easy accessibility consideration is to apply a caption to the
 table. The caption element defines the caption and should be used straight
 after the opening table tag.
@@ -250,12 +271,12 @@ A caption will appear above the table by default, although using the CSS
 caption-side: bottom will, well, do what you would expect.
 
 ### Headers and Footer
-thead, tfoot and tbody allow you to separate the table into header, footer and
+`thead`, `tfoot` and `tbody` allow you to separate the table into header, footer and
 body, which can be handy when dealing with larger tables.
 
-Whereas thead needs to come first, tfoot can, in fact come before a tbody (and
-you can have more than one tbody, if it takes your fancy) although browsers
-will render the tfoot element at the bottom of the table.
+Whereas `thead` needs to come first, `tfoot` can, in fact come before a `tbody` (and
+you can have more than one `tbody`, if it takes your fancy) although browsers
+will render the `tfoot` element at the bottom of the table.
 
 ```html
 <table>
@@ -342,8 +363,98 @@ you hook up your form to a form-handling script, they will all be ignored. This
 is because the form fields need names. So to all of the fields, the attribute
 name needs to be added.
 
-## Span and Div
+### Accessible Forms
+Each form field should have its own explicit label. The label tag sorts this
+out, with a for attribute that associates it to a form element.
 
+```html
+<form>
+    <label for="yourName">Your Name</label>
+    <input name="yourName" id="yourName">
+    <!-- etc. -->
+```
+Labels have the added bonus of visual browsers rendering the labels themselves
+clickable, putting the focus on the associated form field.
+
+Both name and id attributes are typically required; the name for the form to
+handle that field and the id for the label to associate it to.
+
+### Field sets and legends
+You can group fields, for example name (first, last, middle, title etc.) or
+address (line 1, line 2, county, country, postal code, country etc.) using the
+fieldset tag.
+
+```html
+<form action="somescript.php" >
+    <fieldset>
+        <legend>Name</legend>
+        <p>First name <input name="firstName"></p>
+        <p>Last name <input name="lastName"></p>
+    </fieldset>
+    <fieldset>
+        <legend>Address</legend>
+        <p>Address <textarea name="address"></textarea></p>
+        <p>Postal code <input name="postcode"></p>
+    </fieldset>
+    <!-- etc. -->
+</form>
+```
+
+### Option Groups
+The optgroup element groups options in a select box. It requires a label
+attribute, the value of which is displayed as a non-selectable pseudo-heading
+preceding that group in the drop-down list of visual browsers.
+
+```html
+<select name="country">
+    <optgroup label="Africa">
+        <option value="gam">Gambia</option>
+        <option value="mad">Madagascar</option>
+        <option value="nam">Namibia</option>
+    </optgroup>
+    <optgroup label="Europe">
+        <option value="fra">France</option>
+        <option value="rus">Russia</option>
+        <option value="uk">UK</option>
+    </optgroup>
+    <optgroup label="North America">
+        <option value="can">Canada</option>
+        <option value="mex">Mexico</option>
+        <option value="usa">USA</option>
+    </optgroup>
+</select>
+```
+
+e.g
+<select name="country">
+    <optgroup label="Africa">
+        <option value="gam">Gambia</option>
+        <option value="mad">Madagascar</option>
+        <option value="nam">Namibia</option>
+    </optgroup>
+    <optgroup label="Europe">
+        <option value="fra">France</option>
+        <option value="rus">Russia</option>
+        <option value="uk">UK</option>
+    </optgroup>
+    <optgroup label="North America">
+        <option value="can">Canada</option>
+        <option value="mex">Mexico</option>
+        <option value="usa">USA</option>
+    </optgroup>
+</select>
+
+### Navigating Fields
+
+Like links, form fields (and field sets) need to be navigated to without the
+use of a pointing device, such as a mouse. The same methods used in links to
+make this task easier can be used on form elements - tab stops and access keys.
+
+```html
+<input name="firstName" accesskey="f" tabindex="1">
+```
+
+## Span and Div
 The difference between span and div is that a span element is in-line and
 usually used for a small chunk of HTML inside a line (such as inside a
 paragraph) whereas a div (division) element is block-line (which is basically
@@ -357,7 +468,6 @@ chunks of code.
 ```
 
 ## Abbreviation, quotations, and code
-
 Abbreviation
 : `<p>This is about <abbr title="HyperText Markup Language">HTML</abbr></p>`
 
@@ -600,7 +710,6 @@ cite="http://www.icecreamforall.com/changeofpolicy/">increase</ins> the amount
 of free ice cream that the State will provide for its citizens.</p>
 
 ## Sectioning
-
 Whereas _div_ elements can be used to contain sections, used primarily as
 scaffolding on which to hang CSS, they don’t hold a great deal of meaning.
 Sectioning involves a handful of tags that can be used to define specific parts
@@ -667,7 +776,6 @@ _header_ and _footer_ provide further specialized, self-descriptive, sections.
 ```
 
 ### Asides
-
 An aside can be used to represent content that is related the content
 surrounding it.
 
@@ -684,7 +792,6 @@ surrounding it.
 ```
 
 ### Navigation
-
 ```html
 <nav id="main_nav">
     <ul>
@@ -720,7 +827,6 @@ If the textual content of the time element is already machine readable, you
 don’t need the datetime attribute but it is required if it isn’t.
 
 ### Mark
-
 Text can be highlighted, as if with a marker pen, using mark:
 
 ```html
@@ -730,7 +836,6 @@ e.g
 <p>He wants to play with his <mark>Legos</mark></p>
 
 ### Presentational
-
 `<hr>`
 : thematic break between paragraphs
 
@@ -763,4 +868,21 @@ at these browsers and only these browsers.
 <!--[if IE gte 8]>… for IE versions greater than or equal to than 8
 <!--[if IE lt 7]>… for IE versions less than 7
 <!--[if IE lte 7]>… for IE versions less than or equal to 7
+```
+
+## Access Keys
+Access keys allow easier navigation by assigning a keyboard shortcut to a link
+(which will usually gain focus when the user presses “Alt” or “Ctrl” + the
+access key).
+
+```html
+<a href="somepage.html" accesskey="s">Some page</a>
+```
+
+## Skipping HTML
+To aid tabbing, you can supply links that allow users to jump over chunks of
+your web page.
+
+```html
+<a href="#content">Skip to content</a>
 ```
