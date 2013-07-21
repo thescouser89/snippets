@@ -1,10 +1,19 @@
 # CMake Notes
-
-## CMake Variables
-### Source
-http://www.cmake.org/Wiki/CMake_Useful_Variables
+## CMake Resources
 
 ### Variables
+http://www.cmake.org/Wiki/CMake_Useful_Variables
+
+### Syntax
+http://www.cmake.org/cmake/help/syntax.html
+
+### Misc
+http://www.cmake.org/Wiki/CMake
+
+### FAQ
+http://www.cmake.org/Wiki/CMake_FAQ
+
+## CMake Variables
 PROJECT_SOURCE_DIR
 : contains the full path to the root of your project source directory, i.e. to
   the nearest directory where CMakeLists.txt contains the PROJECT() command
@@ -123,4 +132,28 @@ adding the following line to it:
 
 ## Installing and Testing
 
+For the MathFunctions library we setup the library and the header file to be
+installed by adding the following two lines to MathFunctions’ CMakeLists file:
 
+(Notice it says MathFunctions CMakeLists!)
+
+```cmake
+install (TARGETS MathFunctions DESTINATION bin)
+install (FILES MathFunctions.h DESTINATION include)
+```
+
+For the application the following lines are added to the top level CMakeLists
+file to install the executable and the configured header file:
+
+```cmake
+# add the install targets
+install (TARGETS Tutorial DESTINATION bin)
+install (FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
+         DESTINATION include)
+```
+
+The CMake variable CMAKE_INSTALL_PREFIX is used to determine the root of where
+the files will be installed.
+
+At the end of the top level CMakeLists file we can add a number of basic tests
+to verify that the application is working correctly.
