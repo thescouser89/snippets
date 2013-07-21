@@ -16,4 +16,4 @@ Tiny snippets of code for my memory...
 - http://htmldog.com/guides/javascript/
 
 ### CMake
-- http://techbase.kde.org/Development/Tutorials/CMake
+- http://www.cmake.org/cmake/help/cmake_tutorial.html
