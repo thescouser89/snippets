@@ -20,6 +20,28 @@
       <li><a href="#dynamic-pseudo-classes">Dynamic Pseudo Classes</a></li>
       <li><a href="#first-children">First children</a></li>
     </ul>
+    <li><a href="#shorthand-properties">Shorthand Properties</a></li>
+    <ul>
+      <li><a href="#margin-and-padding">Margin and Padding</a></li>
+      <li><a href="#borders">Borders</a></li>
+      <li><a href="#fonts">Fonts</a></li>
+      <li><a href="#background-image">Background Image</a></li>
+    </ul>
+    <li><a href="#specificity">Specificity</a></li>
+    <li><a href="#display">Display</a></li>
+    <ul>
+      <li><a href="#inline">Inline</a></li>
+      <li><a href="#block">Block</a></li>
+      <li><a href="#none">None</a></li>
+      <li><a href="#tables">Tables</a></li>
+      <li><a href="#other-display-types">Other display types</a></li>
+    </ul>
+    <li><a href="#pseudo-elements">Pseudo Elements</a></li>
+    <ul>
+      <li><a href="#first-letters-and-first-lines">First letters and first lines</a></li>
+      <li><a href="#before-and-after-content">Before and After Content</a></li>
+    </ul>
+    <li><a href="#page-layout">Page Layout</a></li>
   </ul>
 </ul>
 </nav>
@@ -303,3 +325,217 @@ p:first-child {
     font-size: 40px;
 }
 ```
+## Shorthand Properties
+
+### Margin and Padding
+```css
+p {
+    margin-top: 1px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+```
+
+into
+
+```css
+p {
+    margin: 1px 5px 10px 20px;
+}
+```
+
+### Borders
+```css
+p {
+    border-width: 1px;
+    border-color: red;
+    border-style: solid;
+}
+```
+
+into
+```css
+p {
+    border: 1px red solid;
+}
+```
+
+### Fonts
+```css
+p {
+    font: italic bold 12px/2 courier;
+}
+```
+This combines font-style, font-weight, font-size, line-height, and font-family.
+
+
+e.g
+```css
+
+p {
+    font: 14px/1.5 "Times New Roman", times, serif;
+    padding: 30px 10px;
+    border: 1px black solid;
+    border-width: 1px 5px 5px 1px;
+    border-color: red green blue yellow;
+    margin: 10px 50px;
+}
+```
+
+### Background Image
+```css
+body {
+    background: white url(http://www.htmldog.com/images/bg.gif) no-repeat top right;
+}
+```
+
+This amalgamates these properties:
+
+- `background-color`, which we have come across before.
+- `background-image`, which is the location of the image itself.
+- `background-repeat`, which is how the image repeats itself. Its value can be:
+  * `repeat`, the equivalent of a “tile” effect across the whole background,
+  * `repeat-y`, repeating on the y-axis, above and below,
+  * `repeat-x` (repeating on the x-axis, side-by-side), or
+  * `no-repeat` (which shows just one instance of the image).
+- `background-position`, which can be top, center, bottom, left, right, a
+   length, or a percentage, or any sensible combination, such as top right.
+
+Background-images can be used in most HTML elements.
+
+## Specificity
+If the selectors are the same then the last one will always take precedence.
+
+```css
+p { color: red }
+p { color: blue }
+```
+
+The text in the box of p elements would be colored blue because that rule came
+last.
+
+The more specific a selector, the more preference it will be given when it
+comes to conflicting styles.
+
+- ID - specificity of 100 (#haha)
+- class - specificity of 10 (.haha)
+- html selector - specificy of 1 ( p )
+
+e.g
+`body #content .alternative p` has a specificity of 112.
+
+Note: Order of the selectors does not matter.
+
+## Display
+The most fundamental types of display are inline, block and none.
+
+### Inline
+The following code, for example, will cause all list items in a list to appear
+next to each other in one continuous line rather than each one having its own
+line:
+
+```css
+li { display: inline }
+```
+
+### Block
+`block` makes a box standalone, fitting the entire width of its containing box,
+with an effective line break before and after it.
+
+`display: inline-block` will keep a box inline but lend the greater formatting
+flexibility of block boxes, allowing margin to the right and left of the box,
+for example.
+
+### None
+`none`, well, doesn’t display a box at all, which may sound pretty useless but
+can be used to good effect with dynamic effects, such as switching extended
+information on and off at the click of a link, or in alternative stylesheets.
+
+`display: none` and `visibility: hidden` vary in that display: none takes the
+element’s box completely out of play, whereas visibility: hidden keeps the box
+and its flow in place without visually representing its contents. For example,
+if the second paragraph of 3 were set to display: none, the first paragraph
+would run straight into the third whereas if it were set to visibility: hidden,
+there would be a gap where the paragraph should be.
+
+### Tables
+Perhaps the best way to understand the table-related display property values is
+to think of HTML tables. `table` is the initial display and you can mimic the
+`tr` and `td` elements with the `table-row` and `table-cell` property values
+respectively.
+
+The display property goes further by offering `table-column`,
+`table-row-group`, `table-column-group`, `table-header-group`,
+`table-footer-group` and `table-caption` as values, which are all quite
+self-descriptive. The immediately obvious benefit of these values is that you
+can construct a table by columns, rather than the row-biased method used in
+HTML.
+
+Finally, the value `inline-table` basically sets the table without line breaks
+before and after it.
+
+### Other display types
+`list-item` displays a box in the way that you would usually expect an li HTML
+element to be displayed. To work properly then, elements displayed this way
+should be nested in a ul or ol element.
+
+`run-in` makes a box either in-line or block depending on the display of its
+parent.
+
+## Pseudo Elements
+
+### First letters and first lines
+```css
+
+p {
+    font-size: 12px;
+}
+
+p:first-letter {
+    font-size: 24px;
+    float: left;
+}
+
+p:first-line {
+    font-weight: bold;
+}
+```
+The CSS 3 specs suggest pseudo elements should include two colons, so
+`p::first-line` as opposed to `p:first-line`
+
+### Before and After Content
+The `before` and `after` pseudo elements are used in conjunction with the
+content property to place content either side of a box without touching the
+HTML.
+
+The value of the content property can be `open-quote`, `close-quote`, any
+string enclosed in quotation marks, or any image, using url(imagename).
+
+```css
+blockquote:before {
+    content: open-quote;
+}
+
+blockquote:after {
+    content: close-quote;
+}
+
+li:before {
+    content: "POW! ";
+}
+
+p:before {
+    content: url(images/jam.jpg);
+}
+```
+You can also do:
+```css
+li:before {
+    content: "POW! ";
+    background: red;
+    color: #fc0;
+}
+```
+
+## Page Layout
