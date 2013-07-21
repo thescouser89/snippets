@@ -62,109 +62,109 @@ When a value is zero, you do not need to state a unit.
 
 ## Colors
 Predefined color names include aqua, black, blue, fuchsia, gray, green, lime,
-           maroon, navy, olive, orange, purple, red, silver, teal, white, and yellow.
-           transparent is also a valid value.
+maroon, navy, olive, orange, purple, red, silver, teal, white, and yellow.
+transparent is also a valid value.
 
-           Colors can also be specified using hex numbers. The hex number is prefixed with
-           a hash character (#) and can be three or six digits in length. Basically, the
-           three-digit version is a compressed version of the six-digit. (#ff0000 becomes
-#f00, #cc9966 becomes #c96, etc.)
+Colors can also be specified using hex numbers. The hex number is prefixed with
+a hash character (#) and can be three or six digits in length. Basically, the
+three-digit version is a compressed version of the six-digit. 
+(#ff0000 becomes #f00, #cc9966 becomes #c96, etc.)
 
-           The six-digit version gives you more control over the exact color.
+The six-digit version gives you more control over the exact color.
 
-           ```css
-           h1 {
+```css
+h1 {
 color: yellow;
-       background-color: blue;
-           }
+background-color: blue;
+}
 ```
 You can apply the color and background-color properties to most HTML elements,
-    including body, which will change the colors of the page and everything in it.
+including body, which will change the colors of the page and everything in it.
 
 ## Text
 
-    font-family
-    : This is the font itself, such as Times New Roman, Arial, or Verdana.
+font-family
+: This is the font itself, such as Times New Roman, Arial, or Verdana.
 
-    The user’s browser has to be able to find the font you specify, which, in most
-    cases, means it needs to be on their computer so there is little point in using
-    obscure fonts that are only sitting on your computer. There are a select few
-    “safe” fonts (the most commonly used are Arial, Verdana and Times New Roman),
-    but you can specify more than one font, separated by commas. The purpose of this
-    is that if the user does not have the first font you specify, the browser will
-    go through the list until it finds one it does have.
+The user’s browser has to be able to find the font you specify, which, in most
+cases, means it needs to be on their computer so there is little point in using
+obscure fonts that are only sitting on your computer. There are a select few
+“safe” fonts (the most commonly used are Arial, Verdana and Times New Roman),
+but you can specify more than one font, separated by commas. The purpose of this
+is that if the user does not have the first font you specify, the browser will
+go through the list until it finds one it does have.
 
-    Note: if the name of a font is more than one word, it should be put in quotation
-    marks, such as font-family: "Times New Roman".
+Note: if the name of a font is more than one word, it should be put in quotation
+marks, such as font-family: "Times New Roman".
 
-    ```css
-    font-family: arial, helvetica, serif
-    ```
+```css
+font-family: arial, helvetica, serif
+```
 
-    font-size
-    : The size of the font
+font-size
+: The size of the font
 
-    font-weight
-    : This states whether the text is bold or not. Most commonly this is used as
-    font-weight: bold or font-weight: normal but other values are bolder, lighter,
-    100, 200, 300, 400 (same as normal), 500, 600, 700 (same as bold), 800 or 900.
+font-weight
+: This states whether the text is bold or not. Most commonly this is used as
+font-weight: bold or font-weight: normal but other values are bolder, lighter,
+100, 200, 300, 400 (same as normal), 500, 600, 700 (same as bold), 800 or 900.
 
-    font-style
-    : This states whether the text is italic or not. It can be font-style: italic or
-    font-style: normal.
+font-style
+: This states whether the text is italic or not. It can be font-style: italic or
+font-style: normal.
 
-    text-decoration
-    : underline, overline, line-through, none
+text-decoration
+: underline, overline, line-through, none
 
-    text-transform
-    : capitalize, uppercase, lowercase, none
+text-transform
+: capitalize, uppercase, lowercase, none
 
-    text spacing
-    : The letter-spacing and word-spacing properties are for spacing between letters
-    or words. The value can be a length or normal.
+text spacing
+: The letter-spacing and word-spacing properties are for spacing between letters
+or words. The value can be a length or normal.
 
-    The line-height property sets the height of the lines in an element, such as a
-    paragraph, without adjusting the size of the font. It can be a number (which
-            specifies a multiple of the font size, so “2” will be two times the font size,
-            for example), a length, a percentage, or normal.
+The line-height property sets the height of the lines in an element, such as a
+paragraph, without adjusting the size of the font. It can be a number (which
+specifies a multiple of the font size, so “2” will be two times the font size,
+for example), a length, a percentage, or normal.
 
-    The text-align property will align the text inside an element to left, right,
-    center, or justify.
+The text-align property will align the text inside an element to left, right,
+center, or justify.
 
-    The text-indent property will indent the first line of a paragraph, for
-    example, to a given length or percentage. This is a style traditionally used
-    in print, but rarely in digital media such as the web.
+The text-indent property will indent the first line of a paragraph, for
+example, to a given length or percentage. This is a style traditionally used
+in print, but rarely in digital media such as the web.
 
 ## The Box Model
 
-    Element -> Padding -> Border -> Margin
+Element -> Padding -> Border -> Margin
 
     ```css
-    margin: 20px;
+margin: 20px;
 padding: 40px;
 ```
 The four sides of an element can also be set individually. margin-top,
-    margin-right, margin-bottom, margin-left, padding-top, padding-right,
-    padding-bottom and padding-left are the self-explanatory properties you can use.
+margin-right, margin-bottom, margin-left, padding-top, padding-right,
+padding-bottom and padding-left are the self-explanatory properties you can use.
 
-    border
-    : To make a border around an element, all you need is border-style. The values
-    can be solid, dotted, dashed, double, groove, ridge, inset and outset.
+border
+: To make a border around an element, all you need is border-style. The values
+can be solid, dotted, dashed, double, groove, ridge, inset and outset.
 
-    _border-width_ sets the width of the border, most commonly using pixels as a
-    value. There are also properties for border-top-width, border-right-width,
-    border-bottom-width and border-left-width.
+_border-width_ sets the width of the border, most commonly using pixels as a
+value. There are also properties for border-top-width, border-right-width,
+border-bottom-width and border-left-width.
 
-    Finally, border-color sets the color.
+Finally, border-color sets the color.
 
-    ```css
-    h2 {
-        border-style: dashed;
-        border-width: 3px;
-        border-left-width: 10px;
-        border-right-width: 10px;
-        border-color: red;
-    }
+```css
+h2 {
+    border-style: dashed;
+    border-width: 3px;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-color: red;
+}
 ```
 
 ## Class and ID selectors
@@ -269,29 +269,29 @@ clicked on.
 - `hover` is for a when something is passed over by an input from the user,
     such as when a cursor moves over a link.
 
-    - `focus` is for when something gains focus, that is when it is selected by, or
-    is ready for, keyboard input.
+- `focus` is for when something gains focus, that is when it is selected by, or
+is ready for, keyboard input.
 
-    `focus` is most often used on form elements but can be used for links. Although
-    most users will navigate around and between pages using a pointing device such
-    as a mouse those who choose note to, or are unable to do so, such as those with
-    motor disabilities, may navigate using a keyboard or similar device. Links can
-    be jumped between using a tab key and they will gain focus one at a time.
+`focus` is most often used on form elements but can be used for links. Although
+most users will navigate around and between pages using a pointing device such
+as a mouse those who choose note to, or are unable to do so, such as those with
+motor disabilities, may navigate using a keyboard or similar device. Links can
+be jumped between using a tab key and they will gain focus one at a time.
 
-    ```css
-    a:active {
+``css
+a:active {
 color: red;
-    }
+}
 
 a:hover {
-      text-decoration: none;
-color: blue;
-       background-color: yellow;
-  }
+    text-decoration: none;
+    color: blue;
+    background-color: yellow;
+}
 
 input:focus, textarea:focus {
-background: #eee;
-      }
+    background: #eee;
+}
 ```
 
 ### First children
