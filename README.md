@@ -4,13 +4,16 @@ Snippets
 Tiny snippets of code for my memory...
 
 
-## HTML
-HTML notes come from:
+## Sources
+
+### HTML
 - http://htmldog.com/guides/html/
 
-## CSS
-CSS notes come from:
+### CSS
 - http://htmldog.com/guides/css/
 
-## Javascript
+### Javascript
 - http://htmldog.com/guides/javascript/
+
+### CMake
+- http://techbase.kde.org/Development/Tutorials/CMake
