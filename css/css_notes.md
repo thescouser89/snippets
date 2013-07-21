@@ -11,16 +11,8 @@
     <li><a href="#text">Text</a></li>
     <li><a href="#the-box-model">The Box Model</a></li>
     <li><a href="#class-and-id-selectors">Class and ID selectors</a></li>
-  </ul>
-  <li><a href="#top-{">top {</a></li>
-  <ul>
     <li><a href="#grouping">Grouping</a></li>
     <li><a href="#nesting">Nesting</a></li>
-  </ul>
-  <li><a href="#top-{">top {</a></li>
-  <li><a href="#top-h1-{">top h1 {</a></li>
-  <li><a href="#top-p-{">top p {</a></li>
-  <ul>
     <li><a href="#pseudo-classes">Pseudo Classes</a></li>
     <ul>
       <li><a href="#links">Links</a></li>

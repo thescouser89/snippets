@@ -10,7 +10,16 @@ def hash_number(line)
     break if char != "#"
     count += 1
   end
-  count
+  # cases when text starts with #haha instead of # haha
+  if count != 0
+    if line[count] == ' '
+      count
+    else
+      0
+    end
+  else
+    count
+  end
 end
 
 temp_file = Tempfile.new('foo')
@@ -67,7 +76,7 @@ begin
       end
 
       if skip && line.strip !~ /<\/nav>/
-          next
+        next
       elsif skip && line =~/\<\/nav\>/
         skip = false
         next
