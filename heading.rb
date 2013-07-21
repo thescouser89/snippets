@@ -26,6 +26,7 @@ temp_file = Tempfile.new('foo')
 nav_tag = '<nav id="insert_nav_document">'
 
 temp_file.puts nav_tag
+temp_file.puts "<h1>Table Of Contents</h1>"
 prev_hash_num = 0
 skip = false
 path = ARGV[0]

@@ -1,4 +1,5 @@
 <nav id="insert_nav_document">
+<h1>Table Of Contents</h1>
 <ul>
   <li><a href="#html-notes">HTML notes</a></li>
   <ul>
