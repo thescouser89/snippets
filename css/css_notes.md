@@ -8,9 +8,6 @@
       <li><a href="#length-and-percentage">Length and Percentage</a></li>
     </ul>
     <li><a href="#colors">Colors</a></li>
-  </ul>
-  <li><a href="#f00-#cc9966-becomes-#c96-etc.)">f00, #cc9966 becomes #c96, etc.)</a></li>
-  <ul>
     <li><a href="#text">Text</a></li>
     <li><a href="#the-box-model">The Box Model</a></li>
     <li><a href="#class-and-id-selectors">Class and ID selectors</a></li>
@@ -38,8 +35,8 @@
 ## Applying CSS
 ```html
 <head>
-<title>My first web page</title>
-<link rel="stylesheet" href="style.css">
+    <title>My first web page</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 ```
 
@@ -48,7 +45,7 @@ For each selector there are “properties” inside curly brackets.
 ```css
 body {
     font-size: 14px;
-color: navy;
+    color: navy;
 }
 ```
 ### Length and Percentage
@@ -67,15 +64,15 @@ transparent is also a valid value.
 
 Colors can also be specified using hex numbers. The hex number is prefixed with
 a hash character (#) and can be three or six digits in length. Basically, the
-three-digit version is a compressed version of the six-digit. 
+three-digit version is a compressed version of the six-digit.
 (#ff0000 becomes #f00, #cc9966 becomes #c96, etc.)
 
 The six-digit version gives you more control over the exact color.
 
 ```css
 h1 {
-color: yellow;
-background-color: blue;
+    color: yellow;
+    background-color: blue;
 }
 ```
 You can apply the color and background-color properties to most HTML elements,
@@ -139,7 +136,7 @@ in print, but rarely in digital media such as the web.
 
 Element -> Padding -> Border -> Margin
 
-    ```css
+```css
 margin: 20px;
 padding: 40px;
 ```
@@ -174,19 +171,19 @@ selector is a name preceded by a hash character (“#”).
 ```css
 #top {
     background-color: #ccc;
-padding: 20px
+    padding: 20px
 }
 .intro {
-color: red;
-       font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 ```
 
 ```html
 <div id="top">
-<h1>Chocolate curry</h1>
-<p class="intro">This is my recipe for making curry purely with chocolate</p>
-<p class="intro">Mmm mm mmmmm</p>
+    <h1>Chocolate curry</h1>
+    <p class="intro">This is my recipe for making curry purely with chocolate</p>
+    <p class="intro">Mmm mm mmmmm</p>
 </div>
 ```
 The difference between an ID and a class is that an ID can be used to identify
@@ -202,13 +199,13 @@ repeat them.
 
 ```css
 h2 {
-color: red;
+    color: red;
 }
 .thisOtherClass {
-color: red;
+    color: red;
 }
 .yetAnotherClass {
-color: red;
+    color: red;
 }
 ```
 
@@ -216,7 +213,7 @@ into...
 
 ```css
 h2, .thisOtherClass, .yetAnotherClass {
-color: red;
+    color: red;
 }
 ```
 
@@ -224,40 +221,40 @@ color: red;
 ```css
 #top {
     background-color: #ccc;
-padding: 1em
+    padding: 1em
 }
 
 #top h1 {
-color: #ff0;
+    color: #ff0;
 }
 #top p {
-color: red;
-       font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 ```
 
 ```html
 <div id="top">
-<h1>Chocolate curry</h1>
-<p>This is my recipe for making curry purely with chocolate</p>
-<p>Mmm mm mmmmm</p>
+    <h1>Chocolate curry</h1>
+    <p>This is my recipe for making curry purely with chocolate</p>
+    <p>Mmm mm mmmmm</p>
 </div>
 ```
 
 ## Pseudo Classes
 Pseudo classes are bolted on to selectors to specify a state or relation to the
 selector. They take the form of selector:pseudo_class { property: value; },
-    simply with a colon in between the selector and the pseudo class.
+simply with a colon in between the selector and the pseudo class.
 
 ### Links
-    ```css
-    a:link {
-color: blue;
-    }
+```css
+a:link {
+    color: blue;
+}
 
 a:visited {
-color: purple;
-  }
+    color: purple;
+}
 ```
 ### Dynamic Pseudo Classes
 Also commonly used for links, the dynamic pseudo classes can be used to apply
@@ -280,7 +277,7 @@ be jumped between using a tab key and they will gain focus one at a time.
 
 ``css
 a:active {
-color: red;
+    color: red;
 }
 
 a:hover {
