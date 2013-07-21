@@ -268,7 +268,7 @@ as a mouse those who choose note to, or are unable to do so, such as those with
 motor disabilities, may navigate using a keyboard or similar device. Links can
 be jumped between using a tab key and they will gain focus one at a time.
 
-``css
+```css
 a:active {
     color: red;
 }
