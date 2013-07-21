@@ -17,3 +17,4 @@ Tiny snippets of code for my memory...
 
 ### CMake
 - http://www.cmake.org/cmake/help/cmake_tutorial.html
+- http://www.cmake.org/Wiki/CMake_Useful_Variables
