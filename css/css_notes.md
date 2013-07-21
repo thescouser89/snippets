@@ -42,6 +42,11 @@
       <li><a href="#before-and-after-content">Before and After Content</a></li>
     </ul>
     <li><a href="#page-layout">Page Layout</a></li>
+    <ul>
+      <li><a href="#positioning">Positioning</a></li>
+      <li><a href="#floating">Floating</a></li>
+      <li><a href="#examples">Examples</a></li>
+    </ul>
   </ul>
 </ul>
 </nav>
@@ -539,3 +544,111 @@ li:before {
 ```
 
 ## Page Layout
+
+### Positioning
+- `static` is the default value and renders a box in the normal order of
+  things, as they appear in the HTML.
+
+- `relative` is much like static but the box can be offset from its original
+  position with the properties top, right, bottom and left.
+
+- `absolute` pulls a box out of the normal flow of the HTML and delivers it to
+  a world all of its own. In this crazy little world, the absolute box can be
+  placed anywhere on the page using top, right, bottom and left.
+
+- `fixed` behaves like absolute, but it will absolutely position a box in
+  reference to the browser window as opposed to the web page, so fixed boxes
+  should stay exactly where they are on the screen even when the page is
+  scrolled.
+
+```css
+#navigation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+}
+
+#content {
+    margin-left: 200px;
+}
+```
+
+You will see that this will set the navigation bar to the left and set the
+width to 200 pixels. Because the navigation is absolutely positioned, it has
+nothing to do with the flow of the rest of the page so all that is needed is to
+set the left margin of the content area to be equal to the width of the
+navigation bar.
+
+With clever positioning, you can arrange as many blocks as you like. If you
+wanted to add a third column, for example, you could add a “navigation2” chunk
+to the HTML and change the CSS to:
+
+```css
+#navigation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+}
+
+#navigation2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+}
+
+#content {
+    margin: 0 200px;
+    /* setting top and bottom margin to 0 and right and left margin to 200px */
+}
+```
+
+### Floating
+Floating a box will shift it to the right or left of a line, with surrounding
+content flowing around it.
+
+Floating is normally used to shift around smaller chunks within a page, such as
+pushing a navigation link to the right of a container, but it can also be used
+with bigger chunks, such as navigation columns.
+
+Using `float`, you can `float: left` or `float: right`.
+
+```css
+#navigation {
+    float: left;
+    width: 200px;
+}
+
+#navigation2 {
+    float: right;
+    width: 200px;
+}
+
+#content {
+    margin: 0 200px;
+}
+```
+
+Then, if you do not want the next box to wrap around the floating objects, you
+can apply the `clear` property:
+
+
+- `clear: left` will clear left floated boxes
+- `clear: right` will clear right floated boxes
+- `clear: both` will clear both left and right floated boxes.
+
+```css
+#footer {
+    clear: both;
+}
+```
+
+And there you have it. A footer that will appear underneath all columns,
+regardless of the length of any of them.
+
+### Examples
+See: http://htmldog.com/guides/css/intermediate/layout/
+
+
