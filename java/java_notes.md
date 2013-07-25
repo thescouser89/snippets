@@ -18,12 +18,12 @@ Makes no difference if you do i++ or ++i. The latter is preferable as it is
 sometimes more efficient (eg looping with iterators that are not pointers) and
 never less efficient.
 
+# Introduction to Objects
+`Booch: An object has state, behavior and identity.`
 
-Booch: An object has state, behavior and identity.
-
-state - internal data
-behavior - methods
-identity - each object has a unique address in memory
+State: Internal data
+Behavior: Methods
+Identity: Each object has a unique address in memory
 
 When you make a particular request to an object, that method
 is called. This process is usually summarized by saying that
@@ -1285,7 +1285,7 @@ There are two types of elements in your class:
   This creates an enumerated type called Spiciness with five named values.
   Because the instances of enumerated types are constants, they are in all
   capital letters by convention (if there are multiple words in a name, they are
-  separated by underscores) 
+  separated by underscores)
 
       class SimpleEnumUse {
           public static void main(String[] args) {
@@ -2641,7 +2641,7 @@ There are two types of elements in your class:
 
       class EnclosingOuter {
           class Inner{ System.out.println(“Inner class reference is “ + this);
-          // inner class instance 
+          // inner class instance
           System.out.println(“Outer class reference is “
           + EnclosingOuter.this); //outer class instance
           }
@@ -3636,7 +3636,7 @@ pg needs to fix
 
           e.g
 
-          Collection<Integer> collection = 
+          Collection<Integer> collection =
                 new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
 
           Integer[] moreInts = { 6, 7, 8, 9, 10 };
@@ -3687,7 +3687,7 @@ pg needs to fix
 
        public class AsListInference {
            ...
-               List<Snow> snow1 = 
+               List<Snow> snow1 =
                     Arrays.asList(new Crusty(), new Slush(), new Powder());
 
            // Won't Compile:
@@ -5630,7 +5630,7 @@ pg needs to fix
       exception specifications could both enhance developer productivity and
       enhance code quality, but experience with large software projects suggests
       a different result—decreased productivity and little or no increase in
-      code quality." 
+      code quality."
 
   In reference to uncaught exceptions, the CLU creators stated:
 
@@ -11987,7 +11987,7 @@ pg 557 Arrays
   Each of these has an associated subclass of InputStream. In addition, the
   FilterInputStream is also a type of InputStream, to provide a base class for
   "decorator" classes that attach attributes or useful interfaces to input
-  streams. 
+  streams.
 
   [pg 679 - must view table]
 
@@ -12184,7 +12184,7 @@ pg 557 Arrays
   The Java "new" I/O library, introduced in JDK 1.4 in the java.nio.* packages,
   has one goal: speed. In fact, the "old" I/O packages have been reimplemented
   using nio in order to take advantage of this speed increase, so you will
-  benefit even if you don’t explicitly write code with nio. 
+  benefit even if you don’t explicitly write code with nio.
 
   The speed comes from using structures that are closer to the operating
   system’s way of performing I/O: channels and buffers. You could think of it as
@@ -12520,7 +12520,7 @@ pg 557 Arrays
   "persistent" keyword and let the system take care of the details (perhaps this
   will happen in the future ).  Instead, you must explicitly serialize and
   deserialize the objects in your program. If you need a more serious
-  persistence mechanism, consider a tool like Hibernate 
+  persistence mechanism, consider a tool like Hibernate
 
   Object serialization was added to the language to support two major features.
   Java’s Remote Method Invocation (RMI) allows objects that live on other
