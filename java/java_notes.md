@@ -7,8 +7,9 @@
 - IMPORTANT NOTE ON FOR LOOP
 
 ```java
-for ( init-expression ; cond-expression ; loop-expression )
-    statement
+for (init-expression ; cond-expression ; loop-expression) {
+    statement;
+}
 ```
 First the init-expression is executed once.The the cond-expression is evaluated
 before it continues to the statement. At the end the loop-expression is
@@ -21,9 +22,14 @@ never less efficient.
 # Introduction to Objects
 `Booch: An object has state, behavior and identity.`
 
-State: Internal data
-Behavior: Methods
-Identity: Each object has a unique address in memory
+State
+: Internal data
+
+Behavior
+: Methods
+
+Identity
+: Each object has a unique address in memory
 
 When you make a particular request to an object, that method
 is called. This process is usually summarized by saying that
