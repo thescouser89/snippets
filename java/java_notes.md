@@ -302,721 +302,410 @@ lowercase crept into Fortran, not at its beginning.
 - `&` bitwise and
 - `^` bitwise xor
 - `~` NOT
+- `>>` signed right shift - uses sign extension
+- `>>>` unsigned right shift, which uses zero extension.
+- `<<` left shift
 
-  >> signed right shift - uses sign extension
-  << left shift
-  >>> unsigned right shift, which uses zero extension.
+If you shift a char, byte, or short, it will be promoted to int before the shift
+takes place, and the result will be an int.
 
+## Ternary if-else operator
 
-  If you shift a char, byte, or short, it will be promoted to int before the
-  shift takes place, and the result will be an int.
+The ternary operator, also called the conditional operator, is unusual because
+it has three operands.
 
-- Ternary if-else operator
+```java
+boolean-exp ? value0 : value1;
+```
+The conditional operator is different from if-else because it produces a value.
 
-  The ternary operator, also called the conditional operator, is unusual because
-  it has three operands.
+## Controlling Execution
 
-  boolean-exp ? value0 : value1;
+- if-else, while, do-while, for, return, break, switch.
+- do-while
 
-  The conditional operator is different from if-else because it produces a
-  value.
+The sole difference between while and do-while is that statement of the do-while
+always executes at least once, even if the expression evaluated to *false* the
+first time.
 
+- **for**
+```java
+for (initialization; Boolean expression; step) {
+    statement;
+}
+```
 
-  The + operator in Java can also be used to concatenate strings. [ operator
-  overloading, using the operator for something other than arithmetic ] [ allows
-  the programmer to add meanings to almost any operator ]
+- **for-each**
+For use with arrays and containers. This is often called the for each syntax,
+and it means that you don't have to create an int to count through a sequence of
+items - the for each produces each item for you, automatically.
 
+```java
+float[] f = new float[10];
+for (float x : f) {
+    System.out.println(x);
+}
+```
+Any method that returns an array is a candidate for use with foreach.
 
-  *** The use of the String operators has some interesting behaviour. If an
-  expression begins with a String, then all operands that follow must be
-  Strings. [ the compiler automatically turns a double-quoted sequence of
-  characters into a String ]
+**for-each** will also work with any object that is *Iterable*.
 
+- **return**
+The return keyword has two purposes: It specifies what value a method will
+return (if it doesn't have a void return value) and it causes the current method
+to exit, returning that value.
 
-* Controlling Execution
+- **break and continue**
+*break* quits the loop without executing the rest of the statements in the loop.
 
- - if-else, while, do-while, for, return, break, switch. NO goto but you can
-   still do a goto-like jump.
+*continue* stops the execution of the current iteration and goes back to the
+beginning of the loop to begin the next iteration.
 
- - do-while
+A second for of the infinite loop is for(;;). The compiler treats both
+while(true) and for(;;) in the same way.
 
-   The form for do-while is
+- **goto**
 
-   do {
-           statement
-   } while(Boolean-expression);
+A label is an identifier followed by a colon: `label1:`
 
-   The sole difference between while and do-while is that statement of the
-   do-while always executes at least once, even if the expression evaluated to
-   ***  false *** the first time.
+The only place a label is useful in Java is right before an iteration statement.
+And that means *right before* - it does no good to put any other statement
+between the label and the iteration.
 
-- for
+The sole reason to put a label before an iteration is if you're going to nest
+another iteration or a switch inside it.
 
-  for (initialization; Boolean expression; step) {
-          statement
+That's because the break and continue keywords will normally interrupt only the
+current loop, but when used with a label, they'll interrupt the loops up to
+where the label exists:
+
+```java
+label1:
+outer-iteration {
+  inner-iteration {
+      break; // 1
+      continue; // 2
+      continue label1; // 3
+      break label1; // 4
   }
-
-  for (int i = 1, j = i + 10; 1<5; i++, j = i * 2) {
-     ...
-  }
-
-- foreach
-
-  Java SE5 introduces a new and more succint for syntax, for use with arrays and
-  containers. This is often called the for each syntax, and it means that you
-  don't have to create an int to count through a sequence of items - the for
-  each produces each item for you, automatically.
-
-        float[] f = new float[10];
-        ...
-        for (float x : f) {
-                System.out.println(x);
-        }
-
-        Any method that returns an array is a candidate for use with foreach.
-
-        *** foreach will also work with any object that is Iterable.
-
-
-- return
-
-  The return keyword has two purposes: It specifies what value a method will
-  return (if it doesn't have a void return value) and it causes the current
-  method to exit, returning that value.
-
-
-- break and continue
-
-  *break* quits the loop without executing the rest of the statements in the
-  loop.
-
-  *continue* stops the execution of the current iteration and goes back to the
-  beginning of the loop to begin the next iteration.
-
-
-  *** A second for of the infinite loop is for(;;). The compiler treats both
-  while(true) and for(;;) in the same way.
-
-- goto
-
-  A goto is a jump at the source-code level, and that's what brought it into
-  direpute. If a program will always jump from one point to another, isn't there
-  some way to reorganize the code so the flow of control is not so jumpy?
-
-  The problem is not the use of got, but the overuse of goto. Although goto is a
-  reserved word in Java, it is not used in the language.
-
-
-  A label is an identifier followed by a colon:
-
-                label1:
-
-  *** The only place a label is useful in Java is right before an iteration
-  statement. And that means *right before* - it does no good to put any other
-  statement between the label and the iteration.
-
-  The sole reason to put a label before an iteration is if you're going to nest
-  another iteration or a switch inside it.
-
-  *** That's because the break and continue keywords will normally interrupt
-  only the current loop, but when used with a label, they'll interrupt the loops
-  up to where the label exists:
-
-      label1:
-      outer-iteration {
-          inner-iteration {
-
-              break; // 1
-
-              continue; // 2
-
-              continue label1; // 3
-
-              break label1; // 4
-          }
-      }
-
-    1: break the inner iteration and you end up in the outer iteration
-    2: continue moves back to the beginning of the inner iteration
-    3: continue label1 beraks out of the inner iteration and the outer
-       iteration, all the way back to label1. Then it does in fact continue
-       the iteration, but starting the outer iteration.
-
-    4: break label1 also breaks all the way out to label1, but it does not
-       reenter the iteration.  It actually does break out of both
-       iterations.
-
-
-    In the cases where breaking out of a loop will also exit the method, you
-    can simply use a return.
-
-
-
-    In Dijkstra's "Goto considered harmful" paper, what he specifically
-    objected to was the labels, not the goto. He observed that the number of
-    bugs seems to increase with the number of labels in a program, and that
-    labels and gotos make programs difficult to analyze.
-
-    Java labels don't suffer from this problem, since they are constrained
-    in their placement and can't be used to transfer control in an ad hoc
-    manner.
-
-- switch
-
-  The switch is sometimes called a selection statement. The switch statement
-  selects from among pieces of code based on the value of an integral expresion.
-
-  switch (integral-selector) {
-          case value1: statement; break;
-          case value2: statement; break;
-          default: statement;
-  }
-
-  Integral selector is an expression that produces an integral value. The switch
-  compares the result of integral-selector to each integral-value. If it finds a
-  mathc, the corresponding statemnt executes. If no match occurs, the default
-  statement executes.
-
-  If a break statement is missing, the code of the following case statements
-  executes until a break is encountered.
-
-
-  The switch statement is a clean way to implement multiway selection. [
-  floating point numbers don't work as selector, but strings do as of Java 7! ]
-
-  *** For non-integral types, you must use a series of if statements. The new
-  enum feature helps ease this restriction, as enums are designed to work nicely
-  with switch.
-
-          ...
-          case 'o':
-          case 'b':
-          case 'c': statemnt; break;
-
-  *** Notice that cases can be "stacked" on top of each other to provide
-  multiple matches for a particular piece of code. You should be aware
-  that it's essential to put the break statement at the end of a
-  particular case; otherwise, control will simply drop thorough and
-  continue processing on the next case.
-
-* Initialization and Cleanup
-
-  Note that the coding style of making the first letter of all methods lowercase
-  does not apply to constructors, since the name of the constructor must mach
-  the name of the classs exactly [ for constructor ]
-
-  *** A constructor that takes no arguments is called the default constructor.
-
-- Method overloading
-
-  In Java and C++, another factor forces the overloading of method names: the
-  constructor. Because the constructor's name is predetermined by the name of
-  the class, there can be only one constructor name. But what if you want to
-  create an object in more that one way?
-
-  Method overloading is essential to allow the same method name to be used with
-  different argument types. And although method overloading is a must for
-  constructors, it's a general convenience and can be used with any method.
-
-
-  - Distinguishing overloaded methods
-
-    *** If the methods have the same name, how can Java know which method you
-    mean? There's a simple rule: Each overloaded method must take a unique list
-    of argument types.  Even differences in the ordering of arguments are
-    sufficient to distinguish two methods, although you don't normally want to
-    take this approach because it produces difficult-to-maintain code.
-
-  - Overloading with primitives
-
-    *** A primitive can be automatically promoted from a smaller type to a
-    larger one, and this can be slightly confusing in combination with
-    overloading.
-
-                e.g too long! [pg 135]
-
-    You can see that the constant value 5 is treated as an int, so if an
-    overloaded method is available that takes an int, it is used. In all other
-    cases, if you have a data type that is smaller than the argument in the
-    method, that data type is promoted.
-
-    *** char produces a slightly different effect, since if it doesn't find an
-        exact char match, it is promoted to int.
-
-
-  - Overloading on return values
-
-    Why not distinguish between methods based on their return values?
-
-
-    void f() {}
-        int f() { return 1; }
-
-        This might work if we say int x = f();
-
-        However, you can also call a method and ignore the return value. This is
-        oftern referred to as calling a method for its side effect, since you
-        don't care about the return value, but instead want the other effects of
-        the method call.
-
-        f();
-
-        How can Java determine which f() should be called? And how could someone
-        reading the code see it?  Because of this sort of problem, you cannot
-        use return value typs to distinguish overloaded methods.
-
-
-- this
-
-        class Banana { void peel(int i) {} }
-
-        public class BananaPeel {
-            public static void main(String[] args) {
-                Banana a = new Banana();
-                Banana b = new Banana();
-
-                a.peel(1);
-                b.peel(2);
-            }
-        }
-
-  If there's only one method called peel(), how can that method know whether
-  it's being used for object a or b?
-
-
-  To allow you to write the code in a covenient object-oriented syntax in which
-  you "send a message to an object" the compiler does some undercover work for
-  you.
-
-  *** There's a secret first argument passed to the method peel(), and that
-  argument is the reference to the object that's being manipulated. So the two
-  method calls become something like:
-
-          Banana.peel(a, 1);
-          Banana.peel(b, 2);
-
-  This is internal and you can't write these expressions and get the compiler to
-  accept them, but it gives you an idea of what's happening.
-
-  *** Suppose you're inside a method and you'd like to get the reference to the
-  current object.  Since the reference is passed secretly by the compiler,
-  there's no identifier for it.
-
-          However for this purpose there's a keyword: this. The this keyword,
-          which can only be used inside a non-static method, produces the
-          reference to the object that the method has been called for.
-
-          You can treat the reference just like any other object reference.
-
-  *** Keep in mind that if you're calling a method of your class from within
-  another method of your class, you don't need to use this. You simply call the
-  method. The current this reference is automatically used for the other method.
-
-          public class Apricot {
-                  void pick() {}
-                  void pit() { pick(); }
-          }
-
-  Inside pit(), you could say this.pick() but there's no need to. [ People
-  expect * this * to be used only when it is necessary. Following a consistent
-  and straightforward coding style saves time and money ]
-
-
-
-          public class Leaf {
-                  int i = 0;
-                  Leaf increment() {
-                          i++;
-                          return this;
-                  }
-                  void print() {
-                          System.out.println("i = " + 1);
-                  }
-                  public static void main(String[] args) {
-                          Leaf x = new Leaf();
-                          x.increment().increment().increment().print();
-                  }
-          }
-
-  Because increment() return the reference to the current object via the *this*
-  keyword, multiple operations can easily be performed on the same object.
-
-  The *this* keyword is also useful for passing the current object to another
-  method.
-
-          class Apple {
-                  Apple getPeeled() {return Peeler.peel(this); }
-          }
-          class Peeler {
-                  static Apple peel(Apple apple) {
-                          return apple;
-                  }
-          }
-
-   To pass itself to the foreign method, it must use *this*.
-
-  - Calling constructors from constructors
-
-    When you write several constructors for a class, there are times when you'd
-    like to call one constructor from another to avoid duplicating code. You can
-    make such a call by using the this keyword.
-
-    In a constructor, the *this* keyword takes on a different meaning when you
-    give it an argument list.  It makes an explicit call to the constructor that
-    matches that argument list.
-
-    public class Flower {
-        Flower (int petals) {
-        }
-        Flower (String s, int petals) {
-            this(petals);
-        }
+}
+```
+
+In the cases where breaking out of a loop will also exit the method, you can
+simply use a return.
+
+In Dijkstra's "Goto considered harmful" paper, what he specifically objected to
+was the labels, not the goto. He observed that the number of bugs seems to
+increase with the number of labels in a program, and that labels and gotos make
+programs difficult to analyze.
+
+Java labels don't suffer from this problem, since they are constrained in their
+placement and can't be used to transfer control in an ad hoc manner.
+
+- **switch**
+```java
+switch (integral-selector) {
+    case value1: statement; break;
+    case value2: statement; break;
+    default: statement;
+}
+```
+If a break statement is missing, the code of the following case statements
+executes until a break is encountered.
+
+
+The switch statement is a clean way to implement multiway selection. (floating
+point numbers don't work as selector, but strings do as of Java 7!)
+
+For non-integral types, you must use a series of _if_ statements. The new _enum_
+feature helps ease this restriction, as enums are designed to work nicely with
+switch.
+
+```java
+case 'o':
+case 'b':
+case 'c': statement; break;
+```
+# Initialization and Cleanup
+
+Note that the coding style of making the first letter of all methods lowercase
+does not apply to constructors, since the name of the constructor must mach the
+name of the classs exactly (for constructor)
+
+A constructor that takes no arguments is called the **default** constructor.
+
+## Method overloading
+
+In Java and C++, another factor forces the overloading of method names: the
+constructor. Because the constructor's name is predetermined by the name of the
+class, there can be only one constructor name. But what if you want to create an
+object in more that one way?
+
+Method overloading is essential to allow the same method name to be used with
+different argument types. And although method overloading is a must for
+constructors, it's a general convenience and can be used with any method.
+
+### Distinguishing overloaded methods
+
+Each overloaded method must take a unique list of argument types.  Even
+differences in the ordering of arguments are sufficient to distinguish two
+methods, although you don't normally want to take this approach because it
+produces difficult-to-maintain code.
+
+#### Overloading with primitives
+
+A primitive can be automatically promoted from a smaller type to a larger one,
+and this can be slightly confusing in combination with overloading.
+
+_char_ produces a slightly different effect, since if it doesn't find an exact
+_char_ match, it is promoted to _int_.
+
+
+#### Overloading on return values
+```java
+void f() {}
+int f() { return 1; }
+```
+This might work if we say int x = f();
+
+However, you can also call a method and ignore the return value. This is often
+referred to as calling a method for its side effect, since you don't care about
+the return value, but instead want the other effects of the method call.
+
+```java
+f()
+```
+How can Java determine which f() should be called? And how could someone reading
+the code see it?  Because of this sort of problem, you cannot use return value
+typs to distinguish overloaded methods.
+
+### this
+```java
+class Banana { void peel(int i) {} }
+
+public class BananaPeel {
+    public static void main(String[] args) {
+        Banana a = new Banana();
+        Banana b = new Banana();
+
+        a.peel(1);
+        b.peel(2);
+    }
+}
+```
+If there's only one method called peel(), how can that method know whether it's
+being used for object a or b?
+
+To allow you to write the code in a covenient object-oriented syntax in which
+you "send a message to an object" the compiler does some undercover work for
+you.
+
+There's a secret first argument passed to the method peel(), and that argument
+is the reference to the object that's being manipulated. So the two method calls
+become something like:
+
+```java
+Banana.peel(a, 1);
+Banana.peel(b, 2);
+```
+This is internal and you can't write these expressions and get the compiler to
+accept them, but it gives you an idea of what's happening.
+
+Suppose you're inside a method and you'd like to get the reference to the
+current object.  Since the reference is passed secretly by the compiler, there's
+no identifier for it.
+
+However for this purpose there's a keyword: **this**. The *this* keyword, which
+can only be used inside a non-static method, produces the reference to the
+object that the method has been called for.
+
+Keep in mind that if you're calling a method of your class from within another
+method of your class, you don't need to use this. You simply call the method.
+The current this reference is automatically used for the other method.
+
+```java
+public class Apricot {
+    void pick() {}
+    void pit() { pick(); }
+}
+```
+People expect *this* to be used only when it is necessary. Following a
+consistent and straightforward coding style saves time and money.
+
+### Fluent API
+```java
+public class Leaf {
+    int i = 0;
+
+    Leaf increment() {
+        i++;
+        return this;
     }
 
+    public static void main(String[] args) {
+        Leaf x = new Leaf();
+        x.increment().increment().increment();
+    }
+}
+```
+Because increment() return the reference to the current object via the *this*
+keyword, multiple operations can easily be performed on the same object.
+
+The *this* keyword is also useful for passing the current object to another
+method.
+
+```java
+class Apple {
+    Apple getPeeled() {return Peeler.peel(this); }
+}
+class Peeler {
+    static Apple peel(Apple apple) {
+        return apple;
+    }
+}
+```
+
+### Calling constructors from constructors
+
+When you write several constructors for a class, there are times when you'd like
+to call one constructor from another to avoid duplicating code. You can make
+such a call by using the *this* keyword.
+
+In a constructor, the *this* keyword takes on a different meaning when you give
+it an argument list.  It makes an explicit call to the constructor that matches
+that argument list.
+
+```java
+public class Flower {
+    Flower (int petals) { }
+
+    Flower (String s, int petals) {
+        this(petals);
+    }
+}
+```
+
+Note that you cannot call two constructors with this. In addition, the
+constructor call must be the first thing you do, or you'll get a compiler error
+message.
+
+## Cleanup: finalization and garbage collection
+
+Suppose your object allocates "special" memory without using *new*, so it won't
+know how to release the object's "special" memory. To handle this case, Java
+provides a method called finalize() that you can define for your class.
+
+When the gc is ready to release the storage used for your object, it will first
+call finalize(), and only on the next garbage collection pass will it reclaim
+the object's memory.
+
+finalize() offers the ability to perform some important cleanup at the time of
+the garbage collection.
+
+It is limited to special cases in which your object can allocate storage in some
+way other than creating an object. It is because of the possibility that you'll
+do something by allocating memory using a mechanism other than the normal one in
+Java. This can happen through native methods, which is a way to call non-Java
+code from Java.
+
+Joshua Bloch argues that finalizers are unpredictable, dangerous, and generally
+unnecesary.
+
+### The termination condition
+
+In general, you can't rely on finalize() being called, and you must create
+separate "cleanup" methods and call them explicitly.  So it appears that
+finalize() is only useful for obscure memory cleanup that most programmers will
+never use.
+
+However, there is an interesting use of finalize() that does not rely on it
+being called everytime. This is the verification of the termination condition of
+an object.
+
+You can use to check that all open files are closed or not.
+
+Note that System.gc() is used to force finalization.
+
+You should generally assume that the base-class version of finalize() will also
+be doing something important, and call it using super, as you can see in
+Book.finalize() (super.finalize()).
+
+## Member Initialization
+
+Java goes out of its way to guarantee that variables are properly initialized
+before they are used. In the case of a method’s local variables, this guarantee
+comes in the form of a compile-time error.
+
+```java
+void f() {
+    int i;
+    i++; // error
+}
+```
+Each primitive field of a class is guaranteed to get an initial value (default:
+0).
 
-    Note that you cannot call two constructors with this. In addition, the
-    constructor call must be the first thing you do, or you'll get a compiler
-    error message.
-
-- The meaning of static
-
-  It means that there is no *this* for that particular method. You cannot call
-  non-static methods from inside static methods, and you can call a static
-  method for the class itself, without an object.
-
-  If you pass a reference to an object into the static method, then via the
-  reference, you can call non-static methods and access non-static fields.
-
-
-- Cleanup: finalization and garbage collection
-
-  Suppose your object allocates "special" memory without using *new*, so it
-  won't know how to release the object's "special" memory. To handle this case,
-  Java provides a method called finalize() that you can define for your class.
-
-  When the gc is ready to release the storage used for your object, it will
-  first call finalize(), and only on the next garbage collection pass will it
-  reclaim the object's memory.
-
-  finalize() offers the ability to perform some important cleanup at the time of
-  the garbage collection.
-
-  You might find that the storage for an object never gets released because your
-  program never nears the point of running out of storage. This is a good thing,
-  because gc has some overhead, and if you never do it, you never incur that
-  expense.
-
-  ** What is finalize() for?
-
-  The sole reason for the existence of the garbage collector is to recover
-  memory that your program is no longer using. It is limited to special cases in
-  which your object can allocate storage in some way other than creating an
-  object. It is because of the possibility that you'll do something by
-  allocating memory using a mechanism other than the normal one in Java. This
-  can happen through native methods, which is a way to call non-Java code from
-  Java.
-
-  Joshua Bloch argues that finalizers are unpredictable, dangerous, and
-  generally unnecesary.
-
-
-- The termination condition
-
-  In general, you can't rely on finalize() being called, and you must create
-  seperate "cleanup" methods and call them explicitly.  So it appears that
-  finalize() is only useful for obscure memory cleanup that most programmers
-  will never use.
-
-  However, there is an interesting use of finalize() that does not rely on it
-  being called everytime. This is the verification of the termination condition
-  of a n object.
-
-  For example, if the object represents an open file, that file should be closed
-  by the programmer before the object is garbage collected. If any portions of
-  the object are not properly cleaned up, then you have a bug in your program
-  that can be very difficult to find. finalize() cav be used to eventually
-  discover this condition, even if it isn't always called. If one of the
-  finalizations happens to reveal the bug, then you discover the problem, which
-  is all you really care about.
-
-      class Book {
-          boolean checkedOut = false;
-          Book (boolean checkOut) {
-              checkOut = checkOut;
-          }
-
-          void checkIn() {
-              checkOut = false;
-          }
-
-          protected void finalize() {
-              if (checkedOut)
-                  System.out.println("Error: checked out");
-              // you can also do this
-              // super.finalize();
-          }
-      }
-
-        public class TerminationCondition {
-            public static void main (String[] args) {
-                Book novel = new Book(true);
-                // proper cleanup
-                novel.checkIn();
-                // drop the reference, forget to clean up
-                new Book(true);
-                // force garbage collection
-                System.gc();
-            }
-        }
-        output is : Error: checked out
-
-    The termination condition is that all Book objects are supposed to be
-    checked in before they are garbage collected, but in main(), a programmer
-    error doesn't check in one of the books. Without finalize() to verify the
-    termination condition, this can be a dificult bug to find.
-
-    Note that System.gc() is used to force finalization. But even if it isn't,
-    it's highly probable that the errant Book will eventually be discovered
-    through repeated executions of the program.
-
-    You should generally assume that the base-class version of finalize() will
-    also be doing something important, and call it using super, as you can see
-    in Book.finalize().
-
-- How a garbage collector works
-
-  You can think of the C++ heap as a yard where each objects stakes out its own
-  piece of turf. This real estate can become abandoned sometime later and must
-  be reused.
-
-  In some JVMs, the Java heap is quite different; it's more like a conveyor belt
-  that moves forward every time you allocate a new object. This means that
-  object storage allocation is remarkably rapid. The "heap pointer" is simply
-  moved forward into virgin territory, so it's effectively the same as C++ stack
-  allocation.
-
-  You might observe that the heap isn't in fact a conveyor belt, and if you
-  treat it that way, you'll start paging memory  - moving it on and off disk, so
-  that you can appear to have more memory that you actually do.
-
-  Paging significantly impacts performance. Eventually, after you create enough
-  objects, you'll run out of memory.
-
-  The trick is that the garbage collector steps in, and while it collects the
-  garbage it compacts all the objects in the heap so that you've effectively
-  moved the "heap pointer" closer to the beginning of the conveyor belt and
-  farther away from a pagefault. The garbage collector rearranges things and
-  makes it possible for the high-speed, infinite-free-heap model to be used
-  while allocating storage.
-
-  A simple but slow garbage-collection technique is called reference counting.
-  This means that each object contains a reference counter, and every time a
-  reference is attached to that object, the reference count is increased.
-
-  Every time a reference goes out of scope or is set to null, the reference
-  count is decreased. Thus, managing reference counts is a  small but constant
-  overhead that happens throughout the lifetime of your program. The garbage
-  collector moves through the entire list of objects, and when it finds one with
-  a reference count of zero it releases that storage (however, reference
-  counting schemes often release an object as soon as the count goes to zero).
-
-  The one drawback is that if objects circularly refer to each other they can
-  have nonzero reference counts while still being garbage. Locating such
-  self-referential groups requires significant extra work for the garbage
-  collector. Reference counting is commonly used to explain one kind of garbage
-  collection, but it doesn't seem to be used in any JVM implementations.
-
-  In faster schemes, garbage collection is not based on reference counting.
-  Instead, it is based on the idea that any non-dead object must ultimately be
-  traceable back to a reference that lives either on the stack or in static
-  storage. The chain might go through several layers of objects. Thus, if you
-  start in the stack and in the static storage area and walk through all the
-  references, you'll find all the live objects. For each reference that you
-  find, you must trace into the object that it point to, etc, until you've moved
-  through the entire web that originated with the reference on the stack or in
-  static storage. Each object that you move through must still be alive. Note
-  that there is no problem with detached self-referential groups - these are
-  simply not found, and are there automatically garbage.
-
-  In the approach described here, the JVM uses an adaptive garbage-collection
-  scheme, and what it does with the live objects that it locates depends on the
-  variant currently being used.
-
-  One of these variants is stop-and-copy. This mean that the program is first
-  stopped. Then each live object is copied from one heap to another, leaving
-  behind all the garbage. In addition, as the objects are copied into the new
-  heap, they are packed end-to-end, thus compacting the new heap.
-
-  Of course, when an object is moved from one place to another, all references
-  that point at the object must be changed. The reference that goes from the
-  heap or the static storage area to the object can be changed right away, but
-  there can be other references pointing to this object that will be encountered
-  later during the "walk". These are fixed up as they are found.  [ you could
-  imagine a table that maps old addresses to new ones ]
-
-  There are 2 issues that make these so-called "copy collectors" inefficient.
-  THe first is the idea that you have 2 heaps and you slosh all the memory back
-  and forth between these two seperate heaps, maintaining twice as much memory
-  as you actually need. Some JVMs deal with this by allocating the heap in
-  chunks as needed and simply copying from one chunk to another.
-
-  The second issue is the copying process itself. Once your program becomes
-  stable, it might be generating little or no garbage. Despite that, a copy
-  collector will still copy all the memory from one place to another, which is
-  wasteful. To prevent this, some JVMs detect that no new garbage is being
-  generated and switch to a different scheme.
-
-  This other scheme is called mark-and-sweep, and it's what ealier versions of
-  Sun's JVM used all the time.
-
-  For general use, mark-and-sweep is fairly slow, but when you know you're
-  generating little or no garbage, it's fast.
-
-  Mark-and-sweep follows the same logic of starting from the stack and static
-  storage, and tracing through all the reference to find live objects. However,
-  each time it finds a live object, that object is marked by setting a flag in
-  it, but the object isn't collected yet.
-
-  Only when the marking process is finished does the sweep occur. During the
-  sweep, the dead objects are released. However, no copying happens, so if the
-  collector chooses to compact a fragmented heap, it does so by shuffling
-  objects around.
-
-  "Stop-and-copy" refers to the idea that this type of garbage collection is not
-  done in the background; instead, the program is stopped while the garbage
-  collection occurs. In Sun's litereature you'll find many references to garbage
-  collection as a low-priority background process, but it turns out that garbage
-  collection was not implemented that way in earlier version of the Sun JVM.
-  Instead, the Sun garbage collector stopped the program when memory got low.
-  Mark-and-sweep also requires that the program be stopped.
-
-  As previously mentioned, in the JVM described here memory is allocated in big
-  blocks. If you allocate a large object, it gets its own block. Strict
-  stop-and-copy requires copying every live object from the source heap to a new
-  heap before you can free the old one, which translates to lots of memory. With
-  blocks, the garbage collection can typically copy objects to dead blocks as it
-  collects.
-
-  Each block has a generation count to keep track of whether it’s alive. In the
-  normal case, only the blocks created since the last garbage collection are
-  compacted; all other blocks get their generation count bumped if they have
-  been referenced from somewhere. This handles the normal case of lots of
-  short-lived temporary objects.
-
-  Periodically, a full sweep is made — large objects are still not copied (they
-  just get their generation count bumped), and blocks containing small objects
-  are copied and compacted.
-
-  The JVM monitors the efficiency of garbage collection and if it becomes a
-  waste of time because all objects are long-lived, then it switches to
-  mark-and-sweep. Similarly, the JVM keeps track of how successful
-  mark-and-sweep is, and if the heap starts to become fragmented, it switches
-  back to stop-and-copy. This is where the “adaptive” part comes in, so you end
-  up with a mouthful: “Adaptive generational stop-and-copy mark-andsweep.”
-
-
-  There are a number of additional speedups possible in a JVM. An especially
-  important one involves the operation of the loader and what is called a
-  just-in-time (JIT) compiler. A JIT compiler partially or fully converts a
-  program into native machine code so that it doesn’t need to be interpreted by
-  the JVM and thus runs much faster.
-
-  When a class must be loaded (typically, the first time you want to create an
-  object of that class), the .class file is located, and the bytecodes for that
-  class are brought into memory. At this point, one approach is to simply JIT
-  compile all the code, but this has two drawbacks: It takes a little more time,
-  which, compounded throughout the life of the program, can add up; and it
-  increases the size of the executable (bytecodes are significantly more compact
-  than expanded JIT code), and this might cause paging, which definitely slows
-  down a program.
-
-
-  An alternative approach is lazy evaluation, which means that the code is not
-  JIT compiled until necessary.
-
-  Thus code that never gets executed might never be JIT compiled. The Java
-  HotSpot technologies in recent JDKs take a similar approach by increasingly
-  optimizing a piece of code each time it is executed, so the more the code is
-  executed, the faster it gets.
-
-- Member Initialization
-
-  Java goes out of its way to guarantee that variables are properly initialized
-  before they are used. In the case of a method’s local variables, this
-  guarantee comes in the form of a compile-time error.
-
-      void f() {
-        int i;
-        i++; // error
-      }
-
-  If a primitive is a field in a class, however, things are a bit different. As
-  you saw in the Everything Is an Object chapter, each primitive field of a
-  class is guaranteed to get an initial value.
-
-  When you define an object reference inside a class without initializing it to
-  a new object, that reference is given a special value of null.
-
-
-- Specifying initialization
-
-  What happens if you want to give a variable an initial value? One direct way
-  to do this is simply to assign the value at the point you define the variable
-  in the class. (Notice you cannot do this in C++, although C++ novices always
-  try.)
-
-      class Depth{}
-
-      public class Measurement {
-          Depth d = new Depth();
-      }
-
-
-  *** You can even call a method to provide an initialization value. This method
-  can have arguments of course, but those arguments cannot be other other class
-  members that haven't been initialized yet.
-
-      public class MethodInit {
-          int i = f();
-          int f() { return 11; }
-      }
-
-      public class MethodInit3 {
-          // int j = g(i); // Illegal forward reference
-          int i = f();
-
-          int f() { return 11; }
-          int g(int n) { return n*10; }
-      }
-
-  This approach to initialization is simple and straightforward. It has the
-  limitation that every object of type InitialValues will get these same
-  initialization values.
-
-- Constructor initialization
-
-  The constructor can be used to perform initialization, and this gives you
-  greater flexibility in your programming because you can call methods and
-  perform actions at run time to determine the initial values.
-
-      public class Counter {
-            int i; // value is 0 because of automatic initialization
-            Counter() { i = 7;}
-      }
-
-- Order of initialization
-
-  Within a class, the order of initialization is determined by the order that
-  the variables are defined within the class.
-
-  The instance variables are initialized before any methods can be called — even
-  the constructor.
-
-- static data initialization
-
-  There’s only a single piece of storage for a static, regardless of how many
-  objects are created.  You can’t apply the static keyword to local variables,
-  so it only applies to fields.
+When you define an object reference inside a class without initializing it to a
+new object, that reference is given a special value of null.
+
+
+### Specifying initialization
+
+What happens if you want to give a variable an initial value? One direct way to
+do this is simply to assign the value at the point you define the variable in
+the class. (Notice you cannot do this in C++, although C++ novices always try.)
+
+```java
+class Depth{}
+
+public class Measurement {
+    Depth d = new Depth();
+}
+```
+You can even call a method to provide an initialization value. This method can
+have arguments of course, but those arguments cannot be other other class
+members that haven't been initialized yet.
+
+```java
+public class MethodInit {
+    int i = f();
+    int f() { return 11; }
+}
+
+public class MethodInit3 {
+    // int j = g(i); // Illegal forward reference
+    int i = f();
+
+    int f() { return 11; }
+    int g(int n) { return n*10; }
+}
+```
+
+### Constructor initialization
+
+The constructor can be used to perform initialization, and this gives you
+greater flexibility in your programming because you can call methods and perform
+actions at run time to determine the initial values.
+
+```java
+public class Counter {
+    int i; // value is 0 because of automatic initialization
+    Counter() { i = 7;}
+}
+```
+### Order of initialization
+
+Within a class, the order of initialization is determined by the order that the
+variables are defined within the class.
+
+The instance variables are initialized before any methods can be called — even
+the constructor.
+
+## *static* data initialization
+
+There’s only a single piece of storage for a static, regardless of how many
+objects are created. You can’t apply the static keyword to local variables, so
+it only applies to fields.
 
   If a field is a static primitive and you don’t initialize it, it gets the
   standard initial value for its type. If it’s a reference to an object, the
