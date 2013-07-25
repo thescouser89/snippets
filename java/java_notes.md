@@ -707,585 +707,337 @@ There’s only a single piece of storage for a static, regardless of how many
 objects are created. You can’t apply the static keyword to local variables, so
 it only applies to fields.
 
-  If a field is a static primitive and you don’t initialize it, it gets the
-  standard initial value for its type. If it’s a reference to an object, the
-  default initialization value is null.
-
-  Static initialization occurs only if it's necessary. If you don't create an
-  object and never refer to static fields, the static fields will never be
-  created.
-
-  *** They are initialized only when the first object is created ( or the first
-  static access occurs).
-
-      After that, the static objects are not reinitialized.
-
-  The order of initialization is statics first, if they haven’t already been
-  initialized by a previous object creation, and then the non-static objects.
-
-
-  *** Even though it doesn’t explicitly use the static keyword, the constructor
-  is actually a static method.
-
-- Explicit static initialization
-
-  Java allows you to group other static initializations inside a special “static
-  clause” (sometimes called a static block) in a class.
-
-      public class Spon {
-          static int i;
-          static {
-              i = 47;
-          }
-      }
-
-  It appears to be a method, but it’s just the static keyword followed by a
-  block of code. This code, like other static initializations, is executed only
-  once: the first time you make an object of that class or the first time you
-  access a static member of that class
-
-
-- Non-static instance initialization
-
-  Java provides a similar syntax, called instance initialization, for
-  initializing non-static variables for each object.
-
-      public class Mugs {
-          Mug mug1;
-          Mug mug2;
-
-          {
-              mug1 = new Mug(1);
-              mug2 = new Mug(2);
-              print("mug1 & mug2 initialized");
-          }
-
-  *** This syntax is necessary to support the initialization of
-  anonymous inner classes, but it also allows you to guarantee that
-  certain operations occur regardless of which explicit constructor is
-  called.
-
-  Instance initialization clause is executed before the
-  constructor is executed.
-
-- Array initialization
-
-  An array is simply a sequence of either objects or primitives that are all the
-  same type and are packaged together under one identifier name. Arrays are
-  defined and used with the square- brackets indexing operator [ ].
-
-        int[] a1;
-
-  You can also put the square brackets after the identifier to produce exactly
-  the same meaning:
-
-        int a1[];
-
-  This conforms to expectations from C and C++ programmers.
-
-  The compiler doesn’t allow you to tell it how big the array is. This brings us
-  back to that issue of “references.” All that you have at this point is a
-  reference to an array (you’ve allocated enough storage for that reference),
-  and there’s been no space allocated for the array object itself.
-
-  To create storage for the array, you must write an initialization expression.
-  For arrays, initialization can appear anywhere in your code, but you can also
-  use a special kind of initialization expression that must occur at the point
-  where the array is created. This special initialization is a set of values
-  surrounded by curly braces. The storage allocation (the equivalent of using
-  new) is taken care of by the compiler in this case.
-
-        int[] a1 = { 1, 2, 3, 4, 5};
-
-  All arrays have an intrinsic member (whether they’re arrays of objects or
-  arrays of primitives) that you can query—but not change—to tell you how many
-  elements there are in the array.  This member is length.
-
-  Since arrays in Java, like C and C++, start counting from element zero, the
-  largest element you can index is length - 1. If you go out of bounds, C and
-  C++ quietly accept this and allow you to stomp all over your memory, which is
-  the source of many infamous bugs. However, Java protects you against such
-  problems by causing a runtime error (an exception) if you step out of bounds.
-  Of course, checking every array access costs time and code and there's no way
-  to turn it off.
-
-  What if you don’t know how many elements you’re going to need in your array
-  while you’re writing the program? You simply use new to create the elements in
-  the array.
-
-        int[] a;
-        a = new int[rand.nextInt(20)];
-
-  *** If you create a non-primitive array, you create an array of references.
-
-  It's also possible to initialize arrays of objects by using the curly
-  brace-enclosed list. There are two forms:
-
-        Integer[] a = {new Integer(1), new Integer(2), 3};
-
-        Integer[] b = new Integer[] { new Integer(1), new Integer(2), 3 };
-
-        System.out.println(Arrays.toString(a));
-
-
-  Although the first form is useful, it's more limited because it can only
-  be used at the point where the array is defined.
-
-  You can use the second and third forms anywhere, even inside a method call.
-
-- Variable argument lists
-
-  This can include unknown quantities of arguments as well as unknown types.
-
-      static void printArray ( Object... args) {
-          for (Object obj : args)
-              System.out.print(obj + " ");
-      }
-
-      public static void main(String[] args) {
-          printArray(43, 3.14F. 11.11);
-          printArray("one","two");
-          printArray((Object[])new Integer[]{1,2,3,4,5}); // 3
-      }
-
-  [You can achieve the same thing as varargs with an array, but the syntax is
-  less pretty]
-
-  With varargs, you no longer have to explicitly write out the array syntax—the
-  compiler will actually fill it in for you when you specify varargs. You’re
-  still getting an array, which is why print( ) is able to use foreach to
-  iterate through the array.
-
-
-  *** VERY Important
-  *** However, it’s more than just an automatic conversion from a list of
-  elements to an array.
-
-      Clearly, the compiler sees that this is already an array and performs no
-      conversion on it.  [Look at 3]
-
-      So if you have a group of items you can pass them in as a list, and if you
-      already have an array it will accept that as the variable argument list.
-
-      It's also possible to pass zero arguments to a vararg list. This is
-      helpful when you have optional trailist arguments.
-
-      It’s possible to use any type of argument in varargs, including a
-      primitive type.
-
-          static void g(int... args) {
-                ...
-          }
-
-      *** If there is no arguments for varargs, you will receive an array object
-      of length 0.
-
-      Varargs do work in harmony with autoboxing.
-
-      *** Varargs complicate the process of overloading.
-
-            static void f (Character... args) { ... }
-            static void f (Integer... args) {...}
-            static void f (Long... args) {...}
-
-            public static void main(String[] args) {
-                f('a', 'b', 'c');
-                f(1);
-                f(2,1);
-                f(0L);
-                // f(); // won't compile -- ambiguous
-            }
-
-        In each case, the compiler is using autoboxing to match the overloaded
-        method, and it calls the most specifically matching method.
-
-        But when you call f() without arguments, it has no way of knowing which
-        one to call.
-
-        *** You might try solving the problem by adding a non-vararg argument to
-        one of the methods. [ hence it will call the second method below when
-        argument list is empty]
-
-
-            public class A {
-                static void f (float i, Character... args) {...}
-                static void f (Character... args) {...}
-
-                public static void main(String[] args) {
-                    f(1, 'a'); // 1 could get confused as a Character ** similar
-                               // to C
-                    f('a', 'b');
-                }
-            }
-
-    The above code won't compile. However if you give both methods a non-vararg
-    argument, it works.
-
-                reference to f is ambiguous, both method
-                f(float,java.lang.Character...) in A and method
-                f(java.lang.Character...) in A match
-
-                static void f (float 1, Character... args) {...} static void f
-                (char c, Character... args) {...}
-
-    You should only use a variable argument list on one version of an overloaded
-    method. Or consider not doing it at all.
-
-- Enumerated types
-
-  // Spiceness.java
-  public enum Spiceness {
-          NOT, MILD, MEDIUM, HOT, FLAMING
-  }
-
-  This creates an enumerated type called Spiciness with five named values.
-  Because the instances of enumerated types are constants, they are in all
-  capital letters by convention (if there are multiple words in a name, they are
-  separated by underscores)
-
-      class SimpleEnumUse {
-          public static void main(String[] args) {
-              Spiciness howHot = Spiciness.MEDIUM;
-              System.out.println(howHot);
-          }
-      } /* Output MEDIUM */
-
-  The compiler automatically adds useful features when you create an enum. For
-  example, it creates a toString( ) so that you can easily display the name of
-  an enum instance, which is how the print statement above produced its output.
-
-  The compiler also creates an ordinal() method to indicate the declaration
-  order of a particular enum constant, and a static values() method that
-  produces an array of values of the enum constants in the order that they were
-  declared:
-
-      public class EnumOrder {
-          public static void main(String[] args) {
-              for(Spiciness s : Spiciness.values())
-                  System.out.println(s + ", ordinal " + s.ordinal());
-          }
-      }
-
-    /* Output:
-    NOT, ordinal 0
-    MILD, ordinal 1
-    MEDIUM, ordinal 2
-    HOT, ordinal 3
-    FLAMING, ordinal 4
-    */
-
-    SIDENOTE: So it seems like enum will just create a class with methods and
-    other stuff already defined/created for you.
-
-    *** Although enums appear to be a new data type, the keyword only produces
-    some compiler behavior while generating a class for the enum, so in many
-    ways you can treat an enum as if it were any other class. In fact, enums are
-    classes and have their own methods.
-
-    *** An especially nice feature is the way that enums can be used inside
-    switch statements:
-
-        public void describe (Spiceness degree) {
-            switch (degree) {
-                case NOT: print("Not hot at all");      break;
-                case MILD:
-                case MEDIUM: print("A little hot");     break;
-                default:        print("maybe too hot"); break;
-            }
+Static initialization occurs only if it's necessary. If you don't create an
+object and never refer to static fields, the static fields will never be
+created.
+
+After that, the static objects are not reinitialized.
+
+The order of initialization is statics first, if they haven’t already been
+initialized by a previous object creation, and then the non-static objects.
+
+Even though it doesn’t explicitly use the static keyword, the constructor is
+actually a static method.
+
+### Explicit static initialization
+Java allows you to group other static initializations inside a special _static
+clause_ (sometimes called a static block) in a class.
+
+```java
+public class Spon {
+    static int i;
+    static {
+        i = 47;
+    }
+}
+```
+
+### Non-static instance initialization
+Java provides a similar syntax, called instance initialization, for initializing
+non-static variables for each object.
+
+```java
+public class Mugs {
+    Mug mug1;
+    Mug mug2;
+
+    {
+        mug1 = new Mug(1);
+        mug2 = new Mug(2);
+        print("mug1 & mug2 initialized");
+    }
+}
+```
+This syntax is necessary to support the initialization of anonymous inner
+classes, but it also allows you to guarantee that certain operations occur
+regardless of which explicit constructor is called.
+
+Instance initialization clause is executed before the constructor is executed.
+
+## Array initialization
+An array is simply a sequence of either objects or primitives that are all the
+same type and are packaged together under one identifier name. Arrays are
+defined and used with the square-brackets indexing operator [ ].
+
+```java
+int[] a1;
+int[] a1 = { 1, 2, 3, 4, 5};
+```
+To know the length of an array, call the `length` member of an array.
+
+What if you don’t know how many elements you’re going to need in your array
+while you’re writing the program? You simply use new to create the elements in
+the array.
+
+```java
+int[] a;
+a = new int[rand.nextInt(20)];
+```
+Note: If you create a non-primitive array, you create an array of references.
+
+It's also possible to initialize arrays of objects by using the curly
+brace-enclosed list. There are two forms:
+
+```java
+Integer[] a = {new Integer(1), new Integer(2), 3};
+Integer[] b = new Integer[] { new Integer(1), new Integer(2), 3 };
+
+System.out.println(Arrays.toString(a));
+```
+Although the first form is useful, it's more limited because it can only be used
+at the point where the array is defined.
+
+You can use the second and third forms anywhere, even inside a method call.
+
+## Variable argument lists
+
+This can include unknown quantities of arguments as well as unknown types.
+
+```java
+static void printArray ( Object... args) {
+    for (Object obj : args)
+        System.out.print(obj + " ");
+}
+public static void main(String[] args) {
+    printArray(43, 3.14F. 11.11);
+    printArray("one","two");
+}
+```
+
+With varargs, you no longer have to explicitly write out the array syntax—the
+compiler will actually fill it in for you when you specify varargs. You’re still
+getting an array, which is why print( ) is able to use foreach to iterate
+through the array.
+
+
+So if you have a group of items you can pass them in as a list, and if you
+already have an array it will accept that as the variable argument list.
+
+It’s possible to use any type of argument in varargs, including a primitive
+type. If there is no arguments for varargs, you will receive an array object of
+length 0.
+
+```java
+static void g(int... args) {
+    ...
+}
+```
+
+## Enumerated types
+```java
+// Spiceness.java
+public enum Spiceness {
+    NOT, MILD, MEDIUM, HOT, FLAMING
+}
+```
+This creates an enumerated type called Spiciness with five named values.
+Because the instances of enumerated types are constants, they are in all capital
+letters by convention (if there are multiple words in a name, they are separated
+by underscores)
+
+```java
+class SimpleEnumUse {
+    public static void main(String[] args) {
+        Spiciness howHot = Spiciness.MEDIUM;
+        System.out.println(howHot);
+    }
+} /* Output MEDIUM */
+```
+The compiler automatically adds useful features when you create an enum. For
+example, it creates a toString( ) so that you can easily display the name of an
+enum instance, which is how the print statement above produced its output.
+
+The compiler also creates an ordinal() method to indicate the declaration order
+of a particular enum constant, and a static values() method that produces an
+array of values of the enum constants in the order that they were declared:
+
+```java
+public class EnumOrder {
+    public static void main(String[] args) {
+        for(Spiciness s : Spiciness.values()) {
+            System.out.println(s + ", ordinal " + s.ordinal());
         }
+    }
+}
+```
+```
+Output:
+NOT, ordinal 0
+MILD, ordinal 1
+MEDIUM, ordinal 2
+HOT, ordinal 3
+FLAMING, ordinal 4
+```
+SIDENOTE: So it seems like enum will just create a class with methods and other
+stuff already defined/created for you. Treat an enum as a class.
 
-    *** Since a switch is intended to select from a limited set of
-    possibilities, it’s an ideal match for an enum. Notice how the enum names
-    can produce a much clearer indication of what the program means to do.
+An especially nice feature is the way that enums can be used inside switch
+statements:
 
-* Access Control
+```java
+public void describe (Spiceness degree) {
+    switch (degree) {
+        case NOT: print("Not hot at all");  break;
+        case MILD:
+        case MEDIUM: print("A little hot"); break;
+        default: print("maybe too hot");    break;
+    }
+}
+```
 
-  *** A primary consideration in object- oriented design is to “separate the
-  things that change from the things that stay the same.”
+# Access Control
 
-- This is particularly important for libraries. Consumers of that library must
-  rely on the part they use, and know that they won’t need to rewrite code if a
-  new version of the library comes out. On the flip side, the library creator
-  must have the freedom to make modifications and improvements with the
-  certainty that the client code won’t be affected by those changes.
 
-- The library programmer must agree not to remove existing methods when
-  modifying a class in the library, since that would break the client
-  programmer’s code.
-
-- To solve this problem, Java provides access specifiers to allow the library
-  creator to say what is available to the client programmer and what is not. The
-  levels of access control from “most access” to “least access” are public,
-  protected, package access (which has no keyword), and private.
-
-- You’ll want to keep everything as “private” as possible, and expose only the
-  methods that you want the client programmer to use.
-
-* package
-
-- A package contains a group of classes, organized together under a single
+**package**
+: A package contains a group of classes, organized together under a single
   namespace.
 
-  For example, there’s a utility library that’s part of the standard Java
-  distribution, organized under the namespace java.util.
+To import everything from that namespace,
+```java
+import java.util.*;
+```
+
+When you create a source-code file for Java, it’s commonly called a compilation
+unit (sometimes a translation unit). Each compilation unit must have a name
+ending in .java, and inside the compilation unit there can be a public class
+that must have the same name as the file (including capitalization, but
+excluding the .java file name extension).
+
+There can be only one public class in each compilation unit; otherwise, the
+compiler will complain. If there are additional classes in that compilation
+unit, they are hidden from the world outside that package because they’re not
+public, and they comprise "support" classes for the main public class.
+
+When you compile a .java file, you get an output file for each class in the
+.java file. Each output file has the name of a class in the .java file, but with
+an extension of .class. Thus you can end up with quite a few .class files from a
+small number of .java files.
+
+If you use a package statement, it must appear as the first non-comment in the
+file. When you say:
+
+```java
+package access;
+```
+
+By convention, the first part of the package name is the reversed Internet
+domain name of the creator of the class. Since Internet domain names are
+guaranteed to be unique, if you follow this convention, your package name will
+be unique and you’ll never have a name clash.
+
+The second part of this trick is resolving the package name into a directory on
+your machine, so that when the Java program runs and it needs to load the .class
+file, it can locate the directory where the .class file resides.
+
+The Java interpreter proceeds as follows. First, it finds the environment
+variable CLASSPATH  (set via the operating system, and sometimes by the
+installation program that installs Java or a Java-based tool on your machine).
+
+CLASSPATH contains one or more directories that are used as roots in a search
+for .class files. Starting at that root, the interpreter will take the package
+name and replace each dot with a slash to generate a path name off of the
+CLASSPATH root (so package foo.bar.baz becomes foo\bar\baz or foo/bar/baz or
+possibly something else, depending on your operating system).
+
+This is then concatenated to the various entries in the CLASSPATH. That’s where
+it looks for the .class file with the name corresponding to the class you’re
+trying to create. (It also searches some standard directories relative to where
+the Java interpreter resides.)
+
+There’s a variation when using JAR files, however. You must put the actual name
+of the JAR file in the classpath, not just the path where it’s located.
+
+```bash
+e.g CLASSPATH=D:\JAVA\LIB;C:\flavors\grape.jar
+```
+When the compiler encounters the import statement for the simple library, it
+begins searching at the directories specified by CLASSPATH, looking for
+subdirectory net/mindview/simple, then seeking the compiled files of the
+appropriate names
+
+### Collision
+
+What happens if two libraries are imported via ‘*’ and they include the same
+names?
+
+```java
+import net.mindview.simple.*; // contains Vector
+import java.util.*; // contains Vector
+```
+ Which Vector class does this refer to? The compiler can’t know, and the reader
+ can’t know either. So the compiler complains and forces you to be explicit.
+
+ ## Static import
+```java
+package simple;
+public class Print {
+    public static void print() {
+        ...
+    }
+}
+
+// In another class
+
+import static simple.Print.*;
+public class Hello {
+    public static void main (String[] args) {
+        print(); // the one from simple.Print.print()
+    }
+}
+```
+
+## Package access
+
+public
+: it means that the member declaration that immediately
+  follows public is available to everyone
+
+default
+: Java treats files like this as implicitly part of the “default package” for
+  that directory, and thus they provide package access to all the other files in
+  that directory.
 
-  e.g ArrayList list = new java.util.ArrayList();
+private
+: The private keyword means that no one can access that member except the class
+  that contains that member, inside methods of that class.
 
-  - If you don't want to write java.util. everytime, just import it at the start
-    of the class.
+protected
+: The protected keyword deals with a concept called inheritance, which takes an
+  existing class
 
-      import java.util.ArrayList;
+Sometimes the creator of the base class would like to take a particular member
+and grant access to derived classes but not the world in general.  That’s what
+protected does. protected also gives package access—that is, other classes in
+the same package may access protected elements.
 
-  - To import everything from that namespace,
+There can be only one public class per compilation unit (file). The idea is that
+each compilation unit has a single public interface represented by that public
+class.
 
-      import java.util.*;
+It can have as many supporting package-access classes as you want.
 
-    When you create a source-code file for Java, it’s commonly called a
-    compilation unit (sometimes a translation unit). Each compilation unit must
-    have a name ending in .java, and inside the compilation unit there can be a
-    public class that must have the same name as the file (including
-    capitalization, but excluding the .java file name extension).
+The name of the public class must exactly match the name of the file containing
+the compilation unit, including capitalization. So for Widget, the name of the
+file must be Widget.java, not widget.java or WIDGET.java.  Again, you’ll get a
+compile-time error if they don’t agree.
 
-    There can be only one public class in each compilation unit; otherwise, the
-    compiler will complain. If there are additional classes in that compilation
-    unit, they are hidden from the world outside that package because they’re
-    not public, and they comprise “support” classes for the main public class.
+It is possible, though not typical, to have a compilation unit with no public
+class at all. In this case, you can name the file whatever you like (although
+naming it arbitrarily will be confusing to people reading and maintaining the
+code).
 
-    When you compile a .java file, you get an output file for each class in the
-    .java file. Each output file has the name of a class in the .java file, but
-    with an extension of .class. Thus you can end up with quite a few .class
-    files from a small number of .java files.
+IMPORTANT: Note that a class cannot be private (that would make it inaccessible
+to anyone but the class) or protected. So you have only two choices for class
+access: package access or public.
 
-    If you’ve programmed with a compiled language, you might be used to the
-    compiler spitting out an intermediate form (usually an “obj” file) that is
-    then packaged together with others of its kind using a linker (to create an
-    executable file) or a librarian (to create a library).
+Actually, an inner class can be private or protected, but that’s a special case.
 
-    That’s not how Java works. A working program is a bunch of .class files,
-    which can be packaged and compressed into a Java ARchive (JAR) file (using
-    Java’s jar archiver). The Java interpreter is responsible for finding,
-    loading, and interpreting these files.
+If you don’t want anyone else to have access to that class, you can make all the
+constructors private, thereby preventing anyone but you, inside a static member
+of the class, from creating an object of that class.
 
 
- *** If you use a package statement, it must appear as the first non-comment in
- the file. When you say:
-
-                        package access;
-
-    You’re saying that the public class name within this compilation unit is
-    under the umbrella of the name access, and anyone who wants to use that name
-    must either fully specify the name or use the import keyword in combination
-    with access, using the choices given previously. (Note that the convention
-    for Java package names is to use all lowercase letters, even for
-    intermediate words.)
-
-    You might observe that, since a package never really gets “packaged” into a
-    single file, a package can be made up of many .class files, and things could
-    get a bit cluttered. To prevent this, a logical thing to do is to place all
-    the .class files for a particular package into a single directory; that is,
-    use the hierarchical file structure of the operating system to your
-    advantage. This is one way that Java references the problem of clutter;
-    you’ll see the other way later when the jar utility is introduced.
-
-    By convention, the first part of the package name is the reversed Internet
-    domain name of the creator of the class. Since Internet domain names are
-    guaranteed to be unique, if you follow this convention, your package name
-    will be unique and you’ll never have a name clash.
-
-
-   The second part of this trick is resolving the package name into a directory
-   on your machine, so that when the Java program runs and it needs to load the
-   .class file, it can locate the directory where the .class file resides.
-
-   The Java interpreter proceeds as follows. First, it finds the environment
-   variable CLASSPATH  (set via the operating system, and sometimes by the
-   installation program that installs Java or a Java-based tool on your
-   machine).
-
-   CLASSPATH contains one or more directories that are used as roots in a search
-   for .class files. Starting at that root, the interpreter will take the
-   package name and replace each dot with a slash to generate a path name
-   off of the CLASSPATH root (so package foo.bar.baz becomes foo\bar\baz or
-   foo/bar/baz or possibly something else, depending on your operating
-   system).
-
-   This is then concatenated to the various entries in the CLASSPATH. That’s
-   where it looks for the .class file with the name corresponding to the class
-   you’re trying to create. (It also searches some standard directories relative
-   to where the Java interpreter resides.)
-
-   e.g net.mindview.simple;
-
-        net.mindview is the domain, "simple" is used to further subdivide it.
-
-            // net/mindview/simple/Vector.java
-            package net.mindview.simple;
-
-        public class Vector {
-            ...
-        }
-
-
-    If you walk back through this path, you can see the package name
-    net.mindview.simple, but what about the first portion of the path? That’s
-    taken care of by the CLASSPATH environment variable
-
-
-    *** There’s a variation when using JAR files, however. You must put the
-    actual name of the JAR file in the classpath, not just the path where it’s
-    located.
-
-        e.g CLASSPATH=D:\JAVA\LIB;C:\flavors\grape.jar
-
-
-    When the compiler encounters the import statement for the simple library, it
-    begins searching at the directories specified by CLASSPATH, looking for
-    subdirectory net/mindview/simple, then seeking the compiled files of the
-    appropriate names
-
-
- * Collision
-
-   What happens if two libraries are imported via ‘*’ and they include the same
-   names?
-
-           e.g import net.mindview.simple.*; // contains Vector
-                   import java.util.*; //contains Vector
-
-   Which Vector class does this refer to? The compiler can’t know, and the
-   reader can’t know either. So the compiler complains and forces you to be
-   explicit.
-
-        java.util.Vector v = new java.util.Vector();
-
-
- * Static import
-
-     package simple;
-     public class Print {
-         public static void print() {
-             ...
-         }
-     }
-
-   // In another class
-
-   import static simple.Print.*;
-   public class Hello {
-           public static void main (String[] args) {
-                   print(); // the one from simple.Print.print()
-           }
-   }
-
- * Package Caveat
-
-  It’s worth remembering that anytime you create a package, you implicitly
-  specify a directory structure when you give the package a name. The package
-  must live in the directory indicated by its name, which must be a directory
-  that is searchable starting from the CLASSPATH.
-
-  Experimenting with the package keyword can be a bit frustrating at first,
-  because unless you adhere to the package-name to directory-path rule, you’ll
-  get a lot of mysterious runtime messages about not being able to find a
-  particular class, even if that class is sitting there in the same directory.
-
-  If you get a message like this, try commenting out the package statement, and
-  if it runs, you’ll know where the problem lies.
-
-  Note that compiled code is often placed in a different directory than source
-  code, but the path to the compiled code must still be found by the JVM using
-  the CLASSPATH.
-
-* Package access
-
-- public:    it means that the member declaration that immediately
-             follows public is available to everyone
-
-- default:   Java treats files like this as implicitly part of the “default
-             package” for that directory, and thus they provide package access
-             to all the other files in that directory.
-
-- private:   The private keyword means that no one can access that member except
-             the class that contains that member, inside methods of that class.
-
-- protected: The protected keyword deals with a concept called inheritance,
-             which takes an existing class
-
-    Sometimes the creator of the base class would like to take a particular
-    member and grant access to derived classes but not the world in general.
-    That’s what protected does. protected also gives package access—that is,
-    other classes in the same package may access protected elements.
-
-
-  Access control is often referred to as implementation hiding. Wrapping data
-  and methods within classes in combination with implementation hiding is often
-  called encapsulation.
-
-  Access control puts boundaries within a data type for two important reasons.
-  The first is to establish what the client programmers can and can’t use. You
-  can build your internal mechanisms into the structure without worrying that
-  the client programmers will accidentally treat the internals as part of the
-  interface that they should be using.
-
-  This feeds directly into the second reason, which is to separate the interface
-  from the implementation. If the structure is used in a set of programs, but
-  client programmers can’t do anything but send messages to the public
-  interface, then you are free to change anything that’s not public (e.g.,
-  package access, protected, or private) without breaking client code.
-
-  In Java, the access specifiers can also be used to determine which classes
-  within a library will be available to the users of that library.
-
-  *** IMPORTANT
-
-    - There can be only one public class per compilation unit (file). The idea
-      is that each compilation unit has a single public interface represented by
-      that public class.
-
-          *** It can have as many supporting package-access classes as you want.
-          If you have more than one public class inside a compilation unit, the
-          compiler will give you an error message. [ so no private class, but
-          package-access class outside of the public class thing]
-
-    - The name of the public class must exactly match the name of the file
-      containing the compilation unit, including capitalization. So for Widget,
-      the name of the file must be Widget.java, not widget.java or WIDGET.java.
-      Again, you’ll get a compile-time error if they don’t agree.
-
-    - It is possible, though not typical, to have a compilation unit with no
-      public class at all. In this case, you can name the file whatever you like
-      (although naming it arbitrarily will be confusing to people reading and
-      maintaining the code).
-
-  *** ***
-
-  What if you’ve got a class inside access that you’re only using to accomplish
-  the tasks performed by Widget or some other public class in access? You don’t
-  want to go to the bother of creating documentation for the client programmer,
-  and you think that sometime later you might want to completely change things
-  and rip out your class altogether, substituting a different one.
-
-  To give you this flexibility, you need to ensure that no client programmers
-  become dependent on your particular implementation details hidden inside
-  access. To accomplish this, you just leave the public keyword off the class,
-  in which case it has package access. (That class can be used only within that
-  package.)
-
-  *** ***
-
-  IMPORTANT: Note that a class cannot be private (that would make it
-  inaccessible to anyone but the class) or protected. So you have only two
-  choices for class access: package access or public.
-
-  ONE THING YOU COULD USE!!!
-
-  *** If you don’t want anyone else to have access to that class, you can make
-  all the constructors private, thereby preventing anyone but you, inside a
-  static member of the class, from creating an object of that class.  ***
-
-  [Actually, an inner class can be private or protected, but that’s a special
-  case.]
-
+### HERE
 * Composition
 
   If you want the references initialized [fields], you can do it:
