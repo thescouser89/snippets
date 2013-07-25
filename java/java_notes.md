@@ -4,7 +4,17 @@
   runtime.
 - need to finish generics section
 
+- All numeric types in Java are signed.
+
 - IMPORTANT NOTE ON FOR LOOP
+
+There are two types of elements in your class:
+Fields
+: Data members - an object of any type that you can talk
+  to via its reference, or a primitive type.
+
+Methods
+: member functions
 
 ```java
 for (init-expression ; cond-expression ; loop-expression) {
@@ -22,6 +32,7 @@ never less efficient.
 When you make a particular request to an object, that method is called. This
 process is usually summarized by saying that you "send a message" to an object,
 and the object figures out what to do with that message.
+
 
 # Introduction to Objects
 `Booch: An object has state, behavior and identity.`
@@ -84,25 +95,20 @@ Stack
 
   Java objects themselves are not placed on the stack.
 
-- Heap      - General-purpose pool of memory where all Java objects live. Unlike
-              the stack, the compiler does not need to know how long that
-              storage must stay on the heap.  Of course, there's a price you pay
-              for this flexibility: It may take more time to allocate and clean
-              up heap storage than stack storage.
+Heap
+: General-purpose pool of memory where all Java objects live. Unlike the stack,
+  the compiler does not need to know how long that storage must stay on the
+  heap.  Of course, there's a price you pay for this flexibility: It may take
+  more time to allocate and clean up heap storage than stack storage.
 
-* All numeric types in Java are signed.
+## Other random notes
 
-* Java SE5 autoboxing
-  Character ch = new Character('x');
-  Character ch = 'x'; // autoboxing
+## Java SE5 autoboxing
+```java
+Character ch = new Character('x');
+Character ch = 'x'; // autoboxing
+```
 
-* High-precision numbers
-- BigInteger and BigDecimal.
-
-There are two types of elements in your class:
-- fields -- data members: an object of any type that you can talk
-                          to via its reference, or a primitive type.
-- methods -- member functions
 
 * Static keyword
 - If you want to have only a single piece of storage for a particular field,
