@@ -1,4 +1,4 @@
-NOTES:
+# Random Notes
 - [need to work on Closures callbacks and framework thingy]
 - Fields and static methods are resolved at runtime, whereas normal methods at
   runtime.
@@ -6,15 +6,17 @@ NOTES:
 
 - IMPORTANT NOTE ON FOR LOOP
 
-        for ( init-expression ; cond-expression ; loop-expression )
-                statement
-                First the init-expression is executed once.The the
-                cond-expression is evaluated before it continues to the
-                statement. At the end the loop-expression is executed.
+```java
+for ( init-expression ; cond-expression ; loop-expression )
+    statement
+```
+First the init-expression is executed once.The the cond-expression is evaluated
+before it continues to the statement. At the end the loop-expression is
+executed.
 
-        Makes no difference if you do i++ or ++i. The latter is preferable as it
-        is sometimes more efficient (eg looping with iterators that are not
-        pointers) and never less efficient.
+Makes no difference if you do i++ or ++i. The latter is preferable as it is
+sometimes more efficient (eg looping with iterators that are not pointers) and
+never less efficient.
 
 
 Booch: An object has state, behavior and identity.
