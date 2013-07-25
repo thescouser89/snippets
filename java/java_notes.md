@@ -19,9 +19,14 @@ Makes no difference if you do i++ or ++i. The latter is preferable as it is
 sometimes more efficient (eg looping with iterators that are not pointers) and
 never less efficient.
 
+When you make a particular request to an object, that method is called. This
+process is usually summarized by saying that you "send a message" to an object,
+and the object figures out what to do with that message.
+
 # Introduction to Objects
 `Booch: An object has state, behavior and identity.`
 
+## Terminology
 State
 : Internal data
 
@@ -31,56 +36,42 @@ Behavior
 Identity
 : Each object has a unique address in memory
 
-When you make a particular request to an object, that method
-is called. This process is usually summarized by saying that
-you "send a message" to an object, and the object figures out
-what to do with that message.
+Composition
+: referred to as a "has-a" relationship, as in A car has an engine.
 
-To send a message to the object, you state the name of the object
-and connect it to the message request with a period.
+Is-a relationship
+: Pure substitution (overriding methods only)
 
-* Composition is often referred to as a "has-a" relationship, as in
-  A car has an engine.
+Is-like-a
+: You add more methods to the super class. The new type has the interface of the
+  old type but is also conatins other methods, so you can't really say it's
+  exactly the same.
 
-* Is-a relationship - pure substitution (overriding methods only)
-* Is-like-a         - you add more methods to the super class
-- The new type has the interface of the old type but is also conatins
-  other methods, so you can't really say it's exactly the same.
-
-* Early Binding
-  The compiler generates a call to a specific function name, and the
+Early Binding
+: The compiler generates a call to a specific function name, and the
   runtime system revolves this call to the absolute address of the code to
   be executed.
 
-* Late Binding (Used in OOP)
-  When you send a message to an object, the code being called isn't determined
+Late Binding (Used in OOP)
+: When you send a message to an object, the code being called isn't determined
   until run time. The compiler does ensure that the method exists and performs
   type checking on the arguments and return value, but it doesn't know the exact
   code to execute.
 
-  TO perform late binding, Java uses a special bit of code in lieu of the
+  To perform late binding, Java uses a special bit of code in lieu of the
   absolute call. This code calculates the address of the method body, using
-  information stored in the object. Thus each object can behave differently
-  according to the contents of that special bit of code.  When you send a
-  message to an object, the object actually does figure out what to do with that
-  message.
+  information stored in the object.
 
- All objects in a singly rooted hierarchy have an interface in common, so they
- are all ultimately the same fundamental type.
-
-* Parameterized types
-- With a parameterized container, the compiler could customize that container so
+Parameterized types
+: With a parameterized container, the compiler could customize that container so
   that it would accept only Shapes and fetch only Shapes. (Called Generics)
 
-
-* Direct Memory Allocation
-- With languages that allow objects to be created on the stack, the
+Direct Memory Allocation
+: With languages that allow objects to be created on the stack, the
   compiler determines how long the object exists and can automatically destroy
   it. However, if you create it on the heap the compiler has no knowledge of its
   lifetime. In a language like C++, you must determine programmatically when to
-  destroy the object, which can lead to memory leaks if you don't do it
-  correctly. Java uses a garbage collector that automatically discovers when
-  an object is no longer in use and destroys it.
+  destroy the object.
 
 * Where storage lives
 - Registers - fastest storage
