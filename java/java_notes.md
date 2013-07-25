@@ -185,12 +185,7 @@ Standalone doc tags are commands that start with an '@' and are placed at the
 beginning of a comment line.  Inline doc tags can appear anywhere within a
 Javadoc comment and also start with an '@' but are surrounded by curly braces.
 
-```java
-{@link package.class#member}
-```
-
 ### Some example tags
-
 **@see**
 : This tag allows you to refer to the documentation of other classes.
 
@@ -202,46 +197,58 @@ Javadoc comment and also start with an '@' but are surrounded by curly braces.
 
 Each one adds a hyperlinked "See Also" entry to the generated documentation.
 
-
-    @link package.class#member label
-
-    Very similar to @see, except that it can be used inline and uses the label
-    as the hyperlink test rather that "See Also."
+**{@link package.class#member label}**
+: Very similar to **@see**, except that it can be used inline and uses the label
+  as the hyperlink test rather that "See Also."
 
 
-    @docRoot - Produces the relative path to the documentation root directory
+**@docRoot**
+: Produces the relative path to the documentation root directory
 
-    @inheritDoc - Inherits the documentation from the nearest base class of this
-                  class into the current doc comment.
+**@inheritDoc**
+: Inherits the documentation from the nearest base class of this class into the
+  current doc comment.
 
-    @version - This is of the form: @version version-information
+**@version**
+: This is of the form: `@version version-information`
 
-    @author - @author author-information  in which author-information could also
-              include your email address or any other appropriate information.
+**@author**
+: author-information  in which author-information could also include your email
+  address or any other appropriate information.
 
-              You can have multiple author tags for a list of authors, but they
-              must be placed consecutively. All the author information will be
-              lumped together into a single paragraph in the generated HTML.
+You can have multiple author tags for a list of authors, but they must be placed
+consecutively.
 
-    @since - This tag allows you to indicate the version of this code that began
-             using a particular feature.
+**@since**
+: This tag allows you to indicate the version of this code that began using a
+  particular feature.
 
-    @param - This is used for method documentation
-             @param parameter-name description
+**@param**
+: This is used for method documentation
 
-    @return - This is used for method documentation, and looks like this:
-              @return description
+```java
+@param parameter-name description
+```
 
-    @throws - Objects that can be "thrown" out of a method if that method fails.
-                      @throws fully-qualified-class-name description
+**@return**
+: This is used for method documentation, and looks like this:
 
-    @deprecated - This is used to indicate features that were superseded by an
-                  improved feature.  The tag is a suggestion that you no longer
-                  use this particular feature, since sometime in the future it
-                  is likely to be removed. A method that is marked @deprecated
-                  causes the compiler to issue a warning if it is used. In Java
-                  SE5, the @deprecated Javadoc tag has been superseded by the
-                  @Deprecated annotation.
+```java
+@return description
+```
+
+**@throws**
+: Objects that can be "thrown" out of a method if that method fails.
+
+```java
+@throws fully-qualified-class-name description
+```
+
+**@deprecated**
+: This is used to indicate features that were superseded by an improved feature.
+  A method that is marked @deprecated causes the compiler to issue a warning if
+  it is used. In Java SE5, the @deprecated Javadoc tag has been superseded by
+  the `@Deprecated` annotation.
 
 
     The Access Control chapter introduces the concept of the static import that
@@ -255,50 +262,46 @@ Each one adds a hyperlinked "See Also" entry to the generated documentation.
     with unary minus, although it does not not have any effect.
 
 
-- Auto Incrememnt and Decrement
+# Operators
 
-  For pre-increment and pre-decrement (++a, --a) the operation is performed and
-  the value is produced.
+## Auto Incrememnt and Decrement
 
-  For post-decrement, the value is produced, then the operation is performed.
+For pre-increment and pre-decrement (++a, --a) the operation is performed and
+the value is produced.
 
-- Beware of equals()
+For post-decrement, the value is produced, then the operation is performed.
 
-  The default behaviour of equals() is to compare references. So it literally
-  does a == comparison.
+## Beware of equals
 
-  Most of the Java library classes implement equals() so that it compares the
-  contents of objects instead of their references.
+The default behaviour of equals() is to compare references. So it literally does
+a == comparison.  Most of the Java library classes implement equals() so that it
+compares the contents of objects instead of their references.
 
-- Short-circuiting
+## Short-circuiting
 
-  When dealing with logical operators, you run into a phenomenon called
-  "short-circuiting". This means that the expression will be evaluated until the
-  truth of falsehood of the entire expression can be unambiguously determined.
-  As a result, the latter parts of a logical expression might not be evaluated.
+When dealing with logical operators, you run into a phenomenon called
+"short-circuiting". This means that the expression will be evaluated until the
+truth of falsehood of the entire expression can be unambiguously determined.  As
+a result, the latter parts of a logical expression might not be evaluated.
 
-- Literals
-  Hexadecimal 0x
-  Octal       0  (Leading 0)
+## Literals
+```
+Hexadecimal 0x
+Octal       0  (Leading 0)
+```
+## Exponential notation
+_e_ means 10 to the power.
 
-- Exponential notation - e means 10 to the power
+E was probably used because at that time, the keyboards were all uppercase.  The
+'E' simply stood for exponential [ not logarithm base 'e' ] which was for the
+base of the number system used - usually 10. [ Fortran] The problem arose as
+lowercase crept into Fortran, not at its beginning.
 
-  float f4 = 1e-43f;
-
-  The compiler normally takes exponential numbers as doubles, so without the
-  trailing f, it will give you an error telling you that you must use a cast to
-  convert double to float.
-
-  E was probably used because at that time, the keyboards were all uppercase.
-  The 'E' simply stood for exponential [ not logarithm base 'e' ] which was for
-  the base of the number system used - usually 10. [ Fortran] The problem arose
-  as lowercase crept into Fortran, not at its beginning.
-
-
-  | bitwise or
-  & bitwise and
-  ^ bitwise xor
-  ~ NOT
+## Shifts
+- `|` bitwise or
+- `&` bitwise and
+- `^` bitwise xor
+- `~` NOT
 
   >> signed right shift - uses sign extension
   << left shift
