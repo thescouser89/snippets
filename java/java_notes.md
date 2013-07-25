@@ -73,19 +73,16 @@ Direct Memory Allocation
   lifetime. In a language like C++, you must determine programmatically when to
   destroy the object.
 
-* Where storage lives
-- Registers - fastest storage
-- Stack     - lives in general random-access memory area, but
-              has direct support from the processor via its stack
-              pointer. The stack pointer is moved down to create
-              new memory and moved up to release that memory.
+## Where storage lives
+Registers
+: fastest storage
 
-              The Java system must know, while it is creating the program,
-              the exact lifetime of all the items that are stored on the
-              stack. This constraint places limits on the flexibility of your
-              programs, so while some Java storage exists on the stack - in
-              particular, object references - Java objects themselves are not
-              placed on the stack.
+Stack
+: lives in general random-access memory area, but has direct support from the
+  processor via its stack pointer. The stack pointer is moved down to create new
+  memory and moved up to release that memory.
+
+  Java objects themselves are not placed on the stack.
 
 - Heap      - General-purpose pool of memory where all Java objects live. Unlike
               the stack, the compiler does not need to know how long that
