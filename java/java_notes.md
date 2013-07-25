@@ -101,142 +101,106 @@ Heap
   heap.  Of course, there's a price you pay for this flexibility: It may take
   more time to allocate and clean up heap storage than stack storage.
 
-## Other random notes
-
 ## Java SE5 autoboxing
 ```java
 Character ch = new Character('x');
 Character ch = 'x'; // autoboxing
 ```
+## Static keyword
+If you want to have only a single piece of storage for a particular field,
+regardless of how many objects of that class are created, of even if no objects
+are created. Use it if you need a method that you can call even if no objects
+are created.
+
+Of course, since static methods don't need any objects to be created before they
+are used, they cannot directly access non-static members or methods by simply
+calling those other members without referring to a named object
+
+## First compilation
+At the beginning of each program file, you must place any necessary import
+statements to bring in extra classes you'll need for the code in that file.
+
+There's a certain library of classes that are automatically brought into every
+Java file: java.lang
+
+System.out is a static PrintStream object. Since it's static, you don't need to
+create anything with new. The out object is always there, and you can just use
+it.
+
+```java
+// Displays all of the properties from the system where you are running the
+// program, so it gives you environment information. The list() method sends
+// the results to its arguments, System.out.
+
+System.getProperties().list(System.out);
+
+// You can also ask for a specific property
+System.out.println(System.getProperty("user.name"));
+```
+
+## Comments and embedded documentation
+If the documentation and the code are seperate, it becomes tedious to change the
+documentation every time you change the code. The tool to extract the comments
+is called Javadoc.
+
+The output of Javadoc is an HTML file that you can view with your Web Browser.
+In addition, you can write your own Javadoc handlers, called doclets, if you
+want to perform special operations on the information procesed by Javadoc (to
+produce output in a different format, for example).
+
+### Syntax
+All of the Javadoc commands occur only within /** */ comments.
+
+There are two primary ways to use Javadoc: Embed HTML or use "doc tags"
+
+There are three "types" of comment documentation, which correspond to the
+element the comment precedes: class, field or method.
+
+```java
+/** A class comment */
+public class Documentation {}
+```
+
+Note that  Javadoc will process comment documentation for only public and
+protected members. Comments for private and package-access members are ignored,
+and you'll see no output.
 
 
-* Static keyword
-- If you want to have only a single piece of storage for a particular field,
-  regardless of how many objects of that class are created, of even if no
-  objects are created. Use it if you need a method that you can call even if no
-  objects are created.
+### Embedded HTML
+```java
+/**
+ * <pre>
+ * System.out.println(new Date());
+ * </pre>
+ * You can <em>even</em> insert a list:
+ * <ol>
+ * <li> Item one
+ * <li> Item two
+ * <li> Item thre
+ * </ol>
+ */
+```
+### Tags
+Standalone doc tags are commands that start with an '@' and are placed at the
+beginning of a comment line.  Inline doc tags can appear anywhere within a
+Javadoc comment and also start with an '@' but are surrounded by curly braces.
 
-  When you say something is static, it means that particular field of method is
-  not tied to any particular object instance of that class.
+```java
+{@link package.class#member}
+```
 
-  With ordinary, non-static fields and methods, you must create an object and
-  use that object to access the field or method, since non-static fields and
-  methods must know the particular object they are working with.
+### Some example tags
 
-  Some object-oriented languages use the terms class data and class methods,
-  meaning that the data and methods exist only for the class as a whole, and not
-  for any particular objects of the class.
+**@see**
+: This tag allows you to refer to the documentation of other classes.
 
-  Of course, since static methods don't need any objects to be created before
-  they are used, they cannot directly access non-static members or methods by
-  simply calling those other members without referring to a named object
+```java
+@see classname
+@see fully-qualified-classname
+@see fully-qualified-classname#method-name
+```
 
-  You can refer to a static method either through an object as you can with any
-  method.
-
-
-- At the beginning of each program file, you must place any necessary import
-  statements to bring in extra classes you'll need for the code in that file.
-
-  There's a certain library of classes that are automatically brought into every
-  Java file: java.lang
-
-  System.out is a static PrintStream object. Since it's static, you don't need
-  to create anything with new. The out object is always there, and you can just
-  use it.
-
-  // Displays all of the properties from the system where you are running the
-  // program, so it gives you environment information. The list() method sends
-  // the results to its arguments, System.out.
-
-  System.getProperties().list(System.out);
-
-  // You can also ask for a specific property
-  System.out.println(System.getProperty("user.name"));
-
-
-* Comments and embedded documentation
-
-- There are two types of comments in Java. First one is the tradional C-style
-  comment that was inherited by C++. /* */ [ can span across many lines ]
-
-- The second form of comment comes from C++. It is the single-line comment,
-  which starts with a // and continues until the end of the line.
-
-- Comment Documentation
-
-  If the documentation and the code are seperate, it becomes tedious to change
-  the documentation every time you change the code. The solution seems simple:
-  Link the code to the documentation. The easiest way to do this is to put
-  everything in the same file.
-
-  The tool to extract the comments is called Javadoc. It not only extracts the
-  information to look for special tags that you put in your programs, but it
-  also pulls out the class name or method name that adjoins the comment.
-
-  The output of Javadoc is an HTML file that you can view with your Web Browser.
-  In addition, you can write your own Javadoc handlers, called doclets, if you
-  want to perform special operations on the information procesed by Javadoc (to
-  produce output in a different format, for example).
-
-  - Syntax
-
-    All of the Javadoc commands occur only within /** comments.
-
-    There are two primary ways to use Javadoc: Embed HTML or use "doc tags"
-
-    Standalone doc tags are commands that start with an '@' and are placed
-    at the beginning of a comment line.  Inline doc tags can appear anywhere
-    within a Javadoc comment and also start with an '@' but are surrounded
-    by curly braces.
-
-
-    *** THere are three "types" of comment documentation, which correspond
-    to the element the comment precedes: class, field or method. That is, a
-    class comment appears right before the definition of a class, a field
-    comment appears right in front of the definition of a field, and a
-    method comment appears right in front of the definition of a method.
-
-               /** A class comment */
-               public class Documentation {
-
-    Note that  Javadoc will process comment documentation for only public
-    and protected members. Comments for private and package-access members
-    are ignored, and you'll see no output.
-
-
-  - Embedded HTML
-
-    Javadoc passes HTML commands through to the generated HTML document. This
-    allows you full use of HTML; however, the primary motive is to let you
-    format code, such as:
-
-    /**
-    * <pre>
-    * System.out.println(new Date());
-    * </pre>
-    * You can <em>even</em> insert a list:
-    * <ol>
-    * <li> Item one
-    * <li> Item two
-    * <li> Item thre
-    * </ol>
-    */
-
-    Don't use headings such as <h1> or <hr> as embedded HTML, because Javadoc
-    inserts its own headings and yours will interfere with them.
-
-    Some example tags
-
-    @see - This tag allows you to refer to the documentation of other classes.
-
-    @see classname
-    @see fully-qualified-classname
-    @see fully-qualified-classname#method-name
-
-    Each one adds a hyperlinked "See Also" entry to the generated documentation.
-    Javadoc will not check the hyperlinks you give it to make sure they are
-    valid.
+Each one adds a hyperlinked "See Also" entry to the generated documentation.
 
 
     @link package.class#member label
