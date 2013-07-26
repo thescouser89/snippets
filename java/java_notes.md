@@ -149,7 +149,7 @@ want to perform special operations on the information procesed by Javadoc (to
 produce output in a different format, for example).
 
 ### Syntax
-All of the Javadoc commands occur only within /** */ comments.
+All of the Javadoc commands occur only within `/** */` comments.
 
 There are two primary ways to use Javadoc: Embed HTML or use "doc tags"
 
@@ -251,34 +251,32 @@ consecutively.
   the `@Deprecated` annotation.
 
 
-    The Access Control chapter introduces the concept of the static import that
-    was added to Java SE5, and creates a tiny library to simplify writing print
-    statements. However, you don't need to know those details in order to begin
-    using that library.
+The Access Control chapter introduces the concept of the static import that was
+added to Java SE5, and creates a tiny library to simplify writing print
+statements. However, you don't need to know those details in order to begin
+using that library.
 
-        import static net.mindview.util.Print.*;
-
-    Unary minus inverts the sign on the data. Unary plus provides symmetry
-    with unary minus, although it does not not have any effect.
+```java
+import static net.mindview.util.Print.*;
+```
+Unary minus inverts the sign on the data. Unary plus provides symmetry with
+unary minus, although it does not not have any effect.
 
 
 # Operators
 
 ## Auto Incrememnt and Decrement
-
 For pre-increment and pre-decrement (++a, --a) the operation is performed and
 the value is produced.
 
 For post-decrement, the value is produced, then the operation is performed.
 
 ## Beware of equals
-
 The default behaviour of equals() is to compare references. So it literally does
 a == comparison.  Most of the Java library classes implement equals() so that it
 compares the contents of objects instead of their references.
 
 ## Short-circuiting
-
 When dealing with logical operators, you run into a phenomenon called
 "short-circuiting". This means that the expression will be evaluated until the
 truth of falsehood of the entire expression can be unambiguously determined.  As
@@ -310,7 +308,6 @@ If you shift a char, byte, or short, it will be promoted to int before the shift
 takes place, and the result will be an int.
 
 ## Ternary if-else operator
-
 The ternary operator, also called the conditional operator, is unusual because
 it has three operands.
 
@@ -320,7 +317,6 @@ boolean-exp ? value0 : value1;
 The conditional operator is different from if-else because it produces a value.
 
 ## Controlling Execution
-
 - if-else, while, do-while, for, return, break, switch.
 - do-while
 
@@ -427,7 +423,6 @@ case 'b':
 case 'c': statement; break;
 ```
 # Initialization and Cleanup
-
 Note that the coding style of making the first letter of all methods lowercase
 does not apply to constructors, since the name of the constructor must mach the
 name of the classs exactly (for constructor)
@@ -435,7 +430,6 @@ name of the classs exactly (for constructor)
 A constructor that takes no arguments is called the **default** constructor.
 
 ## Method overloading
-
 In Java and C++, another factor forces the overloading of method names: the
 constructor. Because the constructor's name is predetermined by the name of the
 class, there can be only one constructor name. But what if you want to create an
@@ -446,14 +440,12 @@ different argument types. And although method overloading is a must for
 constructors, it's a general convenience and can be used with any method.
 
 ### Distinguishing overloaded methods
-
 Each overloaded method must take a unique list of argument types.  Even
 differences in the ordering of arguments are sufficient to distinguish two
 methods, although you don't normally want to take this approach because it
 produces difficult-to-maintain code.
 
 #### Overloading with primitives
-
 A primitive can be automatically promoted from a smaller type to a larger one,
 and this can be slightly confusing in combination with overloading.
 
@@ -566,7 +558,6 @@ class Peeler {
 ```
 
 ### Calling constructors from constructors
-
 When you write several constructors for a class, there are times when you'd like
 to call one constructor from another to avoid duplicating code. You can make
 such a call by using the *this* keyword.
@@ -590,7 +581,6 @@ constructor call must be the first thing you do, or you'll get a compiler error
 message.
 
 ## Cleanup: finalization and garbage collection
-
 Suppose your object allocates "special" memory without using *new*, so it won't
 know how to release the object's "special" memory. To handle this case, Java
 provides a method called finalize() that you can define for your class.
@@ -612,7 +602,6 @@ Joshua Bloch argues that finalizers are unpredictable, dangerous, and generally
 unnecesary.
 
 ### The termination condition
-
 In general, you can't rely on finalize() being called, and you must create
 separate "cleanup" methods and call them explicitly.  So it appears that
 finalize() is only useful for obscure memory cleanup that most programmers will
@@ -631,7 +620,6 @@ be doing something important, and call it using super, as you can see in
 Book.finalize() (super.finalize()).
 
 ## Member Initialization
-
 Java goes out of its way to guarantee that variables are properly initialized
 before they are used. In the case of a method’s local variables, this guarantee
 comes in the form of a compile-time error.
@@ -650,7 +638,6 @@ new object, that reference is given a special value of null.
 
 
 ### Specifying initialization
-
 What happens if you want to give a variable an initial value? One direct way to
 do this is simply to assign the value at the point you define the variable in
 the class. (Notice you cannot do this in C++, although C++ novices always try.)
@@ -682,7 +669,6 @@ public class MethodInit3 {
 ```
 
 ### Constructor initialization
-
 The constructor can be used to perform initialization, and this gives you
 greater flexibility in your programming because you can call methods and perform
 actions at run time to determine the initial values.
@@ -694,15 +680,13 @@ public class Counter {
 }
 ```
 ### Order of initialization
-
 Within a class, the order of initialization is determined by the order that the
 variables are defined within the class.
 
 The instance variables are initialized before any methods can be called — even
 the constructor.
 
-## *static* data initialization
-
+## static data initialization
 There’s only a single piece of storage for a static, regardless of how many
 objects are created. You can’t apply the static keyword to local variables, so
 it only applies to fields.
@@ -790,7 +774,6 @@ at the point where the array is defined.
 You can use the second and third forms anywhere, even inside a method call.
 
 ## Variable argument lists
-
 This can include unknown quantities of arguments as well as unknown types.
 
 ```java
@@ -803,7 +786,6 @@ public static void main(String[] args) {
     printArray("one","two");
 }
 ```
-
 With varargs, you no longer have to explicitly write out the array syntax—the
 compiler will actually fill it in for you when you specify varargs. You’re still
 getting an array, which is why print( ) is able to use foreach to iterate
@@ -886,8 +868,6 @@ public void describe (Spiceness degree) {
 ```
 
 # Access Control
-
-
 **package**
 : A package contains a group of classes, organized together under a single
   namespace.
@@ -956,18 +936,17 @@ subdirectory net/mindview/simple, then seeking the compiled files of the
 appropriate names
 
 ### Collision
-
-What happens if two libraries are imported via ‘*’ and they include the same
+What happens if two libraries are imported via `*` and they include the same
 names?
 
 ```java
 import net.mindview.simple.*; // contains Vector
 import java.util.*; // contains Vector
 ```
- Which Vector class does this refer to? The compiler can’t know, and the reader
- can’t know either. So the compiler complains and forces you to be explicit.
+Which Vector class does this refer to? The compiler can’t know, and the reader
+can’t know either. So the compiler complains and forces you to be explicit.
 
- ## Static import
+## Static import
 ```java
 package simple;
 public class Print {
@@ -987,7 +966,6 @@ public class Hello {
 ```
 
 ## Package access
-
 public
 : it means that the member declaration that immediately
   follows public is available to everyone
@@ -1036,678 +1014,333 @@ If you don’t want anyone else to have access to that class, you can make all t
 constructors private, thereby preventing anyone but you, inside a static member
 of the class, from creating an object of that class.
 
-
-### HERE
-* Composition
-
-  If you want the references initialized [fields], you can do it:
-
-  - At the point the objects are defined. This means that they’ll always be
-    initialized before the constructor is called.
-
-        public class Haha {
-            private String s1 = "Happy";
-        }
-
-  - In the constructor for that class.
-  - Right before you actually need to use the object. This is often called lazy
-    initialization. It can reduce overhead in situations where object creation
-    is expensive and the object doesn’t need to be created every time.
-
-        public class Haha {
-            String s;
-
-            public Haha(){}
-            public String toString() {
-                // Delayed initialization
-                if (s == null) {
-                    s = "Joy";
-                    return s;
-                }
-            }
-        }
-
-  - Using instance initialization.
-
-          public class Haha {
-              private int i;
-              public Haha () {}
-              // instance initialization
-              {
-                  i = 42;
-              }
-          }
-
-* Inheritance
-
-  When you inherit, you say “This new class is like that old class.” You state
-  this in code before the opening brace of the class body, using the keyword
-  extends followed by the name of the base class. When you do this, you
-  automatically get all the fields and methods in the base class.
-
-  e.g concerns Cleanser.java and Detergent.java.
-
-  Second, both Cleanser and Detergent contain a main( ) method. You can create a
-  main( ) for each one of your classes; this technique of putting a main() in
-  each class allows easy testing for each class. And you don’t need to remove
-  the main() when you’re finished; you can leave it in for later testing.
-
-  - Initializing the base class
-
-    Since there are now two classes involved—the base class and the derived
-    class—instead of just one, it can be a bit confusing to try to imagine the
-    resulting object produced by a derived class. From the outside, it looks
-    like the new class has the same interface as the base class and maybe some
-    additional methods and fields. But inheritance doesn’t just copy the
-    interface of the base class. When you create an object of the derived class,
-    it contains within it a subobject of the base class. This subobject is the
-    same as if you had created an object of the base class by itself. It’s just
-    that from the outside, the subobject of the base class is wrapped within the
-    derived-class object.
-
-    Of course, it’s essential that the base-class subobject be initialized
-    correctly, and there’s only one way to guarantee this: Perform the
-    initialization in the constructor by calling the base- class constructor,
-    which has all the appropriate knowledge and privileges to perform the
-    base-class initialization. Java automatically inserts calls to the
-    base-class constructor in the derived-class constructor.
-
-    You can see that the construction happens from the base “outward,” so the
-    base class is initialized before the derived-class constructors can access
-    it.
-
-
-    *** If you want to explicitly call the base-class constructor, use the
-    *super* keyword.
-
-        class Haha extends Hihi {
-            Haha (int i) {
-                super(i);
-            }
-        }
-
-    *** Personal: There is a caveat with base constructors with arguments only.
-        Usually, the derived constructor will automatically call the
-        base constructor who does not have any arguments. However, if
-        you want to call the base constructor with arguments, or if there
-        is no base constructor with no arguments, you have to call super();
-
-    *** The call to the base-class constructor must be the first thing
-        you do in the derived-class constructor.
-
-
-* Delegation
-
-  Midway between inheritance and composition, because you place a member object
-  in the class you’re building (like composition), but at the same time you
-  expose all the methods from the member object in your new class (like
-  inheritance)
-
-  e.g
-
-  public class SpaceShipControls {
-          void up(int velocity) {}
-          void down (int velocity){}
-  }
-
-  public class SpaceShip extends SpaceShipControls {
-
-        public SpaceShip (String name) {}
-        public String toString() {return yeehee;}
-        public static void main(String[] args) {
-                Spaceship protector = new SpaceShip("NSEA Protector");
-                protector.forward(100);
-        }
-  }
-
-  However, a SpaceShip isn’t really “a type of” SpaceShipControls, even if, for
-  example, you “tell” a SpaceShip to go forward( ). It’s more accurate to say
-  that a SpaceShip contains SpaceShipControls, and at the same time all the
-  methods in SpaceShipControls are exposed in a SpaceShip. Delegation solves the
-  dilemma
-
-
-      public class SpaceShipDelegation {
-          private String name;
-          private SpaceShipControls controls = new SpaceShipControls();
-
-          public void up(int velocity) {
-              controls.up(velocity);
-          }
-
-          public void down(int velocity) {
-              controls.down(velocity);
-              controls.down(velocity);
-          }
-          public SpaceShipDelegation(String name) {}
-
-          public static void main(String[] args) {
-              SpaceShipDelegation protector = new SpaceShipDelegation("NSEA Protector");
-          }
-      }
-
-
-  You can see how the methods are forwarded to the underlying controls object,
-  and the interface is thus the same as it is with inheritance. However, you
-  have more control with delegation because you can choose to provide only a
-  subset of the methods in the member object.
-
-- Name Hiding
-
-  If a Java base class has a method name that’s overloaded several times,
-  redefining that method name in the derived class will not hide any of the
-  base-class versions (unlike C++).  Thus overloading works regardless of
-  whether the method was defined at this level or in a base class
-
-
-  *** Java SE5 has added the @Override annotation, which is not a keyword but
-  can be used as if it were. When you mean to override a method, you can choose
-  to add this annotation and the compiler will produce an error message if you
-  accidentally overload instead of overriding.
-
-  The @Override annotation will thus prevent you from accidentally
-  overloading when you don’t mean to.
-
-* Composition v/s Inheritance
-- If you need to use upcast, then you use inheritance
-- Otherwise use Composition
-
-*
-*  The is-a relationship is expressed with
-*  inheritance, and the has-a relationship is expressed with composition.
-*
-
-- Upcasting
-
-  The most important aspect of inheritance is not that it provides methods for
-  the new class.  It’s the relationship expressed between the new class and the
-  base class. This relationship can be summarized by saying, “The new class is a
-  type of the existing class.”
-
-
-* final keyword
-
-  Applies to data, methods and classes.
-
-
-  - final data
-
-    To tell the compiler that a piece of data is "constant".
-
-    A constant is useful for two reasons:
-
-    - It can be a compile-time constant that won't ever change
-    - It can be a value initialized at run time that you don't want changed.
-
-    In the case of a compile-time constant, the compiler is allowed to "fold"
-    the constant value into any calculations in whith it's used; that is, the
-    calculation can be performed at compile tme, eliminating some run-time
-    overhead.
-
-    In Java, these sorts of constants must be primitives and are expressed with
-    the final keyword.
-
-    A field that is both static and final has only one piece of storage that
-    cannot be changed.
-
-    When final is used with object references rather than primitives, the
-    meaning can be confusing. With a primitive, final makes the value a
-    constant, but with an object reference, final makes the reference a
-    constant. Once the reference is initialized to an object, it can never be
-    changed to point to another object. However, the object itself can be
-    modified; Java does not provide a way to make any arbitrary object a
-    constant.
-
-
-    *** Just because something is final doesn’t mean that its value is known at
-    compile time.  e.g final int x = getRandomNumber();
-
-  - Blank finals
-
-      Java allows the creation of blank finals, which are fields that are
-      declared as final but are not given an initialization value. In all cases,
-      the blank final must be initialized before it is used, and the compiler
-      ensures this. However, blank finals provide much more flexibility in the
-      use of the final keyword since, for example, a final field inside a class
-      can now be different for each object, and yet it retains its immutable
-      quality.
-
-          eg public class Haha {
-              private final j; // Blank final
-
-              public Haha() {
-                  j = 1;
-              }
-          }
-
-
-  - final arguments
-
-    Java allows you to make arguments final by declaring them as such in the
-    argument list.  This means that inside the method you cannot change what the
-    argument reference points to. This feature is primarily used to pass data to
-    anonymous inner classes.
-
-  - final methods
-
-    There are two reasons for final methods. The first is to put a “lock” on the
-    method to prevent any inheriting class from changing its meaning. This is
-    done for design reasons when you want to make sure that a method’s behavior
-    is retained during inheritance and cannot be overridden.
-
-
-    The second reason for final methods is efficiency. In earlier
-    implementations of Java, if you made a method final, you allowed the
-    compiler to turn any calls to that method into inline calls. When the
-    compiler saw a final method call, it could (at its discretion) skip the
-    normal approach of inserting code to perform the method call mechanism (push
-    arguments on the stack, hop over to the method code and execute it, hop back
-    and clean off the stack arguments, and deal with the return value) and
-    instead replace the method call with a copy of the actual code in the method
-    body. This eliminated the overhead of the method call. Of course, if a
-    method is big, then your code begins to bloat, and you probably wouldn’t see
-    any performance gains from inlining, since any improvements will be dwarfed
-    by the amount of time spent inside the method.
-
-    In more recent version of Java, the virtual machine (in particular, the
-    hotspot technologies) can detect these situations and optimize away the
-    extra indirection, so its no longer necessary-in fact, it is now generally
-    discouraged-to use final to try to help the optimizer.
-
-
-   - final and private
-
-     Any private methods in a class are implicitly final. Because you can’t
-     access a private method, you can’t override it. You can add the final
-     specifier to a private method, but it doesn’t give that method any extra
-     meaning.
-
-     This issue can cause confusion, because if you try to override a private
-     method (which is implicitly final), it seems to work, and the compiler
-     doesn’t give an error message
-
-* Polymorphism
-
-  Polymorphism is the third essential feature of an object-oriented
-  programming language, after data abstraction and inheritance.
-
-  It provides another dimension of separation of interface from implementation,
-  to decouple what from how. Polymorphism allows improved code organization and
-  readability as well as the creation of extensible programs that can be “grown”
-  not only during the original creation of the project, but also when new
-  features are desired.
-
-  Wouldn’t it be much nicer if you could just write a single method that takes
-  the base class as its argument, and not any of the specific derived classes?
-  That is, wouldn’t it be nice if you could forget that there are derived
-  classes, and write your code to talk only to the base class?
-
-  That’s exactly what polymorphism allows you to do. However, most programmers
-  who come from a procedural programming background have a bit of trouble with
-  the way polymorphism works.
-
-
-  e.g
-      class Instrument {
-          play(Note note) {}
-      }
-      public class Wind extends Instrument {
-          ...
-              @Override
-              play(Note note){}
-      }
-
-  inside Music.java ...
-
-      public static void tune (Instrument i) {
-          i.play(Note.MIDDLE_C);
-      }
-
-  It receives an Instrument reference. So how can the compiler possibly know
-  that this Instrument reference points to a Wind in this case and not a Brass
-  or Stringed? The compiler can’t. To get a deeper understanding of the issue,
-  it’s helpful to examine the subject of binding.
-
-  - Method-call binding
-
-    *** Connecting a method call to a method body is called binding.
-
-    When binding is performed before the program is run (by the compiler and
-    linker, if there is one), it’s called early binding. You might not have
-    heard the term before because it has never been an option with procedural
-    languages. C compilers have only one kind of method call, and that’s early
-    binding.
-
-    The confusing part of the preceding program revolves around early binding,
-    because the compiler cannot know the correct method to call when it has only
-    an Instrument reference.
-
-    The solution is called late binding, which means that the binding occurs at
-    run time, based on the type of object. Late binding is also called dynamic
-    binding or runtime binding. When a language implements late binding, there
-    must be some mechanism to determine the type of the object at run time and
-    to call the appropriate method. That is, the compiler still doesn’t know the
-    object type, but the method-call mechanism finds out and calls the correct
-    method body. The late-binding mechanism varies from language to language,
-    but you can imagine that some sort of type information must be installed in
-    the objects.
-
-    *** ***
-
-    All method binding in Java uses late binding unless the method is static or
-    final (private methods are implicitly final). This means that ordinarily you
-    don’t need to make any decisions about whether late binding will occur—it
-    happens automatically.
-
-    *** ***
-
-    Once you know that all method binding in Java happens polymorphically via
-    late binding, you can write your code to talk to the base class and know
-    that all the derived-class cases will work correctly using the same code. Or
-    to put it another way, you “send a message to an object and let the object
-    figure out the right thing to do.”
-
-  - Pitfall: Overriding private methods
-
-    A private method is automatically final, and is also hidden from the derived
-    class. So Derived’s f( ) in this case is a brand new method; it’s not even
-    overloaded, since the base-class version of f( ) isn’t visible in Derived.
-
-  - Pitfall: fields and static methods
-
-    If you access a field directly, that access will be resolved at compile
-    time, as the following example demonstrates.
-
-
-        class Super {
-            public int field = 0;
-            public int getField() { return field;}
-        }
-      class Sub extends Super {
-          public int field = 1;
-          public int getField() {return field;}
-          public int getSuperField() {return super.field;}
-
-      }
-
-      public class FieldAccess {
-
-          public static void main(String[] args) {
-              Super sup = new Sub();
-              printf(sup.field); // Answer is 0
-              printf(sup.getField()); // Answer is 1
-
-              Sub sub = new Sub();
-
-              printf(sub.field); // Answer is 1
-              printf(sub.getField()); // Answer is 1
-              printf(sub.getSuperField()); // Answer is 0
-
-          }
-      }
-
-
-    *** For one thing, you’ll generally make all fields private and so you won’t
-    access them directly
-
-
-    - If a method is static, it doesn’t behave polymorphically
-
-        class StaticSuper {
-            public static String staticGet() { return "BaseStaticGet"; }
-            public String dynamicGet() { return "BaseDynamicGet"; }
-        }
-        class StaticSub extends StaticSuper {
-            public static String staticGet() { return "DerivedStaticGet"; }
-            public String dynamicGet() { return "DerivedDynamicGet"; }
-        }
-        public class Haha {
-            public static void main (String[] args) {
-                StaticSuper sup = new StaticSub();
-                printf(sup.staticGet()); // BaseStaticGet
-                printf(sup.dynamicGet()); // DerivedDynamicGet
-
-                StaticSub sub = new StaticSub();
-
-                printf(sub.staticGet()); // DerivedStaticGet
-                printf(sub.dynamicGet()); // DerivedDynamicGet
-            }
-        }
-
-
-   *** static methods are associated with the class, and not the individual
-   objects.
-
-
-- Constructors and polymorphism
-
-  Even though constructors are not polymorphic (they’re actually static methods,
-  but the static declaration is implicit), it’s important to understand the way
-  constructors work in complex hierarchies and with polymorphism.
-
-  A constructor for the base class is always called during the construction
-  process for a derived class, chaining up the inheritance hierarchy so that a
-  constructor for every base class is called. This makes sense because the
-  constructor has a special job: to see that the object is built properly. A
-  derived class has access to its own members only, and not to those of the base
-  class (whose members are typically private).
-
-
-  Only the base-class constructor has the proper knowledge and access to
-  initialize its own elements. Therefore, it’s essential that all constructors
-  get called; otherwise the entire object wouldn’t be constructed. That’s why
-  the compiler enforces a constructor call for every portion of a derived class.
-  It will silently call the default constructor if you don’t explicitly call a
-  base-class constructor in the derived-class constructor body. If there is no
-  default constructor, the compiler will complain.
-
-  The order of the constructor calls is important. When you inherit, you know
-  all about the base class and can access any public and protected members of
-  the base class. This means that you must be able to assume that all the
-  members of the base class are valid when you’re in the derived class.
-
- - Inheritance and cleanup
-
-   When using composition and inheritance to create a new class, most of the
-   time you won’t have to worry about cleaning up; subobjects can usually be
-   left to the garbage collector. If you do have cleanup issues, you must be
-   diligent and create a dispose( ) method (the name I have chosen to use here;
-   you may come up with something better) for your new class. And with
-   inheritance, you must override dispose( ) in the derived class if you have
-   any special cleanup that must happen as part of garbage collection. When you
-   override dispose( ) in an inherited class, it’s important to remember to call
-   the base-class version of dispose( ), since otherwise the base-class cleanup
-   will not happen.
-
- - Behaviour of polymorphic methods inside constructors [ very important!!! ]
-
-   The hierarchy of constructor calls brings up an interesting dilemma. What
-   happens if you’re inside a constructor and you call a dynamically-bound
-   method of the object being constructed?
-
-   Inside an ordinary method, the dynamically-bound call is resolved at run
-   time, because the object cannot know whether it belongs to the class that the
-   method is in or some class derived from it.
-
-   If you call a dynamically-bound method inside a constructor, the overridden
-   definition for that method is used. However, the effect of this call can be
-   rather unexpected because the overridden method will be called before the
-   object is fully constructed. This can conceal some difficult-to-find bugs.
-
-   So what happens when you call the derived method instead of the base one even
-   though the derived class is not properly initialized first? Read below:
-
-
-   Actual process of initialization:
-
-   - The storage allocated for the object is initialized to binary zero before
-     anything else happens.  [ so that means that the derived class has fields
-     initialized to 0/null at least ]
-   - The base-class constructors are called as described previously. At this
-     point, the overridden method is called.
-   - Member initializers are called in the order of declaration.
-   - The body of the derived-class constructor is called.
-
-
-   There’s an upside to this, which is that everything is at least initialized
-   to zero (or whatever zero means for that particular data type) and not just
-   left as garbage. This includes object references that are embedded inside a
-   class via composition, which become null. So if you forget to initialize that
-   reference, you’ll get an exception at run time.
-
-   On the other hand, you should be pretty horrified at the outcome of this
-   program. You’ve done a perfectly logical thing, and yet the behavior is
-   mysteriously wrong, with no complaints from the compiler.
-
-   *** ***
-   As a result, a good guideline for constructors is, “Do as little as possible
-   to set the object into a good state, and if you can possibly avoid it, don’t
-   call any other methods in this class.” The only safe methods to call inside a
-   constructor are those that are final in the base class. (This also applies to
-   private methods, which are automatically final.)
-   *** ***
-
-- Covariant return types
-
-  Java SE5 adds covariant return types, which means that an overridden method in
-  a derived class can return a type derived from the type returned by the
-  base-class method
-
-
-      class Grain {
-          public String toString() {return "Grain"; }
-      }
-       class Wheat extends Grain {
-           public String toString() { return "Wheat"; }
-       }
-       class Mill {
-           Grain process {return new Grain(); }
-       }
-       class WheatMill extends Mill {
-           Wheat process() {return new Wheat(); }
-       }
-
-
-       Mill m = new Mill();
-       Grain g = m.process(); // Grain
-
-       m = new WheatMill();
-       g = m.process(); // Wheat
-
-
-    The key difference between Java SE5 and earlier versions of java is that the
-    earlier versions would force the overridden version of process( ) to return
-    Grain, rather than Wheat, even though Wheat is derived from Grain and thus
-    is still a legitimate return type. Covariant return types allow the more
-    specific Wheat return type.
-
-
-- Designing with inheritance
-
-  In fact, if you choose inheritance first when you’re using an existing class
-  to make a new class, things can become needlessly complicated.  A better
-  approach is to choose composition first, especially when it’s not obvious
-  which one you should use. Composition does not force a design into an
-  inheritance hierarchy. But composition is also more flexible since it’s
-  possible to dynamically choose a type (and thus behavior) when using
-  composition, whereas inheritance requires an exact type to be known at compile
-  time.
-
-
-*** A general guideline is “Use inheritance to express differences in behavior,
-    and fields to express variations in state.”
-
-- Inheritance should be used mostly to override methods of the parent class, to
-  make the use of upcasting meaningful
-
-- However extending/adding those methods are permitted (is like a relationship,
-  because the derived class is like the base class- it has the same fundamental
-  interface - but it has other feature that require additional methods to
-  implement)
-
-  It has a drawback. The extended part of the interface in the derived class is
-  not available from the base class, so once you upcast, you can’t call the new
-  methods
-
-
-  Since you lose the specific type information via an upcast (moving up the
-  inheritance hierarchy), it makes sense that to retrieve the type
-  information—that is, to move back down the inheritance hierarchy—you use a
-  downcast. However, you know an upcast is always safe because the base class
-  cannot have a bigger interface than the derived class. Therefore, every
-  message you send through the base class interface is guaranteed to be
-  accepted. But with a downcast, you don’t really know that a shape (for
-  example) is actually a circle. It could instead be a triangle or square or
-  some other type.
-
-  At runtime, Java checks for the cast to ensure that it is in fact the type you
-  think it is at runtime.  If it isn't, you get a ClassCaseException.
-
-*** This act of checking types at run time is called runtime type identification
-    (RTTI).  ***
-
-
-* Try not to invoke public methods in your constructor/methods
-- Because if another class overrides some of those public methods, when the
-  parent class contructor is called, the derived class methods will be called
-  instead of ours.
-
-- Abstract
-
-  A class containing abstract methods is called an abstract class. If a class
-  contains one or more abstract methods, the class itself must be qualified as
-  abstract. (Otherwise, the compiler gives you an error message.)
-
-  If you inherit from an abstract class and you want to make objects of the new
-  type, you must provide method definitions for all the abstract methods in the
-  base class. If you don’t (and you may choose not to), then the derived class
-  is also abstract, and the compiler will force you to qualify that class with
-  the abstract keyword.
-
-  It’s possible to make a class abstract without including any abstract methods.
-  This is useful when you’ve got a class in which it doesn’t make sense to have
-  any abstract methods, and yet you want to prevent any instances of that class.
-
-
-  It’s helpful to create abstract classes and methods because they make the
-  abstractness of a class explicit, and tell both the user and the compiler how
-  it was intended to be used.  Abstract classes are also useful refactoring
-  tolls, since they allow you to easily move common methods up the inheritance
-  hierarchy.
-
-- Interfaces
-
-  The interface keyword produces a completely abstract class, one that provides
-  no implementation at all. It allows the creator to determine method names,
-  argument lists, and return types, but no method bodies. An interface provides
-  only a form, but no implementation.
-
-  So the interface is used to establish a "protocol" between classes.
-
-  *** However, an interface is more than just an abstract class taken to the
-  extreme, since it allows you to perform a variation of "multiple inheritance"
-  by creating a class that can be upcast to more than one base type.
-
-  To create an interface, use the interface keyword instead of the class
-  keyword. As with a class, you can add the public keyword before the interface
-  keyword (but only if that interface is defined in a file of the same name). If
-  you leave off the public keyword, you get package access, so the interface is
-  only usable within the same package. An interface can also contain fields, but
-  these are implicitly static and final.
-
-################################################################################
-################################################################################
-  You can choose to explicitly declare the methods in an interface as public,
-  but they are public even if you don’t say it. So when you implement an
-  interface, the methods from the interface must be defined as public.
-  Otherwise, they would default to package access, and you’d be reducing the
-  accessibility of a method during inheritance, which is not allowed by the Java
-  compiler.
-
-  [ so during inheritance, you can increase the visibility of a method, from
-  protected to public! ]
-################################################################################
-################################################################################
+## Inheritance
+
+### Initializing the base class
+If you want to explicitly call the base-class constructor, use the *super*
+keyword.
+
+```java
+class Haha extends Hihi {
+    Haha (int i) {
+        super(i);
+    }
+}
+```
+Note
+: There is a caveat with base constructors with arguments only.  Usually, the
+  derived constructor will automatically call the base constructor who does not
+  have any arguments. However, if you want to call the base constructor with
+  arguments, or if there is no base constructor with no arguments, you have to
+  call super();
+
+The call to the base-class constructor must be the first thing you do in the
+derived-class constructor.
+
+## Overriding
+Java SE5 has added the `@Override` annotation, which is not a keyword but can be
+used as if it were. When you mean to override a method, you can choose to add
+this annotation and the compiler will produce an error message if you
+accidentally overload instead of overriding.
+
+The `@Override` annotation will thus prevent you from accidentally overloading
+when you don’t mean to.
+
+## Upcasting
+The most important aspect of inheritance is not that it provides methods for the
+new class.  It’s the relationship expressed between the new class and the base
+class. This relationship can be summarized by saying, “The new class is a type
+of the existing class.”
+
+
+## Final keyword
+Applies to data, methods and classes.
+
+
+Final data
+: To tell the compiler that a piece of data is "constant".
+
+A constant is useful for two reasons:
+- It can be a compile-time constant that won't ever change
+- It can be a value initialized at run time that you don't want changed.
+
+A field that is both static and final has only one piece of storage that cannot
+be changed.
+
+Just because something is final doesn’t mean that its value is known at compile
+time.  e.g `final int x = getRandomNumber();`
+
+### Blank finals
+Java allows the creation of blank finals, which are fields that are declared as
+final but are not given an initialization value.
+
+```java
+public class Haha {
+    private final j; // Blank final
+
+    public Haha() {
+        j = 1;
+    }
+}
+```
+### Final arguments
+Java allows you to make arguments final by declaring them as such in the
+argument list.  This means that inside the method you cannot change what the
+argument reference points to. This feature is primarily used to pass data to
+anonymous inner classes.
+
+### Final methods
+There are two reasons for final methods. The first is to put a “lock” on the
+method to prevent any inheriting class from changing its meaning. This is done
+for design reasons when you want to make sure that a method’s behavior is
+retained during inheritance and cannot be overridden.
+
+### Final and private
+Any private methods in a class are implicitly final. Because you can’t access a
+private method, you can’t override it. You can add the final specifier to a
+private method, but it doesn’t give that method any extra meaning.
+
+# Polymorphism
+Polymorphism is the third essential feature of an object-oriented programming
+language, after data abstraction and inheritance.
+
+It provides another dimension of separation of interface from implementation, to
+decouple what from how. Polymorphism allows improved code organization and
+readability as well as the creation of extensible programs that can be “grown”
+not only during the original creation of the project, but also when new features
+are desired.
+
+Wouldn’t it be much nicer if you could just write a single method that takes the
+base class as its argument, and not any of the specific derived classes?  That
+is, wouldn’t it be nice if you could forget that there are derived classes, and
+write your code to talk only to the base class?
+
+That’s exactly what polymorphism allows you to do. However, most programmers who
+come from a procedural programming background have a bit of trouble with the way
+polymorphism works.
+
+```java
+class Instrument {
+    play(Note note) {}
+}
+public class Wind extends Instrument {
+    @Override
+    play(Note note){}
+}
+```
+Inside Music.java ...
+
+```java
+public static void tune (Instrument i) {
+    i.play(Note.MIDDLE_C);
+}
+```
+It receives an Instrument reference. So how can the compiler possibly know that
+this Instrument reference points to a Wind in this case and not a Brass or
+Stringed? The compiler can’t. To get a deeper understanding of the issue, it’s
+helpful to examine the subject of binding.
+
+### Method-call binding
+Connecting a method call to a method body is called binding.
+
+When binding is performed before the program is run (by the compiler and linker,
+if there is one), it’s called early binding. You might not have heard the term
+before because it has never been an option with procedural languages. C
+compilers have only one kind of method call, and that’s early binding.
+
+The confusing part of the preceding program revolves around early binding,
+because the compiler cannot know the correct method to call when it has only an
+Instrument reference.
+
+The solution is called late binding, which means that the binding occurs at run
+time, based on the type of object. Late binding is also called dynamic binding
+or runtime binding. When a language implements late binding, there must be some
+mechanism to determine the type of the object at run time and to call the
+appropriate method. That is, the compiler still doesn’t know the object type,
+but the method-call mechanism finds out and calls the correct method body. The
+late-binding mechanism varies from language to language, but you can imagine
+that some sort of type information must be installed in the objects.
+
+All method binding in Java uses late binding unless the method is static or
+final (private methods are implicitly final). This means that ordinarily you
+don’t need to make any decisions about whether late binding will occur—it
+happens automatically.
+
+### Pitfall: fields and static methods
+If you access a field directly, that access will be resolved at compile time, as
+the following example demonstrates.
+
+```java
+class Super {
+    public int field = 0;
+    public int getField() { return field;}
+}
+class Sub extends Super {
+    public int field = 1;
+    public int getField() {return field;}
+    public int getSuperField() {return super.field;}
+
+}
+public class FieldAccess {
+    public static void main(String[] args) {
+        Super sup = new Sub();
+        printf(sup.field); // Answer is 0
+        printf(sup.getField()); // Answer is 1
+
+        Sub sub = new Sub();
+        printf(sub.field); // Answer is 1
+        printf(sub.getField()); // Answer is 1
+        printf(sub.getSuperField()); // Answer is 0
+    }
+}
+```
+
+For one thing, you’ll generally make all fields private and so you won’t access
+them directly
+
+
+If a method is static, it doesn’t behave polymorphically
+
+```java
+class StaticSuper {
+    public static String staticGet() { return "BaseStaticGet"; }
+    public String dynamicGet() { return "BaseDynamicGet"; }
+}
+
+class StaticSub extends StaticSuper {
+    public static String staticGet() { return "DerivedStaticGet"; }
+    public String dynamicGet() { return "DerivedDynamicGet"; }
+}
+
+public class Haha {
+    public static void main (String[] args) {
+        StaticSuper sup = new StaticSub();
+        printf(sup.staticGet()); // BaseStaticGet
+        printf(sup.dynamicGet()); // DerivedDynamicGet
+
+        StaticSub sub = new StaticSub();
+        printf(sub.staticGet()); // DerivedStaticGet
+        printf(sub.dynamicGet()); // DerivedDynamicGet
+    }
+}
+```
+Static methods are associated with the class, and not the individual objects.
+
+
+## Constructors and polymorphism
+Even though constructors are not polymorphic (they’re actually static methods,
+but the static declaration is implicit), it’s important to understand the way
+constructors work in complex hierarchies and with polymorphism.
+
+A constructor for the base class is always called during the construction
+process for a derived class, chaining up the inheritance hierarchy so that a
+constructor for every base class is called. This makes sense because the
+constructor has a special job: to see that the object is built properly. A
+derived class has access to its own members only, and not to those of the base
+class (whose members are typically private).
+
+The order of the constructor calls is important. When you inherit, you know all
+about the base class and can access any public and protected members of the base
+class. This means that you must be able to assume that all the members of the
+base class are valid when you’re in the derived class.
+
+## Inheritance and cleanup
+When using composition and inheritance to create a new class, most of the time
+you won’t have to worry about cleaning up; subobjects can usually be left to the
+garbage collector. If you do have cleanup issues, you must be diligent and
+create a dispose( ) method (the name I have chosen to use here; you may come up
+with something better) for your new class. And with inheritance, you must
+override dispose( ) in the derived class if you have any special cleanup that
+must happen as part of garbage collection. When you override dispose( ) in an
+inherited class, it’s important to remember to call the base-class version of
+dispose( ), since otherwise the base-class cleanup will not happen.
+
+## Behaviour of polymorphic methods inside constructors
+The hierarchy of constructor calls brings up an interesting dilemma. What
+happens if you’re inside a constructor and you call a dynamically-bound method
+of the object being constructed?
+
+Inside an ordinary method, the dynamically-bound call is resolved at run time,
+because the object cannot know whether it belongs to the class that the method
+is in or some class derived from it.
+
+If you call a dynamically-bound method inside a constructor, the overridden
+definition for that method is used. However, the effect of this call can be
+rather unexpected because the overridden method will be called before the object
+is fully constructed. This can conceal some difficult-to-find bugs.
+
+Actual process of initialization:
+- The storage allocated for the object is initialized to binary zero before
+  anything else happens.  [ so that means that the derived class has fields
+  initialized to 0/null at least ]
+- The base-class constructors are called as described previously. At this
+  point, the overridden method is called.
+- Member initializers are called in the order of declaration.
+- The body of the derived-class constructor is called.
+
+As a result, a good guideline for constructors is, “Do as little as possible to
+set the object into a good state, and if you can possibly avoid it, don’t call
+any other methods in this class.” The only safe methods to call inside a
+constructor are those that are final in the base class. (This also applies to
+private methods, which are automatically final.)
+
+## Covariant return types
+Java SE5 adds covariant return types, which means that an overridden method in a
+derived class can return a type derived from the type returned by the base-class
+method
+
+```java
+class Grain {
+    public String toString() {return "Grain"; }
+}
+class Wheat extends Grain {
+    public String toString() { return "Wheat"; }
+}
+class Mill {
+    Grain process() {return new Grain(); }
+}
+class WheatMill extends Mill {
+    Wheat process() {return new Wheat(); }
+}
+
+Mill m = new Mill();
+Grain g = m.process(); // Grain
+
+m = new WheatMill();
+g = m.process(); // Wheat
+```
+
+At runtime, Java checks for the cast to ensure that it is in fact the type you
+think it is at runtime.  If it isn't, you get a ClassCaseException.
+
+This act of checking types at run time is called runtime type identification
+(RTTI)
+
+## Abstract
+A class containing abstract methods is called an abstract class. If a class
+contains one or more abstract methods, the class itself must be qualified as
+abstract. (Otherwise, the compiler gives you an error message.)
+
+## Interfaces
+The interface keyword produces a completely abstract class, one that provides no
+implementation at all. It allows the creator to determine method names, argument
+lists, and return types, but no method bodies. An interface provides only a
+form, but no implementation.
+
+So the interface is used to establish a "protocol" between classes.
+
+However, an interface is more than just an abstract class taken to the extreme,
+since it allows you to perform a variation of "multiple inheritance" by creating
+a class that can be upcast to more than one base type.
+
+You can choose to explicitly declare the methods in an interface as public, but
+they are public even if you don’t say it. So when you implement an interface,
+the methods from the interface must be defined as public.  Otherwise, they would
+default to package access, and you’d be reducing the accessibility of a method
+during inheritance, which is not allowed by the Java compiler.
+
+[ so during inheritance, you can increase the visibility of a method, from
+protected to public! ]
 
 
 - Multiple Inheritance in Java
