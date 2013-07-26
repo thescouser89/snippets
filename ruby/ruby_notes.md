@@ -1,228 +1,165 @@
 * The structure and execution of Ruby programs
 
-- Lexical Structure
+# Lexical Structure
 
-  The Ruby interpreter parses a program as a sequence of tokens. Tokens include
-  comments, literals, punctuation, identifiers, and keywords.
+The Ruby interpreter parses a program as a sequence of tokens. Tokens include
+comments, literals, punctuation, identifiers, and keywords.
 
 
-- Comments
+## Comments
 
-  Comments in Ruby begin with a # character and continue to the end of the line.
-  The Ruby interpreter ignores the # character and any text that follows it (but
-  does not ignore the newline character, which is meaningful whitespace and may
-  serve as a statement terminator).
+Comments in Ruby begin with a # character and continue to the end of the line.
+The Ruby interpreter ignores the # character and any text that follows it (but
+does not ignore the newline character, which is meaningful whitespace and may
+serve as a statement terminator).
 
-  If a # character appears within a string or regular expression literal, then
-  it is simply part of the string or regular expression and does not introduce a
-  comment.
+If a # character appears within a string or regular expression literal, then it
+is simply part of the string or regular expression and does not introduce a
+comment.
 
-        # This entire line is a comment
-        x = "# this is a string"                # and this is a comment
-        y = /# this is a regular expression/
+```ruby
+# This entire line is a comment
+x = "# this is a string"                # and this is a comment
+y = /# this is a regular expression/
+```
 
+Multiline comments are usually written simply by beginning each line with a
+seperate # character.
 
-  Multiline comments are usually written simply by beginning each line with a
-  seperate # character.
+Ruby has no C-style /*...*/ comment. THere is no way to embed a comment in the
+middle of a line of code
 
-  Ruby has no C-style /*...*/ comment. THere is no way to embed a comment in the
-  middle of a line of code
+### Embedded documents
 
+Ruby supports another style of multiline comment known as an embedded document.
 
-- Embedded documents
+These start on a line that begin =begin and continue until (and include) a line
+that begins =end.
 
-  Ruby supports another style of multiline comment known as an embedded
-  document.
+Any text that appears after =begin or =end is part of the comment and is also
+ignored, but that extra text must be seperated from the =begin and =end by at
+least one space.
 
-  These start on a line that begint =begin and continue until (and include) a
-  line that begins =end.
+As the name implied, embedded documents can be used to include long blocks of
+documentation within a program, or to embed source code of another language
+(such as HTML or SQL) with a Ruby program.
 
-  Any text that appears after =begin or =end is part of the comment and is also
-  ignored, but that extra text must be seperated from the =begin and =end by at
-  least one space.
+Embedded documents are usually intended to be used by some kind of
+postprocessing tool that is run over the Ruby source code, and it is typical to
+follow =begin with an identifier that indicates which tool the comment is
+intended for.
 
-  Embedded documents are a convenient way to comment out long blocks of code
-  without prefixing each line with a # character.
+Ruby programs can include embedded API documentation as specially formatted
+comments that preceded method, class, and module definitions. You can browse
+this documentation using the ri tool. The rdoc tool extracts documentation
+comments from Ruby source and formats them as HTML or prepares them for display
+by ri. [See the file lib/rdoc/README in the Ruby source code for details]
 
-  Note that embedded documents only work if the = signs are the first characters
-  of each line:
+Documentation comments must come immediately before the module, class or method
+whose API they document. They are usually written as multiline comments where
+each line begins with #, but they can also be written as embedded documents that
+start =begin rdoc. (The rdoc tool will not process these comments if you leave
+out the "rdoc".)
 
-                # =begin
-                        blablabal
-                # =end
+#### Rdoc overview:
+```java
+# = Headings
 
-  This is not embedded documents!
+# Headings being with an equals sign
 
+# == Sub-Headings
+# The line above produces a subheading
+# === Sub-Sub-Heading
+# And so on
 
-  As the name implied, embedded documents can be used to include long blocks of
-  documentation within a program, or to embed source code of another language
-  (such as HTML or SQL) with a Ruby program.
+# = Examples
+#
+#      Indented lines are displayes verbatim in code font.
+#      Be careful not to indent your headings and lists, though.
 
-  Embedded documents are usually intended to be used by some kind of
-  postprocessing tool that is run over the Ruby source code, and it is typical
-  to follow =begin with an identifier that indicates which tool the comment is
-  intended for.
+# = Lists and Fonts
+# Lists items begin with * or -. Indicate fonts with punctuation or HTML:
+# * _italic_ or <i>multi-word italic</i>
+# * *bold* or <b>multi-word bold</b>
+# * +code+ or <tt>multi-word code</tt>
 
+# 1. Numbered lists begin with numbers.
+# 99. Any number will do; they don't have to be sequential.
+# 1. There is no way to do nested lists
 
-   Ruby programs can include embedded API documentation as specially formatted
-   comments that preceded method, class, and module definitions. You can browse
-   this documentation using the ri tool. The rdoc tool extracts documentation
-   comments from Ruby source and formats them as HTML or prepares them for
-   display by ri. [See the file lib/rdoc/README in the Ruby source code for
-   details]
+# The terms of a description list are bracketed:
+# [item 1] This is a description of item 1
+# [item 2] This is a description of item 2
+```
+## Identifiers
 
-   ** Documentation comments must come immediately before the module, class or
-   method whose API they document. They are usually written as multiline
-   comments where each line begins with #, but they can also be written as
-   embedded documents that start =begin rdoc. (The rdoc tool will not process
-   these comments if you leave out the "rdoc".)
+An identifier is simply a name. Ruby uses identifiers to name variables,
+methods, classes, and so forth.
 
-- Rdoc overview:
+Ruby identifiers consist of letters, numbers, and underscores characters, but
+they may not begin with a number.
 
-        # = Headings
-
-        # Headings being with an equals sign
-
-        # == Sub-Headings
-        # The line above produces a subheading
-        # === Sub-Sub-Heading
-        # And so on
-
-        # = Examples
-        #
-        #      Indented lines are displayes verbatim in code font.
-        #      Be careful not to indent your headings and lists, though.
-
-        # = Lists and Fonts
-        # Lists items begin with * or -. Indicate fonts with punctuation or HTML:
-        # * _italic_ or <i>multi-word italic</i>
-        # * *bold* or <b>multi-word bold</b>
-        # * +code+ or <tt>multi-word code</tt>
-
-        # 1. Numbered lists begin with numbers.
-        # 99. Any number will do; they don't have to be sequential.
-        # 1. There is no way to do nested lists
-
-        # The terms of a description list are bracketed:
-        # [item 1] This is a description of item 1
-        # [item 2] This is a description of item 2
-
-- Literals
-
-  Literals are values that appear directly in Ruby source code. They include
-  numbers, strings of text, and regular expressions.  (Other literals, such as
-  array and hash values, are not individual tokens but are more complex
-  expressions.). Ruby number and string literal syntax is actually quite
-  complicated.
-
-        1               # an integer literal
-        'one'           # a string literal
-        "two"           # another string literal
-        /three/         # a regular expression literal
-
-- Punctuation
-
-  Ruby uses punctuation characters for a number of purposes. Most Ruby operators
-  are written using punctuation characters, such as + for addition, * for
-  multiplication, and || for the Boolean OR operation.
-
-  Punctuation characters also serve to delimit string, regular expression,
-  array, and hash literals, and to group and seperate expressions, method
-  arguments, and array indexes.
-
-
-- Identifiers
-
-  An identifier is simply a name. Ruby uses identifiers to name variables,
-  methods, classes, and so forth.
-
-  Ruby identifiers consist of letters, numbers, and underscores characters, but
-  they may not begin with a number.
-
-  Identifiers may not include whitespace or nonprinting characters, and they may
-  not include punctuation characters except as described here.
-
-  ** Identifiers that begin with a capital letter A-Z are constants, and the
-  Ruby interpreter will issue a warning (but not an error) if you alter the
-  value of such an identifier.
-
-  ** Class and module names must begin with initial capital letters.
-
-            PI              # Constant
-
-  By convention, multiword identifiers that are not constants are written with
-  underscores like_this, whereas multiword constants are written LikeThis or
-  LIKE_THIS.
-
-
-
-- Case sensitivity
-
-  Ruby is case-sensitive language.
-
-
-- Unicode characters in identifiers
-
-  Ruby's rules for forming identifiers are defined in terms of ASCII characters
-  that are not allowed. In general, all characters outside of the ASCII
-  character set are valid in identifiers, including characters that appear to be
-  punctuation.
-
-  In a UTF-8 encoded file, for example, the following Ruby code is valid
-
-      def x(x,y)         # the name of this method is the Unicode multiplication
-                         # sign ???
-                         # note that in the book pg 29 the x( ) is smaller, that
-                         # is probably the unicode multiplication sign
-        x*y
-      end
-
-   Similarly, a Japanese programmer writing a program encoded in SJIS or EUC can
-   include Kanji characters in her identifiers.
-
-
-* The special rules about forming identifiers are based on ASCII characters and
-* are not enforced for characters outside of that set. An identifier may not
-* begin with an ASCII digit, for example, but it may begin with a digit from a
-* non-Latin alphabet. Similarly, an identifier must begin with an ASCII capital
-* letter in order to be considered a constant. The identifier Å, for example, is
-* not a constant.
-
-  [So basically rules for identifier namings only pertain to ACSCII characters,
-  such that an identifier cannot have an ASCII digit as first character. However
-  if the "digit" is defined in an encoding other than ASCII, you can use it as
-  first character]
-
-  Two identifiers are the same only if they are represented by the same sequence
-  of bytes. Some character sets, such as Unicode, have more than one codepoint
-  that represents the same character. No Unicode normalization is performed in
-  Ruby, and two distinct codepoints are treated as distinct characters, even if
-  they have the same meaning or are represented by the same font glyph.
-
-
-- Punctuation in identifiers
-
-  Punctuation characters may appear at the start and end of Ruby identifiers.
-
-
-        $   Global variables are prefixed with a dollar sign. Follows the Perl
-            example
-
-        @   Instance variables are prefixed with a single at sign, and class
-            variables are prefixed with two at signs.
-
-        ?   As a helpful convention, methods that return Boolean values often
-            have names that end with a question mark
-
-        !   Method names may end with an exclamation point to indicate that they
-            should be used cautiously.  This naming convention is often to
-            distinguish mutator methods that alter the object on which they are
-            invoked from variants that return a modified copy of the original
-            object.
-
-        =   Methods whose names end with an equals sign can be invoked by
-            placing the method name, without the equals sign, on the left side
-            of an assignment operator.
+Identifiers may not include whitespace or nonprinting characters, and they may
+not include punctuation characters except as described here.
+
+Identifiers that begin with a capital letter A-Z are constants, and the Ruby
+interpreter will issue a warning (but not an error) if you alter the value of
+such an identifier.
+
+Class and module names must begin with initial capital letters.
+
+By convention, multiword identifiers that are not constants are written with
+underscores like_this, whereas multiword constants are written LikeThis or
+LIKE\_THIS.
+
+## Unicode characters in identifiers
+Ruby's rules for forming identifiers are defined in terms of ASCII characters
+that are not allowed. In general, all characters outside of the ASCII character
+set are valid in identifiers, including characters that appear to be
+punctuation.
+
+Similarly, a Japanese programmer writing a program encoded in SJIS or EUC can
+include Kanji characters in her identifiers.
+
+The special rules about forming identifiers are based on ASCII characters and
+are not enforced for characters outside of that set. An identifier may not begin
+with an ASCII digit, for example, but it may begin with a digit from a non-Latin
+alphabet. Similarly, an identifier must begin with an ASCII capital letter in
+order to be considered a constant. The identifier Å, for example, is not a
+constant.
+
+So basically rules for identifier namings only pertain to ACSCII characters,
+such that an identifier cannot have an ASCII digit as first character. However
+if the "digit" is defined in an encoding other than ASCII, you can use it as
+first character
+
+Two identifiers are the same only if they are represented by the same sequence
+of bytes. Some character sets, such as Unicode, have more than one codepoint
+that represents the same character. No Unicode normalization is performed in
+Ruby, and two distinct codepoints are treated as distinct characters, even if
+they have the same meaning or are represented by the same font glyph.
+
+## Punctuation in identifiers
+Punctuation characters may appear at the start and end of Ruby identifiers.
+
+$   Global variables are prefixed with a dollar sign. Follows the Perl
+    example
+
+@   Instance variables are prefixed with a single at sign, and class
+    variables are prefixed with two at signs.
+
+?   As a helpful convention, methods that return Boolean values often
+    have names that end with a question mark
+
+!   Method names may end with an exclamation point to indicate that they
+    should be used cautiously.  This naming convention is often to
+    distinguish mutator methods that alter the object on which they are
+    invoked from variants that return a modified copy of the original
+    object.
+
+=   Methods whose names end with an equals sign can be invoked by
+    placing the method name, without the equals sign, on the left side
+    of an assignment operator.
 
 
     e.g $files
