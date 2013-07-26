@@ -1321,7 +1321,7 @@ A class containing abstract methods is called an abstract class. If a class
 contains one or more abstract methods, the class itself must be qualified as
 abstract. (Otherwise, the compiler gives you an error message.)
 
-## Interfaces
+# Interfaces
 The interface keyword produces a completely abstract class, one that provides no
 implementation at all. It allows the creator to determine method names, argument
 lists, and return types, but no method bodies. An interface provides only a
@@ -1335,1293 +1335,663 @@ a class that can be upcast to more than one base type.
 
 You can choose to explicitly declare the methods in an interface as public, but
 they are public even if you don’t say it. So when you implement an interface,
-the methods from the interface must be defined as public.  Otherwise, they would
+the methods from the interface must be defined as public. Otherwise, they would
 default to package access, and you’d be reducing the accessibility of a method
 during inheritance, which is not allowed by the Java compiler.
 
-[ so during inheritance, you can increase the visibility of a method, from
-protected to public! ]
+[so during inheritance, you can increase the visibility of a method, from
+protected to public!]
 
+## Extending an interface with inheritance
+You can easily add new method declarations to an interface by using inheritance,
+and you can also combine several interfaces into a new interface with
+inheritance. In both cases you get a new interface,
 
-- Multiple Inheritance in Java
+```java
+interface Monster {
+    void menace();
+}
+interface DangerousMonster extends Monster {
+    void destroy();
+}
+class DragonZilla implements DangerousMonster {
+    public void menace() {}
+    public void destroy() {}
+}
+interface Lethal {
+    void kill();
+}
+interface Vampire extends DangerousMonster, Lethal {
+    void drinkBlood();
+}
+class VeryBadVampire implements Vampire {
+    public void menace() {}
+    public void destroy() {}
+    public void kill() {}
+    public void drinkBlood() {}
+}
+```
+Fields in interfaces are by default public and final, the interface is a
+convenient tool for creating groups of constant values.
 
-  Because an interface has no implementation at all—that is, there is no storage
-  associated with an interface—there’s nothing to prevent many interfaces from
-  being combined. This is valuable because there are times when you need to say,
-  "An x is an a and a b and a c."
+Fields defined in interfaces cannot be "blank finals," but they can be
+initialized with non-constant expressions.
 
-  This brings up a question: Should you use an interface or an abstract class?
-  If it’s possible to create your base class without any method definitions or
-  member variables, you should always prefer interfaces to abstract classes. In
-  fact, if you know something is going to be a base class, you can consider
-  making it an interface
+```java
+public interface Haha {
+    Random RAND = new Random(47);
+    int RANDOM_INT = RAND.nextInt(10);
+}
+```
+Since the fields are static, they are initialized when the class is first
+loaded, which happens when any of the fields are accessed for the first time.
 
-- Extending an interface with inheritance
+The fields, of course, are not part of the interface. The values are stored in
+the static storage area for that interface.
 
-  You can easily add new method declarations to an interface by using
-  inheritance, and you can also combine several interfaces into a new interface
-  with inheritance. In both cases you get a new interface,
+You can also declare variables. Of course they are also final and public. So
+they are basically constants that will be shared among the classes that
+implement that interface.
 
-        interface Monster {
-            void menace();
+## Inner Class
+The inner class is a valuable feature because it allows you to group classes
+that logically belong together and to control the visibility of one within the
+other. However, it’s important to understand that inner classes are distinctly
+different from composition.
+
+You create an inner class just as you’d expect—by placing the class definition
+inside a surrounding class
+
+### The link to the outer class
+So far, it appears that inner classes are just a name-hiding and code
+organization scheme, which is helpful but not totally compelling. However,
+there’s another twist. When you create an inner class, an object of that inner
+class has a link to the enclosing object that made it, and so it can access the
+members of that enclosing object—without any special qualifications. In
+addition, inner classes have access rights to all the elements in the enclosing
+class.
+
+The inner class can access methods and fields from the enclosing class as if it
+owned them.  [It can even access private fields in the enclosing class]
+
+So an inner class has automatic access to the members of the enclosing class.
+How can this happen? The inner class secretly captures a reference to the
+particular object of the enclosing class that was responsible for creating it.
+
+Then, when you refer to a member of the enclosing class, that reference is used
+to select that member.
+
+### Using the .this and .new
+If you need to produce the reference to the outer-class object, you name the
+outer class followed by a dot and this. The resulting reference is automatically
+the correct type, which is known and checked at compile time, so there is no
+runtime overhead.
+
+public class DotThis {
+    void f() {print("dotThis.f()");}
+
+    public class Inner {
+        public DotThis outer() {
+            return DotThis.this; // A plain "this" would be Inner's "this"
         }
-        interface DangerousMonster extends Monster {
-            void destroy();
-        }
-        class DragonZilla implements DangerousMonster {
-            public void menace() {}
-            public void destroy() {}
-        }
-        interface Lethal {
-            void kill();
-        }
-        interface Vampire extends DangerousMonster, Lethal {
-            void drinkBlood();
-        }
-        class VeryBadVampire implements Vampire {
-            public void menace() {}
-            public void destroy() {}
-            public void kill() {}
-            public void drinkBlood() {}
-        }
-
-- Name collisions in interfaces
-
-
-    interface I1 { void f(); }
-    interface I1 { int f(int i); }
-    interface I3 { int f(); }
-
-    class C  { public int f() {return 1;}
-
-    class C2 implements I1, I2 {
-        public void f(){}
-        public int f(int i){return 1;} // overloaded
     }
-    class C3 extends C implements I2 {
-        public int f(int i) {return 1;} // overloaded
+    public Inner inner() { return new Inner(); }
+    public static void main(String[] args) {
+        DotThis dt = new DotThis();
+        DotThis.Inner dti = dt.Inner();
+        dti.outer().f();
     }
-    class C4 extends C implements I3 {
-        public int f() { return 1;} // overloaded
+}
+class EnclosingOuter {
+    class Inner{ System.out.println(“Inner class reference is “ + this);
+        // inner class instance
+        System.out.println(“Outer class reference is “
+                + EnclosingOuter.this); //outer class instance
     }
-
-    // Methods differ by return type only
-    /*
-       class C5 extends C implements I1 { }
-       interface I4 extends I1, I3 {}
-     */
-
-  The difficulty occurs because overriding, implementation, and overloading
-  get unpleasantly mixed together. Also, overloaded methods cannot differ only
-  by return type. When the last two lines are uncommented,  you'll get error
-  messages.
-
-
-  One of the most compelling reasons for interfaces is to allow multiple
-  implementations for the same interface. In simple cases this is in the form
-  of a method that accepts an interface, leaving it up to you to implement
-  that interface and pass your object to the method.
-
-  Thus, a common use for interfaces is the aforementioned Strategy design
-  pattern. You write a method that performs certain operations, and that
-  method takes an interface that you also specify. You’re basically saying,
-  "You can use my method with any object you like, as long as your object
-  conforms to my interface." This makes your method more flexible, general and
-  reusable.
-
-
-
-* Fields in interfaces are by default public and final, the interface
-  is a convenient tool for creating groups of constant values.
-
-  Fields defined in interfaces cannot be "blank finals," but they can be
-  initialized with non- constant expressions.
-
-      public interface Haha {
-          Random RAND = new Random(47);
-          int RANDOM_INT = RAND.nextInt(10);
-      }
-
-  Since the fields are static, they are initialized when the class is first
-  loaded, which happens when any of the fields are accessed for the first time.
-
-  The fields, of course, are not part of the interface. The values are stored in
-  the static storage area for that interface.
-
-
-// not so sure about that, they said fields, not methods! >> I wrote that >>
-// So defining void f(); really means public final void f();
-
- You can also declare variables. Of course they are also final and public.
- SO they are basically constants that will be shared among the classes that
- implement that interface.
-
- One thing that you can do is:
-
-     public interface A {
-         Random rand = new Random();
-         int randomInt = rand.nextInt(10);
-     }
-
-
-* Nesting interfaces
-        Interfaces may be nested within classes and within other interfaces.
-
-        class A {
-            interface B {
-                void f();
-            }
-            // it's inside class A, so I guess it's ok to have public class here
-            public class BImp implements B {
-                public void f(){}
-            }
-
-            private interface D {
-                void f();
-            }
-
-            public class DIMP2 implements D {
-                public void f(){}
-            }
-            public D getD() { return new DIMP2(); }
-            private D dRef;
-
-            public void receiveD(D d) {
-                dRef = d;
-                dRef.f();
-            }
-
-            // Note where the public class is and the package access of the
-            // outer class!
-        }
-
-        public class Hoho {
-            public static void main(String[] args) {}
-        }
-        // nested interfaces
-        interface E {
-            interface G {
-                void f();
-            }
-        }
-        // This could be used so that only one object has permission to invoke
-        // methods on
-        // D (I am talking of the receiveD() func)
-
-        // note: nested classes!
-        public class Haha {
-            // ok since it's inside the top level public class Haha?
-            // ok for inner class to be public too
-            public class BIMP implements A.B { // also works E.G, A.C
-                public void f() {}
-            }
-        }
-            // Cannot implement a private interface except within that
-            // interface's defining class:
-            // ! class DIMP implements A.D {
-            // ^^ this won't work
-
-
- From there you can see that interfaces can be nested inside classes. They can
- also be defined as _private_!
-
- Note that DIMP2 is public even though the interface is private
- -- Used to force the definition of the methods in that interface without adding
-    any type information.
-
-    *** Interface E shows that interfaces can be nested within each other.
-    However, the rules about interfaces—in particular, that all interface
-    elements must be public—are strictly enforced here, so an interface nested
-    within another interface is automatically public and cannot be made private.
-
-    Also, private interfaces cannot be implemented outside of their defining
-    classes.
-
-    So interfaces can be private if defined inside a class but an interface
-    CANNOT be private if defined on its own.
-
-
-- Interfaces and factories
-
-  An interface is intended to be a gateway to multiple implementations, and a
-  typical way to produce objects that fit the interface is the Factory Method
-  design pattern. Instead of calling a constructor directly, you call a creation
-  method on a factory object which produces an implementation of the
-  interface—this way, in theory, your code is completely isolated from the
-  implementation of the interface, thus making it possible to transparently swap
-  one implementation for another.
-
-
-          // Factories.java
-
-          interface Service {
-              void method1();
-              void method2();
-          }
-         interface ServiceFactory {
-             Service getService();
-         }
-         class Implementation1 implements Service {
-             Implementation1(){}
-             public void method1() {print("imp 1 method 1");}
-             public void method2() {print("imp 1 method 2");}
-         }
-         class Implementation1Factory implements ServiceFactory {
-             public Service getService() {
-                 return new Implementation1();
-             }
-         }
-         class Implementation2 implements Service {
-             Implementation2(){}
-             public void method1() {print("imp 2 method 1");}
-             public void method2() {print("imp 2 method 2");}
-         }
-         class Implementation2Factory implements ServiceFactory {
-             public Service getService() {
-                 return new Implementation2();
-             }
-         }
-         public class Factories {
-             public static void serviceConsumer(ServiceFactory fact) {
-                 Service s = fact.getService();
-                 s.method1();
-                 s.method2();
-             }
-             public static void main(String[] args) {
-                 serviceConsumer(new Implementation1Factory());
-                 serviceConsumer(new Implementation2Factory());
-             }
-         }
-
-  Without the Factory Method, your code would somewhere have to specify the
-  exact type of Service being created, so that it could call the appropriate
-  constructor.
-
-  Why would you want to add this extra level of indirection? One common reason
-  is to create a framework.
-
-
-  Many people have fallen to this temptation, creating interfaces and factories
-  wherever it’s possible. The logic seems to be that you might need to use a
-  different implementation, so you should always add that abstraction. It has
-  become a kind of premature design optimization.
-
-  Any abstraction should be motivated by a real need. Interfaces should be
-  something you refactor to when necessary, rather than installing the extra
-  level of indirection everywhere, along with the extra complexity. That extra
-  complexity is significant, and if you make someone work through that
-  complexity only to realize that you’ve added interfaces "just in case" and for
-  no compelling reason—well, if I see such a thing I begin to question all the
-  designs that this particular person has done.
-
-  An appropriate guideline is to prefer classes to interfaces. Start with
-  classes, and if it becomes clear that interfaces are necessary, then refactor.
-  Interfaces are a great tool, but they can easily be overused.
-
-
-* Inner Class
-
-  The inner class is a valuable feature because it allows you to group classes
-  that logically belong together and to control the visibility of one within the
-  other. However, it’s important to understand that inner classes are distinctly
-  different from composition.
-
-  You create an inner class just as you’d expect—by placing the class definition
-  inside a surrounding class
-
-
-- The link to the outer class
-
-  So far, it appears that inner classes are just a name-hiding and code
-  organization scheme, which is helpful but not totally compelling. However,
-  there’s another twist. When you create an inner class, an object of that inner
-  class has a link to the enclosing object that made it, and so it can access
-  the members of that enclosing object—without any special qualifications. In
-  addition, inner classes have access rights to all the elements in the
-  enclosing class.
-
-  The inner class can access methods and fields from the enclosing class as if
-  it owned them.  [It can even access private fields in the enclosing class]
-
-
-  So an inner class has automatic access to the members of the enclosing class.
-  How can this happen? The inner class secretly captures a reference to the
-  particular object of the enclosing class that was responsible for creating it.
-  Then, when you refer to a member of the enclosing class, that reference is
-  used to select that member. Fortunately, the compiler takes care of all these
-  details for you, but now you can see that an object of an inner class can be
-  created only in association with an object of the enclosing class (when, as
-  you shall see, the inner class is non-static). Construction of the inner-class
-  object requires the reference to the object of the enclosing class, and the
-  compiler will complain if it cannot access that reference. Most of the
-  time this occurs without any intervention on the part of the programmer.
-
-
-- Using the .this and .new
-
-  If you need to produce the reference to the outer-class object, you name the
-  outer class followed by a dot and this. The resulting reference is
-  automatically the correct type, which is known and checked at compile time, so
-  there is no runtime overhead.
-
-      public class DotThis {
-          void f() {print("dotThis.f()");}
-
-          public class Inner {
-              public DotThis outer() {
-                  return DotThis.this; // A plain "this" would be Inner's "this"
-              }
-          }
-          public Inner inner() { return new Inner(); }
-          public static void main(String[] args) {
-              DotThis dt = new DotThis();
-              DotThis.Inner dti = dt.Inner();
-              dti.outer().f();
-          }
-      }
-
-      class EnclosingOuter {
-          class Inner{ System.out.println(“Inner class reference is “ + this);
-          // inner class instance
-          System.out.println(“Outer class reference is “
-          + EnclosingOuter.this); //outer class instance
-          }
-      }
-
-  Sometimes you want to tell some other object to create an object of one of its
-  inner classes.  To do this you must provide a reference to the other
-  outer-class object in the new expression, using the .new syntax.o
-
-      public class DotNew {
-          public class Inner {}
-          public static void main(String[] args) {
-              DotNew dn = new DotNew();
-              DotNew.Inner dni = dn.new Inner();
-          }
-      }
-
-  If you make a nested class (a *static* inner class), then it doesn't need a
-  reference to the outer-class object.
-
-- Inner classes and upcasting
-
-  Inner classes really come into their own when you start upcasting to a base
-  class, and in particular to an interface. (The effect of producing an
-  interface reference from an object that implements it is essentially the same
-  as upcasting to a base class.) That’s because the inner class—the
-  implementation of the interface—can then be unseen and unavailable, which is
-  convenient for hiding the implementation. All you get back is a reference to
-  the base class or the interface.
-
-
-- OuterClassName.InnerClassName
-
-- Really useful when you make the inner class implement some interface
-- Other advantage is that you can hide the class to other classes, whereas if
-  you only use "normal classes", then the class that implements the interface
-  has to be public or package access.
-
-* Local Inner Class [creation of an entire class within the scope of a method
+}
+```
+Sometimes you want to tell some other object to create an object of one of its
+inner classes. To do this you must provide a reference to the other outer-class
+object in the new expression, using the .new syntax.o
+
+```java
+public class DotNew {
+    public class Inner {}
+    public static void main(String[] args) {
+        DotNew dn = new DotNew();
+        DotNew.Inner dni = dn.new Inner();
+    }
+}
+```
+If you make a nested class (a *static* inner class), then it doesn't need a
+reference to the outer-class object.
+
+### Inner classes and upcasting
+Inner classes really come into their own when you start upcasting to a base
+class, and in particular to an interface. (The effect of producing an interface
+reference from an object that implements it is essentially the same as upcasting
+to a base class.) That’s because the inner class—the implementation of the
+interface—can then be unseen and unavailable, which is convenient for hiding the
+implementation. All you get back is a reference to the base class or the
+interface.
+
+
+Local Inner Class
+: Creation of an entire class within the scope of a method
   instead of the scope of another class]
 
-*** Cannot be public, protected, private, static
-*** This also applies for anonymous classes
-
-- A class defined within a method
-
-    public class Parcel4 {
-        // This is a method!
-        public Destination dest(String s) {
-            class PDestination implements Destination {
-                private String label;
-                private PDestination(String whereTo) {
-                    label = whereTo;
-                }
-                public String readLabel() {return label; }
+```java
+public class Parcel4 {
+    // This is a method!
+    public Destination dest(String s) {
+        class PDestination implements Destination {
+            private String label;
+            private PDestination(String whereTo) {
+                label = whereTo;
             }
-            // Still in the method!
-            return new PDestination(s);
+            public String readLabel() {return label; }
         }
-        public static void main(String[] args) {
-            Parcel4 p = new Parcel4();
-            Destination d = p.dest("Tanzania");
+        // Still in the method!
+        return new PDestination(s);
+    }
+}
+```
+Nest an inner class within any arbitrary scope:
+
+*SideNote*: Note the syntax to create a new inner class object
+```java
+Parcel3 p = new Parcel3());
+Parcel3.PContents pc = p.new PContents();
+```
+## Anonymous Inner classes
+```java
+public class Parcel6 {
+    public Contents cont() {
+        return new Contents() {
+            private int i = 11;
+
+            public int value() { return i; }
+        }; // >>> Semicolon required!!!
+    }
+    public static void main(String[] args) {
+        Parcel6 p = new Parcel6();
+        Contents c = p.cont();
+    }
+}
+// Contents.java
+public interface Contents {
+    int value();
+}
+```
+What this strange syntax means is "Create an object of an anonymous class that’s
+inherited from Contents." The reference returned by the new expression is
+automatically upcast to a Contents reference.
+
+Contents is created by using a default constructor. If argument needed:
+
+```java
+public class Parcel7 {
+    public Wrapping wrap(int x) {
+        return new Wrapping(x) {
+            public int value() {
+                return super.value() * 47;
+            }
+        };
+    }
+}
+public class Wrapping {
+    private int i;
+    public Wrapping(int x) {
+        i = x;
+    }
+    public int value() {
+        return i;
+    }
+}
+```
+ That is, you simply pass the appropriate argument to the base-class
+ constructor, seen here as the x passed in new Wrapping(x). Although it’s an
+ ordinary class with an implementation, Wrapping is also being used as a common
+ "interface" to its derived classes
+
+If you are defining an anonymous inner class and want to use an object that is
+defined outside the anonymous inner class, the compiler requires that the
+**argument** reference be _final_ like the argument to dest().
+
+SO THE **ARGUMENTS** THAT ARE PASSED TO THE METHOD THAT CONTAINS THE ANONYMOUS
+INNER CLASS NEED TO BE FINAL IF THEY ARE TO BE USED INSIDE THE INNER CLASS
+
+THE ANONYMOUS INNER CLASS CAN STILL ACCESS ALL THE OBJECTS DEFINED IN THE
+ENCLOSING CLASS WITHOUT THE NEED FOR FINAL!!!
+
+```java
+WithInner getWithInner (final String x) {
+    return new WithInner() {
+        /// here i'm referring to x; so
+        // x must be final if i want to refer
+        // to it even after the method has
+        // returned and does not exist anymore.
+        getString() {
+            return x;
         }
     }
-
-  PDestination cannot be accessed outside of dest().
-
-- Nest an inner class within any arbitrary scope:
-
-    public class Parcel5 {
-        private void internalTracking(boolean b) {
-            if (b) {
-                class TrackingSlip {
-                    private String id;
-                    Tracking Slip(String s) {
-                        id = s;
-                    }
-                    String getSlip() {return id; }
-                }
-                TrackingSlip ts = new TrackingSlip("slip");
-                String s = ts.getSlip();
-            }
-            // outside if loop
-            // TrackinSlip is out of scope here!
-        }
-
-* SideNote: Note the syntax to create a new inner class object
-- Parcel3 p = new Parcel3());
-- Parcel3.PContents pc = p.new PContents();
-
-
-
-- Anonymous Inner classes
-
-        public class Parcel6 {
-            public Contents cont() {
-                return new Contents() {
-                    private int i = 11;
-
-                    public int value() { return i; }
-                }; // >>> Semicolon required!!!
-            }
-            public static void main(String[] args) {
-                Parcel6 p = new Parcel6();
-                Contents c = p.cont();
-            }
-        }
-        // Contents.java
-        public interface Contents {
-            int value();
-        }
-
-   What this strange syntax means is "Create an object of an anonymous class
-   that’s inherited from Contents." The reference returned by the new expression
-   is automatically upcast to a Contents reference.
-
-
-   Contents is created by using a default constructor. If argument needed:
-
-       public class Parcel7 {
-           public Wrapping wrap(int x) {
-               return new Wrapping(x) {
-                   public int value() {
-                       return super.value() * 47;
-                   }
-               };
-           }
-       }
-       // You simply pass the appropriate argument to the base-class
-       // constructor,
-       // seen here as the x passed in new Wrapping(x);
-       // Wrapping.java
-       public class Wrapping {
-           private int i;
-           public Wrapping(int x) {
-               i = x;
-           }
-           public int value() {
-               return i;
-           }
-       }
-       // SO right now it acts as inheritance i guess?
-
-   That is, you simply pass the appropriate argument to the base-class
-   constructor, seen here as the x passed in new Wrapping(x). Although it’s an
-   ordinary class with an implementation, Wrapping is also being used as a
-   common "interface" to its derived classes
-
-
-   OR
-
-       // this is a method
-
-       ...
-       public Destination dest(final String dest) {
-           return new Destination() {
-               private String label = dest;
-               public String readLabel() { return label; }
-           };
-       }
-
-       // Destination.java
-       public interface Destination {
-           String readLabel();
-       }
-
-   *** IMPORTANT ***
-
-   If you are defining an anonymous inner class and want to use an object that
-   is defined outside the anonymous inner class, the compiler requires that the
-   **argument** reference be _final_ like the argument to dest().
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   *** SUPER IMPORTANT: it needs to be final if it is going to be used inside
-   the inner class[ IT REFERS TO THE ARGUMENT ]. case where it needs not be
-   final is eg below.
-
-    SO THE **ARGUMENTS** THAT ARE PASSED TO THE METHOD THAT CONTAINS THE
-    ANONYMOUS INNER CLASS NEED TO BE FINAL IF THEY ARE TO BE USED INSIDE THE
-    INNER CLASS
-
-    THE ANONYMOUS INNER CLASS CAN STILL ACCESS ALL THE OBJECTS DEFINED IN THE
-    ENCLOSING CLASS WITHOUT THE NEED FOR FINAL!!!
-
-                     >>> Explanation from StackOverflow <<<
-    The variables lastPrice and price are local variables in the main() method.
-    The object that you create with the anonymous class might last until after
-    the main() method returns.
-
-    When the main() method returns, local variables (such as lastPrice and
-    price) will be cleaned up from the stack, so they won't exist anymore after
-    main() returns.
-
-    But the anonymous class object references these variables. Things would go
-    horribly wrong if the anonymous class object tries to access the variables
-    after they have been cleaned up.
-
-    IMPORTANT PART HERE: By making lastPrice and price final, they are not
-    really variables anymore, but constants.  The compiler can then just replace
-    the use of lastPrice and price in the anonymous class with the values of the
-    constants (at compile time, ofcourse), and you won't have the problem with
-    accessing non-existent variables anymore.
-
-
-    >>> My view <<<
-    The method where the anonymous/inner class is created will die on the stack
-    after it has returned what it had to return. But the anonymous/inner object
-    that was returns still is alive after that enclosing method is dead. So if
-    the inner object refers to values that are found inside that method, like
-    the arguments of that method, it won't be able to do it since the method is
-    dead!
-
-    Declaring those values as final will make the object keep a copy of the
-    values of the method even though that method is still dead.
-
-        e.g
-
-        WithInner getWithInner (final String x) {
-            return new WithInner() {
-                /// here i'm referring to x; so
-                // x must be final if i want to refer
-                // to it even after the method has
-                // returned and does not exist anymore.
-                getString() {
-                    return x;
-                }
-            }
-        }
-
-*** NOTE ***    This also applies to local inner class that need to
-                access something from the enclosing method arguments.
-
-     SO e.g
-
-         // this is a method
-         public WithInner getWithInner(final String x) {
-
-             class Hoho extends WithInner {
-                 String a = x;
-                 // won't compile if x is not final !!!
-             }
-             return new Hoho();
-         }
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   ANONYMOUS inner classes need their stuff to be FINAL
-
-   abstract class Base {
-       public Base( int i) {
-           println("Base Constructor, i = " + i);
-       }
-       public abstract void f();
-   }
-
-    public class AnonymousConstructor {
-        public static Base getBase(int i) {
-            // *** IMPORTANT: i does not have to be final since i is passed to
-            // the base constructor of the anonymous class, it is never directly
-            // used inside the anonymous class.
-            return new Base(i) {
-                // this is some sort of initialization inside the curvy braces
-                {
-                    println("Inside instance inializer");
-                }
-                public void f() {
-                    System.out.println("in anonymous f()"):
-                }
-            };
-        }
-
-        public static void main(String[] args) {
-            Base base = getBase(47);
-            base.f();
-        }
-
-    // Base constructor, i = 47
-    // Inside instance initializer
-    // in anonymous f()
-
-- You can’t have a named constructor in an anonymous class (since there’s no
-  name!), but with instance initialization, you can, in effect, create a
-  constructor for an anonymous inner class [ see example above, where instance
-  iniliazer is printed, this is instance initialization ]
-
-  Inside the instance initializer you can see code that couldn’t be executed as
-  part of a field initializer (that is, the if statement). So in effect, an
-  instance initializer is the constructor for an anonymous inner class. Of
-  course, it’s limited; you can’t overload instance initializers, so you can
-  have only one of these constructors.
-
-  IMPORTANT: <<< Anonymous inner classes are somewhat limited compared to
-  regular inheritance, because they can either extend a class or implement an
-  interface, but not both. And if you do implement an interface, you can only
-  implement one.
-  >>>
-
-
-- Being able to access members of the enclosing class
-
-        interface Selector {
-            boolean end();
-            Object current();
-            void next();
-        }
-        public class Sequence {
-            private static Test monitor = new Test();
-            private Object[] objects;
-            private int next = 0;
-
-            ...
-
-                private class SSelector implements Selector {
-                    private int i = 0;
-                    public boolean end() {
-                        return i == objects.length;
-                    }
-                    public Object current() {
-                        return objects[i];
-                    }
-                    public void next() {
-                        if ( i< objects.length) i++;
-                    }
-                }
-            ...
-        }
-
-    SSelector is a private class that provides Selector functionality
-
-    Note that SSelector refers to "objects" variable for example,, which is a
-    reference that isn't part of SSelector but is instead a private field in the
-    enclosing class .
-
-    *** An inner class has automatic access to the members of the enclosing
-    class.
-
-    THe inner class must keep a reference to the particular object of the
-    enclosing class that was responsible for creating it.
-
-    Then when you refer to a member of the enclosing class, the (hidden)
-    reference is used to select that member.
-
-- Nested class
-
-    *** If you don't need a connection between the inner class object and the
-    outer class object, then you can make the inner class _static_. This is
-    commonly called a _nested class_.
-
-    A nested class means:
-
-    - You don't need an outer-class object in order to create an object of a
-      nested class.
-    - You can't access a non-static outer-class object from an object of a
-      nested class.  ( SINCE NESTED CLASS MEANS INNER CLASS THAT IS STATIC !!!)
-
-    Fields and methods in ordinary inner classes can only be at the outer level
-    of a class, so ordinary inner classes cannot have static data, static
-    fields, or nested classes. However nested classes can have all of these.(?
-    pg 279)
-
-    In an ordinary (non-static) inner class, the link to the outer-class object
-    is achieved with a special this reference. A nested class does not have a
-    special this reference, which makes it analogous to a static method.
-
-- Classes inside interfaces
-
-*** Normally you can't put any code inside an interface, but a nested class can
-    be part of an interface. Since the class is static, it does not violate the
-    rules of interfaces(since it is static?) - the nested class is only placed
-    inside the namespace of the interface.
-
-    You can even implement the surrounding interface in the inner class
-
-
-        // ClassInInterface.java
-
-        public interface ClassInInterface {
-            void howdy();
-
-            class Test implements ClassInInterface {
-                public void howdy() {
-                    print("Howdy!");
-                }
-                public static void main(String[] args) {
-                    new Test().howdy();
-                }
-            }
-        }// Output is: Howdy!
-
-    IMPORTANT: <<< It’s convenient to nest a class inside an interface when you
-    want to create some common code to be used with all different
-    implementations of that interface.
-    >>>
-
-    Earlier in this book I suggested putting a main( ) in every class to act as
-    a test bed for that class. One drawback to this is the amount of extra
-    compiled code you must carry around. If this is a problem, you can use a
-    nested class to hold your test code
-
-
-        public class TestBed {
-            public void f() { print(" f() "); }
-            public static class Tester {
-                public static void main(String[] args) {
-                    TestBed t = new TestBed();
-                    t.f();
-                }
-            }
-        }// Output: f()
-
-
-    This generates a separate class called TestBed$Tester (to run the program,
-    you say Java TestBed$Tester, but you must escape the ‘$’ under Unix/Linux
-    systems). You can use this class for testing, but you don’t need to include
-    it in your shipping product; you can simply delete TestBed$Tester.class
-    before packaging things up.
-
-------------------------------------
-
-* Reaching outward from a multiply-nested class
-
-- It does not matter how deeply an inner class may be nested - it can
-  transparently access all of the memvers of all the classes it is nested
-  within.
-
-      class MNA {
-          private void f() {}
-          class A {
-              private void g() {}
-              public class B{
-                  void h() {
-                      g();
-                      f();
-                  }
-              }
-          }
-      }
-
-        public class MultiNestingAccess {
-            public static boid main(String[] args) {
-                MNA mna = new MNA();
-                MNA.A mnaa = mna.new A();
-                MNA.A.B mnaab = mnaa.new B();
-                mnaab.h();
-            }
-        }
-
-
-
- * Why inner classes?
- - Typically, the inner class inherits from a class or implements an interface,
-   and the code in the inner class manipulates the outer class object that it
-   was created within. So you could say that an inner class provides a kind of
-   window into the outer class.
-
-
-   ** The most compelling reason for inner classes is:
-
-    Each inner class can independently inherit from an implementation.  Thus,
-    the inner class is not limited by whether the outer class is already
-    inheriting from an implementation.
-
-
-        e.g
-
-        class D {}
-        abstract class E {}
-
-         class Z extends D {
-             // kind of inherits E here, since we are calling the base
-             // constructor of
-             // E, even though the outer class inherits D
-             E makeE {
-                 return new E() {};
+}
+```
+This also applies to local inner class that need to access something from the
+enclosing method arguments.
+
+```java
+// this is a method
+public WithInner getWithInner(final String x) {
+
+    class Hoho extends WithInner {
+        String a = x;
+        // won't compile if x is not final !!!
+    }
+    return new Hoho();
+}
+```
+You can’t have a named constructor in an anonymous class (since there’s no
+name!), but with instance initialization, you can, in effect, create a
+constructor for an anonymous inner class [ see example above, where instance
+iniliazer is printed, this is instance initialization ]
+
+Anonymous inner classes are somewhat limited compared to regular inheritance,
+because they can either extend a class or implement an interface, but not both.
+And if you do implement an interface, you can only implement one.
+
+## Nested class
+If you don't need a connection between the inner class object and the outer
+class object, then you can make the inner class _static_. This is commonly
+called a _nested class_.
+
+A nested class means:
+- You don't need an outer-class object in order to create an object of a
+  nested class.
+- You can't access a non-static outer-class object from an object of a
+  nested class. ( SINCE NESTED CLASS MEANS INNER CLASS THAT IS STATIC !!!)
+
+In an ordinary (non-static) inner class, the link to the outer-class object is
+achieved with a special this reference. A nested class does not have a special
+this reference, which makes it analogous to a static method.
+
+### Reaching outward from a multiply-nested class
+
+ It does not matter how deeply an inner class may be nested - it can
+ transparently access all of the members of all the classes it is nested within.
+
+```java
+ class MNA {
+     private void f() {}
+     class A {
+         private void g() {}
+         public class B{
+             void h() {
+                 g();
+                 f();
              }
          }
+     }
+ }
 
+public class MultiNestingAccess {
+    public static boid main(String[] args) {
+        MNA mna = new MNA();
+        MNA.A mnaa = mna.new A();
+        MNA.A.B mnaab = mnaa.new B();
+        mnaab.h();
+    }
+}
+```
+## Why inner classes?
+Typically, the inner class inherits from a class or implements an interface, and
+the code in the inner class manipulates the outer class object that it was
+created within. So you could say that an inner class provides a kind of window
+into the outer class.
 
-    If you have abstract or concrete classes instead of interfaces, You are
-    suddenly limited to using inner classes if your class must somehow implement
-    both of the others.
+Each inner class can independently inherit from an implementation.  Thus, the
+inner class is not limited by whether the outer class is already inheriting from
+an implementation.
 
-        - The inner class can have multiple instances, each with its own state
-          information that is independent of the information in the outer class
-          object
+```java
+class D {}
+abstract class E {}
 
-        - In a single outer class you can have several inner classes, each of
-          which implement the same interface or inherit from the same cass in a
-          different way.
+class Z extends D {
+    // kind of inherits E here, since we are calling the base
+    // constructor of
+    // E, even though the outer class inherits D
+    E makeE {
+        return new E() {};
+    }
+}
+```
+## Closures and Callbacks
+A _closure_ is a callable object that retains the information from the scope in
+which it was created. From this definition, you can see that an inner class is
+an object-oriented closure, because it doesn't just contain each piece of
+information from the outer class object, it automatically holds a reference back
+to the whole outer class object, where it has permission to manipulate all the
+members, even private ones.
 
-        - The point of creation of the inner class object is not tied to the
-          creation of hte outer class object.
+With a callback, some other object is given a piece of information that allows
+it to call back into the originating object at some later point.
 
-        - There is no potentially confusing "is-a" relationship with the inner
-          class; it's a seperate entity.
+```java
+class MyIncrement {
+    void increment() {
+        println("Other operation");
+    }
+    static void f(MyIncrement mi) { mi.increment(); }
+}
 
-pg needs to fix
-pg 283
-* Closures and Callbacks
+// if your class must implement increment() in some other way, you must
+// use an inner class
 
-- A _closure_ is a callable object that retains the information from the scope
-  in which it was created. From this definition, you can see that an inner class
-  is an object-oriented closure, because it doesn't just contain each piece of
-  information from the outer class object, it automatically holds a reference
-  back to the whole outer class object, where it has permission to manipulate
-  all the members, even private ones.
+class Callee2 extends MyIncrement {
+    private int i = 0;
+    private void increment() {
+        i++;
+        println(i);
+    }
+    private class Closure implements Incrementable {
+        public void increment() { incr(); }
+    }
+    Incrementable getCallbackReference() {
+        return new Closure();
+    }
+}
+```
+The inner class Closure implements Incrementable to provide a hook back into
+Callee2— but a safe hook. Whoever gets the Incrementable reference can, of
+course, only call increment( ) and has no other abilities (unlike a pointer,
+which would allow you to run wild).
 
-- With a callback, some other object is given a piece of information that allows
-  it to call back into the originating object at some later point.
+Caller takes an Incrementable reference in its constructor (although the
+capturing of the callback reference could happen at any time) and then, sometime
+later, uses the reference to "call back" into the Callee class.  The value of
+the callback is in its flexibility; you can dynamically decide what methods will
+be called at run time. The benefit of this will become more evident in the
+Graphical User Interfaces chapter, where callbacks are used everywhere to
+implement GUI functionality.
 
+## Can inner classes be overridden?
+Create an inner class, inherit from the enclosing class and redefine the inner
+class.... is it possible to override the entire inner class?
 
-      class MyIncrement {
-          void increment() {
-              println("Other operation");
-          }
-          static void f(MyIncrement mi) { mi.increment(); }
-      }
+"Overriding" an inner class as if it were another method of the outer class
+doesn’t really do anything [overiding is more associated with methods]
 
-        // if your class must implement increment() in some other way, you must
-        // use an inner class
+```java
+class Egg {
+    private Yolk y;
+    protected class Yolk {
+        public Yolk() {println("Egg.Yolk()");}
+    }
+    public Egg() {
+        System.out.println("New Egg()");
+        y = new Yolk();
+    }
+}
+public class BigEgg extends Egg {
+    public class Yolk {
+        public Yolk() { println("BigEgg.Yolk()"); }
+    }
+    public static void main(String[] args) {
+        new BigEgg();
+    }
+}
 
-        class Callee2 extends MyIncrement {
-            private int i = 0;
-            private void increment() {
-                i++;
-                println(i);
+// New Egg() and Egg.Yolk() are printed
+// we would expect that BigEgg.Yolk() to be printed because
+// y = new Yolk() in the Egg() should in theory call the overridden one
+// (BigEgg.Yolk())
+```
+
+You might think that since a BigEgg is being created, the "overridden" version
+of Yolk would be used, but this is not the case.
+
+You can't really implicitly since the two inner classes are completely seperate
+entities, each in their own namespace. However it is still possible to
+explicitly inherit from the inner class.
+
+Note that this is different from trying to inherit the inner class itself, right
+now we are inheriting the outer class and trying to also "inherit the inner
+class"
+
+```java
+class Egg2 {
+    protected class Yolk {
+        public Yolk() {
+            println("Egg2.Yolk()");
+        }
+    }
+    public void f() {
+        println("Egg2.Yolk.f()");
+    }
+    private Yolk y = new Yolk();
+    public Egg2() {
+        println("New Egg2()");
+    }
+    public void insertYolk(Yolk yy) { y = yy; }
+    public void g() { y.f();}
+}
+
+class BigEgg2 extends Egg2 {
+    private static Test monitor = new Test();
+    public class Yolk extends Egg2.Yolk {
+        public Yolk() {
+            println("BigEgg2.Yolk()");
+        }
+        public void f() {
+            println("BigEgg2.Yolk.f()");
+        }
+    }
+    public BigEgg2() {
+        insertYolk(new Yolk());
+    }
+    public static void main (String[] args) {
+        Egg2 e2 = new BigEgg2();
+        e2.g();
+    }
+}
+
+// what we would see:
+// Egg2.Yolk()
+// New Egg2()
+// Egg2.Yolk()
+// BigEgg2.Yolk()
+// BigEgg2.Yolk.f()
+```
+### Local Inner classes
+As noted earlier, inner classes can also be created inside code blocks,
+typically inside the body of a method. A local inner class cannot have an
+"access" specifier because it isn't part of the outer class, but it does have
+access to the _final_ variables in the current code block and all the members of
+the enclosing class.
+
+```java
+// LocalInnerClass.java
+interface Counter {
+    int next();
+}
+
+public class LocalInnerClass {
+    private int count = 0;
+
+    Counter getCounter (final String name) {
+        // local inner class
+
+        class LocalCounter implements Counter {
+            public LocalCounter() {
+                System.out.println("localcounter()");
             }
-            private class Closure implements Incrementable {
-                public void increment() { incr(); }
-            }
-            Incrementable getCallbackReference() {
-                return new Closure();
+            public int next() {
+                print(name); // access local final
+                return count++;
             }
         }
+        return new LocalCounter();
+    }
 
-  The inner class Closure implements Incrementable to provide a hook back into
-  Callee2— but a safe hook. Whoever gets the Incrementable reference can, of
-  course, only call increment( ) and has no other abilities (unlike a pointer,
-  which would allow you to run wild).
+    // same thing with anonymous inner class
 
-  Caller takes an Incrementable reference in its constructor (although the
-  capturing of the callback reference could happen at any time) and then,
-  sometime later, uses the reference to "call back" into the Callee class.  The
-  value of the callback is in its flexibility; you can dynamically decide what
-  methods will be called at run time. The benefit of this will become more
-  evident in the Graphical User Interfaces chapter, where callbacks are used
-  everywhere to implement GUI functionality.
-
-pg needs to fix
-* Inner classes and control frameworks ??
-  An application framework is a class or a set of classes that’s designed to
-  solve a particular type of problem. To apply an application framework, you
-  typically inherit from one or more classes and override some of the methods.
-  The code that you write in the overridden methods customizes the general
-  solution provided by that application framework in order to solve your
-  specific problem.  This is an example of the Template Method design pattern
-
-  The Template Method contains the basic structure of the algorithm, and it
-  calls one or more overrideable methods to complete the action of that
-  algorithm. A design pattern separates things that change from things that stay
-  the same, and in this case the Template Method is the part that stays the
-  same, and the overrideable methods are the things that change.
-
-  A control framework is a particular type of application framework dominated by
-  the need to respond to events. A system that primarily responds to events is
-  called an event-driven system. A common problem in application programming is
-  the graphical user interface (GUI), which is almost entirely event-driven. As
-  you will see in the Graphical User Interfaces chapter, the Java Swing library
-  is a control framework that elegantly solves the GUI problem and that heavily
-  uses inner classes.
-
-  To see how inner classes allow the simple creation and use of control
-  frameworks, consider a control framework whose job is to execute events
-  whenever those events are "ready." Although "ready" could mean anything, in
-  this case it will be based on clock time. What follows is a control framework
-  that contains no specific information about what it’s controlling. That
-  information is supplied during inheritance, when the action( ) portion of the
-  algorithm is implemented.
-
-  First, here is the interface that describes any control event. It’s an
-  abstract class instead of an actual interface because the default behavior is
-  to perform the control based on time.
-
-
-* Inheriting from inner classes
-
-- Because the inner class constructor must attach to a reference of the
-  enclosing class object, things are slightly complicated when you inherit from
-  an inner class. The problem is that the "secret" reference to the enclosing
-  class object must be initialized, and yet in the derived class there's no
-  longer a default object to attach to.
-
-- I think it means that to access an inner class, you need to initialize the
-  outer class first. So when you inherit an inner class, you need to create the
-  outer class first and feed it to the constructor of the class that is
-  extending the inner class.
-
-
-      class WithInner {
-          class Inner{}
-      }
-
-      public class InheritInner extends WithInner.Inner {
-          //! InheritInner(){} // Won't compile
-          InheritInner(WithInner wi) {
-              // get an enclosing instance that contains WithInner.Inner
-              wi.super();
-          }
-          public static void main (String[] args) {
-              WithInner wi = new WithInner();
-              InheritInner ii = new InheritINner(wi);
-          }
-      }
-
-    You can see that InheritInner is extending only the inner class, not the
-    outer one. But when it comes time to create a constructor, the default one
-    is no good, and you can’t just pass a reference to an enclosing object. In
-    addition, you must use the syntax
-
-                enclosingClassReference.super();
-
-    inside the constructor. This provides the necessary reference, and the
-    program will then compile.
-
-* Can inner classes be overridden?
-- Create an inner class, inherit from the enclosing class and redefine the inner
-  class.... is it possible to override the entire inner class?
-
-    "Overriding" an inner class as if it were another method of the outer class
-    doesn’t really do anything [overiding is more associated with methods]
-
-        class Egg {
-            private Yolk y;
-            protected class Yolk {
-                public Yolk() {println("Egg.Yolk()");}
-            }
-            public Egg() {
-                System.out.println("New Egg()");
-                y = new Yolk();
-            }
-        }
-        public class BigEgg extends Egg {
-            private static Test monitor = new Test();
-            public class Yolk {
-                public Yolk() { println("BigEgg.Yolk()"); }
-            }
-            public static void main(String[] args) {
-                new BigEgg();
-            }
-        }
-
-        // New Egg() and Egg.Yolk() are printed
-        // we would expect that BigEgg.Yolk() to be printed because
-        // y = new Yolk() in the Egg() should in theory call the overridden one
-        // (BigEgg.Yolk())
-
-  You might think that since a BigEgg is being created, the "overridden" version
-  of Yolk would be used, but this is not the case.
-
-- You can't really implicitly since the two inner classes are completely
-  seperate entities, each in their own namespace. However it is still possible
-  to explicitly inherit from the inner class.
-
-*** Note that this is different from trying to inherit the inner class itself,
-    right now we are inheriting the outer class and trying to also "inherit the
-    inner class"
-
-        class Egg2 {
-            protected class Yolk {
-                public Yolk() {
-                    println("Egg2.Yolk()");
-                }
-            }
-            public void f() {
-                println("Egg2.Yolk.f()");
-            }
-            private Yolk y = new Yolk();
-            public Egg2() {
-                println("New Egg2()");
-            }
-            public void insertYolk(Yolk yy) { y = yy; }
-            public void g() { y.f();}
-        }
-
-      class BigEgg2 extends Egg2 {
-          private static Test monitor = new Test();
-          public class Yolk extends Egg2.Yolk {
-              public Yolk() {
-                  println("BigEgg2.Yolk()");
-              }
-              public void f() {
-                  println("BigEgg2.Yolk.f()");
-              }
-          }
-          public BigEgg2() {
-              insertYolk(new Yolk());
-          }
-          public static void main (String[] args) {
-              Egg2 e2 = new BigEgg2();
-              e2.g();
-          }
-      }
-
-      // what we would see:
-      // Egg2.Yolk()
-      // New Egg2()
-      // Egg2.Yolk()
-      // BigEgg2.Yolk()
-      // BigEgg2.Yolk.f()
-
-
-* Local Inner classes
-- As noted earlier, inner classes can also be created inside code blocks,
-  typically inside the body of a method. A local inner class cannot have an
-  "access" specifier because it isn't part of the outer class, but it does have
-  access to the _final_ variables in the current code block and all the members
-  of the enclosing class.
-
-          // LocalInnerClass.java
-          interface Counter {
-              int next();
-          }
-
-        public class LocalInnerClass {
-            private int count = 0;
-
-            Counter getCounter (final String name) {
-                // local inner class
-
-                class LocalCounter implements Counter {
-                    public LocalCounter() {
-                        System.out.println("localcounter()");
-                    }
-                    public int next() {
-                        print(name); // access local final
-                        return count++;
-                    }
-                }
-                return new LocalCounter();
-            }
-
-            // same thing with anonymous inner class
-
-            Counter getCounter2(final String name) {
-                return new Counter() {
-                    // anonymous inner class cannot have a named constructor.
-                    // only an
-                    // instance initializer
-                    {
-                        System.out.println("Counter()");
-                    }
-                    public int next() {
-                        System.out.print(name); // access local final
-                        return count++;
-                    }
-                };
-            }
-        }
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Since the name of the local inner class is not accessible outside the method,
-  the only justification for using a local inner class instead of an anonymous
-  inner class is if you need a named constructor and/or an overloaded
-  constructor, since an anonymous inner class can only use instance
-  initialization.
-
-  The only reason to make a local inner class rather than an anonymous inner
-  class is if you need to make more than one object of that class.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * Inner class identifiers
-
- - Since every class produces a .class file that holds all the information about
-   how to create objects of that type, you might guess that inner classes must
-   also produce .class files.
-
-   The names of these files/classes have a strict formula: the name of the
-   enclosing class, followed by a '$', followed by the name of the inner class.
-
-   If inner classes are anonymous, the compiler simply starts generating numbers
-   as inner class identifiers. If inner classes are nested within inner classes,
-   their names are simply appended after a '$' and the outer class
-   identifier(s).
-
-   // eg Counter.class
-         LocalInnerClass$2.class
-                 LocalInnerClass$1LocalCounter.class
-                 LocalInnerClass.class
-
-
-
-* Holding your objects
-
-  In general, your programs will always be creating new objects based on some
-  criteria that will be known only at run time. Before then, you won’t know the
-  quantity or even the exact type of the objects you need. To solve the general
-  programming problem, you need to create any number of objects, anytime,
-  anywhere.
-
-  Java has several ways to hold objects (or rather, references to objects). The
-  compiler-supported type is the array, which has been discussed before. An
-  array is the most efficient way to hold a group of objects, and you’re pointed
-  towards this choice if you want to hold a group of primitives. But an array
-  has a fixed size, and in the more general case, you won’t know at the time
-  you’re writing the program how many objects you’re going to need, or whether
-  you need a more sophisticated way to store your objects—so the fixed-sized
-  constraint of an array is too limiting.
-
-  The java.util library has a reasonably complete set of container classes to
-  solve this problem, the basic types of which are List, Set, Queue, and Map.
-  These types of objects are also known as collection classes, but because the
-  Java library uses the name Collection to refer to a particular subset of the
-  library, I shall use the more inclusive term "container." Containers provide
-  sophisticated ways to hold your objects, and you can solve a surprising number
-  of problems by using these tools.
-
-  Among their other characteristics—Set, for example, holds only one object of
-  each value, and Map is an associative array that lets you associate objects
-  with other objects—the Java container classes will automatically resize
-  themselves. So, unlike with arrays, you can put in any number of objects and
-  you don’t need to worry about how big to make the container while you’re
-  writing the program.
-
-
-- Generics and type-safe containers
-
-  One of the problems of using pre-Java SE5 containers was that the compiler
-  allowed you to insert an incorrect type into a container. For example,
-  consider a container of Apple objects, using the basic workhorse container,
-  ArrayList. For now, you can think of ArrayList as "an array that automatically
-  expands itself." Using an ArrayList is straightforward: Create one, insert
-  objects using add( ), and access them with get( ), using an index—just as you
-  do with an array, but without the square brackets.  ArrayList also has a
-  method size( ) to let you know how many elements have been added, so that
-  you don’t inadvertently index off the end and cause an error
-
-  In this example, Apples and Oranges are placed into the container, then pulled
-  out.  Normally, the Java compiler will give you a warning because the example
-  does not use generics. Here, a special Java SE5 annotation is used to suppress
-  the warning. Annotations start with an ‘@’ sign, and can take an argument;
-  this one is @SuppressWarnings and the argument indicates that "unchecked"
-  warnings only should be suppressed
-
-      import java.util.*;
-
-      class Apple {
-              privae static long counter;
-              private final long id = counter++;
-              public long id() {return id;}
-      }
-      class Orange {}
-
-      public calss ApplesAndOrangesWithoutGenerics {
-        @SuppressWarnings("unchecked")
-        public static void main(String[] args) {
-                ArrayList apples = new ArrayList();
-
-            for(int i = 0: i < 3; i++) { apples.add(new Apple());}
-            apples.add(new Orange()); // not prevented from adding an Orange to
-                                      // apples.
-            for(int i = 0; i < apples.size(); i++)
+    Counter getCounter2(final String name) {
+        return new Counter() {
+            // anonymous inner class cannot have a named constructor.
+            // only an
+            // instance initializer
             {
-                 ((Apple)apples.get(i).id();
-                 // Orange is detected only at run time
+                System.out.println("Counter()");
             }
+            public int next() {
+                System.out.print(name); // access local final
+                return count++;
+            }
+        };
+    }
+}
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Since the name of the local inner class is not accessible outside the method,
+the only justification for using a local inner class instead of an anonymous
+inner class is if you need a named constructor and/or an overloaded constructor,
+since an anonymous inner class can only use instance initialization.
+
+The only reason to make a local inner class rather than an anonymous inner class
+is if you need to make more than one object of that class.
+
+### Inner class identifiers
+
+Since every class produces a .class file that holds all the information about
+how to create objects of that type, you might guess that inner classes must also
+produce .class files.
+
+The names of these files/classes have a strict formula: the name of the
+enclosing class, followed by a '$', followed by the name of the inner class.
+
+If inner classes are anonymous, the compiler simply starts generating numbers as
+inner class identifiers. If inner classes are nested within inner classes, their
+names are simply appended after a '$' and the outer class identifier(s).
+
+```
+// eg Counter.class
+     LocalInnerClass$2.class
+             LocalInnerClass$1LocalCounter.class
+             LocalInnerClass.class
+```
+# Holding your objects
+
+The java.util library has a reasonably complete set of container classes to
+solve this problem, the basic types of which are List, Set, Queue, and Map.
+These types of objects are also known as collection classes, but because the
+Java library uses the name Collection to refer to a particular subset of the
+library, I shall use the more inclusive term "container." Containers provide
+sophisticated ways to hold your objects, and you can solve a surprising number
+of problems by using these tools.
+
+Among their other characteristics—Set, for example, holds only one object of
+each value, and Map is an associative array that lets you associate objects with
+other objects—the Java container classes will automatically resize themselves.
+So, unlike with arrays, you can put in any number of objects and you don’t need
+to worry about how big to make the container while you’re writing the program.
+
+## Generics and type-safe containers
+
+One of the problems of using pre-Java SE5 containers was that the compiler
+allowed you to insert an incorrect type into a container. For example, consider
+a container of Apple objects, using the basic workhorse container, ArrayList.
+For now, you can think of ArrayList as "an array that automatically expands
+itself." Using an ArrayList is straightforward: Create one, insert objects using
+add( ), and access them with get( ), using an index—just as you do with an
+array, but without the square brackets.  ArrayList also has a method size( ) to
+let you know how many elements have been added, so that you don’t inadvertently
+index off the end and cause an error
+
+In this example, Apples and Oranges are placed into the container, then pulled
+out.  Normally, the Java compiler will give you a warning because the example
+does not use generics. Here, a special Java SE5 annotation is used to suppress
+the warning. Annotations start with an ‘@’ sign, and can take an argument; this
+one is @SuppressWarnings and the argument indicates that "unchecked" warnings
+only should be suppressed
+
+```java
+import java.util.*;
+
+class Apple {
+    privae static long counter;
+    private final long id = counter++;
+    public long id() {return id;}
+}
+class Orange {}
+
+public calss ApplesAndOrangesWithoutGenerics {
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) {
+        ArrayList apples = new ArrayList();
+
+       for(int i = 0: i < 3; i++) { apples.add(new Apple());}
+       apples.add(new Orange()); // not prevented from adding an Orange to
+       // apples.
+       for(int i = 0; i < apples.size(); i++)
+       {
+           ((Apple)apples.get(i).id();
+            // Orange is detected only at run time
         }
-      }
+    }
+}
+```
+When you go to fetch out what you think are Apple objects using the ArrayList
+method get( ), you get back a reference to an Object that you must cast to an
+Apple. Then you need to surround the entire expression with parentheses to force
+the evaluation of the cast before calling the id( ) method for Apple; otherwise,
+you’ll get a syntax error. At run time, when you try to cast the Orange object
+to an Apple, you’ll get an error in the form of the aforementioned exception.
 
-  The classes Apple and Orange are distinct; they have nothing in common except
-  that they are both Objects. (Remember that if you don’t explicitly say what
-  class you’re inheriting from, you automatically inherit from Object.) Since
-  ArrayList holds Objects, you can not only add Apple objects into this
-  container using the ArrayList method add( ), but you can also add Orange
-  objects without complaint at either compile time or run time.
+For example, to define an ArrayList intended to hold Apple objects, you say
+ArrayList<Apple> instead of just ArrayList. The angle brackets surround the type
+parameters (there may be more than one), which specify the type(s) that can be
+held by that instance of the container. With generics, you’re prevented, at
+compile time, from putting the wrong type of object into a container.
 
-  When you go to fetch out what you think are Apple objects using the ArrayList
-  method get( ), you get back a reference to an Object that you must cast to an
-  Apple. Then you need to surround the entire expression with parentheses to
-  force the evaluation of the cast before calling the id( ) method for Apple;
-  otherwise, you’ll get a syntax error. At run time, when you try to cast the
-  Orange object to an Apple, you’ll get an error in the form of the
-  aforementioned exception.
+```java
+public class ApplesAndOrangesWithGenerics {
+    public static void main(String[] args) {
+        ArrayList<Apple> apples = new ArrayList<Apple>();
+        for (int i = 0; i< 3; i++)
+            apples.add(new Apple());
 
-  For example, to define an ArrayList intended to hold Apple objects, you say
-  ArrayList<Apple> instead of just ArrayList. The angle brackets surround the
-  type parameters (there may be more than one), which specify the type(s) that
-  can be held by that instance of the container. With generics, you’re
-  prevented, at compile time, from putting the wrong type of object into a
-  container.
+        // Compile-time error
+        // apples.add(new Orange());
+        ...
+            for (Apple c : apples)
+                System.out.println(c.id());
+    }
+}
+```
+Now the compiler will prevent you from putting an Orange into apples, so it
+becomes a compile-time error rather than a runtime error.
 
-      Using Generics
+It aLso work with upcasting
 
-          public class ApplesAndOrangesWithGenerics {
-              public static void main(String[] args) {
-                  ArrayList<Apple> apples = new ArrayList<Apple>();
-                  for (int i = 0; i< 3; i++)
-                      apples.add(new Apple());
+```java
+class GrannySmith extend Apple{}
+ArrayList<Apple> apples = new ArrayList<Apple>();
+apples.add(new GrannySmith());
+```
+## Basic Concepts
+The Java container library takes the idea of "holding your objects" and divides
+it into two distinct concepts, expressed as the basic interfaces of the library:
 
-                  // Compile-time error
-                  // apples.add(new Orange());
-                  ...
-                      for (Apple c : apples)
-                          System.out.println(c.id());
-              }
-          }
-  Now the compiler will prevent you from putting an Orange into apples, so it
-  becomes a compile-time error rather than a runtime error. Also notice that the
-  cast is no longer necessary when fetching items back out from the List. Since
-  the List knows what type it holds, it does the cast for you when you call get(
-  ). Thus, with generics you not only know that the compiler will check the type
-  of object that you put into a container, but you also get cleaner syntax when
-  using the objects in the container.
-
-  you can use the foreach syntax to select each element in the List.
-
-
-  ALso work with upcasting
-
-          class GrannySmith extend Apple{}
-                ...
-          ArrayList<Apple> apples = new ArrayList<Apple>();
-          apples.add(new GrannySmith());
-          ...
-
-- Basic Concepts
-
-  The Java container library takes the idea of "holding your objects" and
-  divides it into two distinct concepts, expressed as the basic interfaces of
-  the library:
-
-  1.  Collection: a sequence of individual elements with one or more rules
+Collection
+: a sequence of individual elements with one or more rules
   applied to them. A List must hold the elements in the way that they were
   inserted, a Set cannot have duplicate elements, and a Queue produces the
   elements in the order determined by a queuing discipline (usually the same
   order in which they are inserted).
 
-  2.  Map: a group of key-value object pairs, allowing you to look up a value
+Map
+: a group of key-value object pairs, allowing you to look up a value
   using a key.  An ArrayList allows you to look up an object using a number, so
   in a sense it associates numbers to objects. A map allows you to look up an
   object using another object. It’s also called an associative array, because it
@@ -2629,342 +1999,262 @@ pg needs to fix
   value object using a key object just like you look up a definition using a
   word. Maps are powerful programming tools.
 
-
-  Although it’s not always possible, ideally you’ll write most of your code to
-  talk to these interfaces, and the only place where you’ll specify the precise
-  type you’re using is at the point of creation.
-
-  e.g List<Apple> apples = new ArrayList<Apple>();
-
-  Notice that the ArrayList has been upcast to a List, in contrast to the
-  way it was handled in the previous examples. The intent of using the
-  interface is that if you decide you want to change your implementation,
-  all you need to do is change it at the point of creation,
-
-  This approach won’t always work, because some classes have additional
-  functionality. For example, LinkedList has additional methods that are not in
-  the List interface, and a TreeMap has methods that are not in the Map
-  interface. If you need to use those methods, you won’t be able to upcast to
-  the more general interface.
-
-
-  The Collection interface generalizes the idea of a sequence—a way of holding a
-  group of objects.
-
-       Collection<Integer> c = new ArrayList<Integer>();
-
-  Since this example only uses Collection methods, any object of a class
-  inherited from Collection would work, but ArrayList is the most basic type of
-  sequence.
-
-
-  *** The name of the add( ) method suggests that it puts a new element in the
-  Collection.  However, the documentation carefully states that add( ) "ensures
-  that this Collection contains the specified element." This is to allow for the
-  meaning of Set, which adds the element only if it isn’t already there. With an
-  ArrayList, or any sort of List, add( ) always means "put it in," because Lists
-  don’t care if there are duplicates.
-
-- Adding groups of elements
-
-  *** There are utility methods in both the Arrays and Collections classes in
-  java.util that add groups of elements to a Collection. Arrays.asList( ) takes
-  either an array or a comma- separated list of elements (using varargs) and
-  turns it into a List object.
-
-  Collections.addAll( ) takes a Collection object and either an array or a
-  comma-separated list and adds the elements to the Collection.
-
-          e.g
-
-          Collection<Integer> collection =
-                new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
-
-          Integer[] moreInts = { 6, 7, 8, 9, 10 };
-          collection.addAll(Arrays.asList(moreInts));
-
-          // runs significantly faster, but you can't
-          // construct a Collection this way
-
-          Collections.addAll(collection, 11, 12, 13, 14, 15);
-          Collections.addAll(collection, moreInts);
-
-          // *********** Very Important ***************
-          // *** Produces a list "backed by" an array: ***
-
-          List<Integer> list = Arrays.asList(16, 17, 18, 19, 20);
-          list.set(1, 99); // OK -- modify an element
-
-          // list.add(21); // Runtime error because the
-          // underlying array cannot be resized.
-
-   *** The constructor for a Collection can accept another Collection which it
-   uses for initializing itself, so you can use Arrays.asList( ) to produce
-   input for the constructor.  However, Collections.addAll( ) runs *** much
-   faster ***, and it’s just as easy to construct the Collection with no
-   elements and then call Collections.addAll( ), so this is the preferred
-   approach.
-
-   The Collection.addAll( ) member method can only take an argument of another
-   Collection object, so it is not as flexible as Arrays.asList( ) or
-   Collections.addAll( ), which use variable argument lists.
-
-  *** It’s also possible to use the output of Arrays.asList( ) directly, as a
-  List, but the underlying representation in this case is the array, which
-  cannot be resized. If you try to add( ) or delete( ) elements in such a list,
-  that would attempt to change the size of an array, so you’ll get an
-  "Unsupported Operation" error at run time.
-
-  * A limitation of Arrays.asList( ) is that it takes a best guess about the
-  * resulting type of the List, and doesn’t pay attention to what you’re
-  * assigning it to.
-
-      class Snow{}
-       class Powder extends Snow {}
-       class Light extends Powder {}
-       class Heavy extends Powder {}
-       class Crusty extends Snow {}
-       class Slush extends Snow {}
-
-       public class AsListInference {
-           ...
-               List<Snow> snow1 =
-                    Arrays.asList(new Crusty(), new Slush(), new Powder());
-
-           // Won't Compile:
-           // List<Snow> snow2 = Arrays.asList(new Light(), new Heavy());
-           // Compiler says:
-           // found      : java.util.List<Powder>
-           // required: java.util.List<Snow>
-
-           // Collections.addAll() doesn't get confused:
-
-           List<Snow> snow3 = new ArrayList<Snow>();
-           Collections.addAll(snow3, new Light(), new Heavy());
-
-           // Give a hing using an explicit type argument specification:
-
-           List<Snow> snow4 = Arrays.<Snow>asList(new Light(), new Heavy());
-           ...
-       }
-
-
-    When trying to create snow2, Arrays.asList( ) only has types of Powder, so
-    it creates a List<Powder> rather than a List<Snow>, whereas
-    Collections.addAll( ) works fine because it knows from the first argument
-    what the target type is.
-
-    As you can see from the creation of snow4, it’s possible to insert a "hint"
-    in the middle of Arrays.asList( ), to tell the compiler what the actual
-    target type should be for the resulting List type produced by Arrays.asList(
-    ). This is called an explicit type argument specification.
-
-  - Printing containers
-
-    You must use Arrays.toString( ) to produce a printable representation of an
-    array, but the containers print nicely without any help.
-
-        public class PrintingContainers {
-            static Collection fill(Collection<String> collection) {
-                collection.add("rat");
-                collection.add("cat");
-                collection.add("dog");
-                collection.add("dog");
-                return collection;
-            }
-            static Map fill(Map<String,String> map) {
-                map.put("rat", "Fuzzy");
-                map.put("cat", "Rags");
-                map.put("dog", "Bosco");
-                map.put("dog", "Spot");
-                return map;
-            }
-            public static void main(String[] args) {
-                print(fill(new ArrayList<String>()));
-                print(fill(new LinkedList<String>()));
-                print(fill(new HashSet<String>()));
-                print(fill(new TreeSet<String>()));
-                print(fill(new LinkedHashSet<String>()));
-                print(fill(new HashMap<String,String>()));
-                print(fill(new TreeMap<String,String>()));
-                print(fill(new LinkedHashMap<String,String>()));
-            }
-        }
-
-        Output:
-        [rat, cat, dog, dog]
-        [rat, cat, dog, dog]
-        [dog, cat, rat]
-        [cat, dog, rat]
-        [rat, cat, dog]
-        {dog=Spot, cat=Rags, rat=Fuzzy}
-        {cat=Rags, dog=Spot, rat=Fuzzy}
-        {rat=Fuzzy, cat=Rags, dog=Spot}
-
-    This shows the two primary categories in the Java container library. The
-    distinction is based on the number of items that are held in each "slot" in
-    the container. The Collection category only holds one item in each slot. It
-    includes the List, which holds a group of items in a specified sequence, the
-    Set, which only allows the addition of one identical item, and the Queue,
-    which only allows you to insert objects at one "end" of the container and
-    remove objects from the other "end" (for the purposes of this example, this
-    is just another way of looking at a sequence and so it is not shown). A Map
-    holds two objects, a key and an associated value, in each slot.
-
-
-    In the output, you can see that the default printing behavior (provided via
-    each container’s toString( ) method) produces reasonably readable results. A
-    Collection is printed surrounded by square brackets, with each element
-    separated by a comma. A Map is surrounded by curly braces, with each key and
-    value associated with an equal sign (keys on the left, values on the right).
-
-    ArrayList and LinkedList are both types of List, and you can see from the
-    output that they both hold elements in the same order in which they are
-    inserted. The difference between the two is not only performance for certain
-    types of operations, but also that a LinkedList contains more operations
-    than an ArrayList.
-
-    HashSet, TreeSet and LinkedHashSet are types of Set. The output shows that a
-    Set will only hold one of each identical item, but it also shows that the
-    different Set implementations store the elements differently. The HashSet
-    stores elements using a rather complex approach that will be explored in the
-    Containers in Depth chapter—all you need to know at this point is that this
-    technique is the fastest way to retrieve elements, and as a result the
-    storage order can seem nonsensical (often, you only care whether something
-    is a member of the Set, not the order in which it appears). If storage order
-    is important, you can use a TreeSet, which keeps the objects in ascending
-    comparison order, or a LinkedHashSet, which keeps the objects in the order
-    in which they were added.
-
-    A Map (also called an associative array) allows you to look up an object
-    using a key, like a simple database. The associated object is called a
-    value. If you have a Map that associates states with their capitals and you
-    want to know the capital of Ohio, you look it up using "Ohio" as the
-    key—almost as if you were indexing into an array. Because of this behavior,
-    a Map only accepts one of each key.
-
-    Map.put(key, value) adds a value (the thing you want) and associates it with
-    a key (the thing you look it up with). Map.get(key) produces the value
-    associated with that key.
-
-    Notice that you don’t have to specify (or think about) the size of the Map
-    because it resizes itself automatically. Also, Maps know how to print
-    themselves, showing the association with keys and values. The order that the
-    keys and values are held inside the Map is not the insertion order because
-    the HashMap implementation uses a very fast algorithm that controls the
-    order.
-
-    The example uses the three basic flavors of Map: HashMap, TreeMap and
-    LinkedHashMap. Like HashSet, HashMap provides the fastest lookup technique,
-    and also doesn’t hold its elements in any apparent order. A TreeMap keeps
-    the keys sorted by ascending comparison order, and a LinkedHashMap keeps the
-    keys in insertion order while retaining the lookup speed of the HashMap.
-
-- List
-
-  Lists promise to maintain elements in a particular sequence. The List
-  interface adds a number of methods to Collection that allow insertion and
-  removal of elements in the middle of a List.
-
-  The basic ArrayList, which excels at randomly accessing elements, but is
-  slower when inserting and removing elements in the middle of a List.
-
-  The LinkedList, which provides optimal sequential access, with inexpensive
-  insertions and deletions from the middle of the List. A LinkedList is
-  relatively slow for random access, but it has a larger feature set than the
-  ArrayList.
-
-  Unlike an array, a List allows you to add elements after it has been created,
-  or remove elements, and it resizes itself. That’s its fundamental value: a
-  modifiable sequence.
-
-  You can find out whether an object is in the list using the contains( )
-  method. If you want to remove an object, you can pass that object’s reference
-  to the remove( ) method. Also, if you have a reference to an object, you can
-  discover the index number where that object is located in the List using
-  indexOf( )
-
-
-  When deciding whether an element is part of a List, discovering the index of
-  an element, and removing an element from a List by reference, the equals( )
-  method (part of the root class Object) is used. Each Pet is defined to be a
-  unique object, so even though there are two Cymrics in the list, if I create a
-  new Cymric object and pass it to indexOf( ), the result will be -1 (indicating
-  it wasn’t found), and attempts to remove( ) the object will return false.  For
-  other classes, equals( ) may be defined differently—Strings, for example, are
-  equal if the contents of two Strings are identical. So to prevent surprises,
-  it’s important to be aware that List behavior changes depending on equals( )
-  behavior.
-
-  It’s possible to insert an element in the middle of the List.
-
-  for a LinkedList, insertion and removal in the middle of a list is a cheap
-  operation (except for, in this case, the actual random access into the
-  middle of the list), but for an ArrayList it is an expensive operation.
-  Does this mean you should never insert elements in the middle of an
-  ArrayList, and switch to a LinkedList if you do? No, it just means you
-  should be aware of the issue, and if you start doing many insertions in
-  the middle of an ArrayList and your program starts slowing down, that you
-  might look at your List implementation as the possible culprit
-
-  The subList( ) method allows you to easily create a slice out of a larger
-  list, and this naturally produces a true result when passed to containsAll( )
-  for that larger list. It’s also interesting to note that order is
-  unimportant—you can see in output lines 11 and 12 that calling the intuitively
-  named Collections.sort( ) and Collections.shuffle( ) on sub doesn’t affect the
-  outcome of containsAll( ). subList( ) produces a list backed by the original
-  list. Therefore, changes in the returned list are reflected in the original
-  list, and vice versa.
-
-
-  The retainAll( ) method is effectively a "set intersection" operation, in this
-  case keeping all the elements in copy
-
-
-  The removeAll( ) method also operates based on the equals( ) method. As the
-  name implies, it removes all the objects from the List that are in the
-  argument List. The set( ) method is rather unfortunately named because of the
-  potential confusion with the Set class— "replace" might have been a better
-  name here, be
-
-  you can convert any Collection to an array using toArray( ).
-
-  This is an overloaded method; the no-argument version returns an array of
-  Object, but if you pass an array of the target type to the overloaded version,
-  it will produce an array of the type specified (assuming it passes type
-  checking). If the argument array is too small to hold all the objects in the
-  List (as is the case here), to Array( ) will create a new array of the
-  appropriate size.
-
-       e.g List<String> = collection.toArray(new String[0]);
-
-
-- Iterator
-
-  In any container, you must have a way to insert elements and fetch them out
-  again. After all, that’s the primary job of a container—to hold things. In a
-  List, add( ) is one way to insert elements, and get( ) is one way to fetch
-  elements.
-
-  If you want to start thinking at a higher level, there’s a drawback: You need
-  to program to the exact type of the container in order to use it. This might
-  not seem bad at first, but what if you write code for a List, and later on you
-  discover that it would be convenient to apply that same code to a Set? Or
-  suppose you’d like to write, from the beginning, a piece of general- purpose
-  code that doesn’t know or care what type of container it’s working with, so
-  that it can be used on different types of containers without rewriting that
-  code?
-
-
-  The concept of an Iterator (another design pattern) can be used to achieve
-  this abstraction.  An iterator is an object whose job is to move through a
-  sequence and select each object in that sequence without the client programmer
-  knowing or caring about the underlying structure of that sequence. In
-  addition, an iterator is usually what’s called a lightweight object: one
-  that’s cheap to create. For that reason, you’ll often find seemingly strange
-  constraints for iterators; for example, the Java Iterator can move in only one
-  direction.  There’s not much you can do with an Iterator except:
-
+```java
+List<Apple> apples = new ArrayList<Apple>();
+```
+Notice that the ArrayList has been upcast to a List, in contrast to the way it
+was handled in the previous examples. The intent of using the interface is that
+if you decide you want to change your implementation, all you need to do is
+change it at the point of creation,
+
+This approach won’t always work, because some classes have additional
+functionality. For example, LinkedList has additional methods that are not in
+the List interface, and a TreeMap has methods that are not in the Map interface.
+If you need to use those methods, you won’t be able to upcast to the more
+general interface.
+
+The Collection interface generalizes the idea of a sequence—a way of holding a
+group of objects.
+
+```java
+Collection<Integer> c = new ArrayList<Integer>();
+```
+Since this example only uses Collection methods, any object of a class inherited
+from Collection would work, but ArrayList is the most basic type of sequence.
+
+Collection -> List and Sets
+
+## Adding groups of elements
+
+here are utility methods in both the Arrays and Collections classes in java.util
+that add groups of elements to a Collection. Arrays.asList( ) takes either an
+array or a comma- separated list of elements (using varargs) and turns it into a
+List object.
+
+Collections.addAll( ) takes a Collection object and either an array or a
+comma-separated list and adds the elements to the Collection.
+
+```java
+Collection<Integer> collection =
+new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
+
+Integer[] moreInts = { 6, 7, 8, 9, 10 };
+collection.addAll(Arrays.asList(moreInts));
+
+// runs significantly faster, but you can't
+// construct a Collection this way
+
+Collections.addAll(collection, 11, 12, 13, 14, 15);
+Collections.addAll(collection, moreInts);
+
+// *********** Very Important ***************
+// *** Produces a list "backed by" an array: ***
+
+List<Integer> list = Arrays.asList(16, 17, 18, 19, 20);
+list.set(1, 99); // OK -- modify an element
+
+// list.add(21); // Runtime error because the
+// underlying array cannot be resized.
+```
+The constructor for a Collection can accept another Collection which it uses for
+initializing itself, so you can use Arrays.asList( ) to produce input for the
+constructor.  However, Collections.addAll( ) runs **much faster**, and it’s
+just as easy to construct the Collection with no elements and then call
+Collections.addAll( ), so this is the preferred approach.
+
+The Collection.addAll( ) member method can only take an argument of another
+Collection object, so it is not as flexible as Arrays.asList( ) or
+Collections.addAll( ), which use variable argument lists.
+
+Note
+: It’s also possible to use the output of Arrays.asList( ) directly, as a List,
+  but the underlying representation in this case is the array, which cannot be
+  resized. If you try to add( ) or delete( ) elements in such a list, that would
+  attempt to change the size of an array, so you’ll get an "Unsupported
+  Operation" error at run time.
+
+A limitation of Arrays.asList( ) is that it takes a best guess about the
+resulting type of the List, and doesn’t pay attention to what you’re assigning
+it to.
+
+```java
+class Snow{}
+class Powder extends Snow {}
+class Light extends Powder {}
+class Heavy extends Powder {}
+class Crusty extends Snow {}
+class Slush extends Snow {}
+
+public class AsListInference {
+    ...
+        List<Snow> snow1 =
+        Arrays.asList(new Crusty(), new Slush(), new Powder());
+
+    // Won't Compile:
+    // List<Snow> snow2 = Arrays.asList(new Light(), new Heavy());
+    // Compiler says:
+    // found      : java.util.List<Powder>
+    // required: java.util.List<Snow>
+
+    // Collections.addAll() doesn't get confused:
+
+    List<Snow> snow3 = new ArrayList<Snow>();
+    Collections.addAll(snow3, new Light(), new Heavy());
+
+    // Give a hing using an explicit type argument specification:
+
+    List<Snow> snow4 = Arrays.<Snow>asList(new Light(), new Heavy());
+    ...
+}
+```
+
+When trying to create snow2, Arrays.asList( ) only has types of Powder, so it
+creates a List<Powder> rather than a List<Snow>, whereas Collections.addAll( )
+works fine because it knows from the first argument what the target type is.
+
+As you can see from the creation of snow4, it’s possible to insert a "hint" in
+the middle of Arrays.asList( ), to tell the compiler what the actual target type
+should be for the resulting List type produced by Arrays.asList(). This is
+called an explicit type argument specification.
+
+### Printing containers
+
+You must use Arrays.toString( ) to produce a printable representation of an
+array, but the containers print nicely without any help.
+
+```java
+public class PrintingContainers {
+    static Collection fill(Collection<String> collection) {
+        collection.add("rat");
+        collection.add("cat");
+        collection.add("dog");
+        collection.add("dog");
+        return collection;
+    }
+    static Map fill(Map<String,String> map) {
+        map.put("rat", "Fuzzy");
+        map.put("cat", "Rags");
+        map.put("dog", "Bosco");
+        map.put("dog", "Spot");
+        return map;
+    }
+    public static void main(String[] args) {
+        print(fill(new ArrayList<String>()));
+        print(fill(new LinkedList<String>()));
+        print(fill(new HashSet<String>()));
+        print(fill(new TreeSet<String>()));
+        print(fill(new LinkedHashSet<String>()));
+        print(fill(new HashMap<String,String>()));
+        print(fill(new TreeMap<String,String>()));
+        print(fill(new LinkedHashMap<String,String>()));
+    }
+}
+```
+```
+Output:
+[rat, cat, dog, dog]
+[rat, cat, dog, dog]
+[dog, cat, rat]
+[cat, dog, rat]
+[rat, cat, dog]
+{dog=Spot, cat=Rags, rat=Fuzzy}
+{cat=Rags, dog=Spot, rat=Fuzzy}
+{rat=Fuzzy, cat=Rags, dog=Spot}
+```
+In the output, you can see that the default printing behavior (provided via each
+container’s toString( ) method) produces reasonably readable results. A
+Collection is printed surrounded by square brackets, with each element separated
+by a comma. A Map is surrounded by curly braces, with each key and value
+associated with an equal sign (keys on the left, values on the right).
+
+If storage order is important, you can use a TreeSet, which keeps the objects in
+ascending comparison order, or a LinkedHashSet, which keeps the objects in the
+order in which they were added.
+
+Map.put(key, value) adds a value (the thing you want) and associates it with a
+key (the thing you look it up with). Map.get(key) produces the value associated
+with that key.
+
+The example uses the three basic flavors of Map: HashMap, TreeMap and
+LinkedHashMap. Like HashSet, HashMap provides the fastest lookup technique, and
+also doesn’t hold its elements in any apparent order. A TreeMap keeps the keys
+sorted by ascending comparison order, and a LinkedHashMap keeps the keys in
+insertion order while retaining the lookup speed of the HashMap.
+
+## List
+
+Lists promise to maintain elements in a particular sequence. The List interface
+adds a number of methods to Collection that allow insertion and removal of
+elements in the middle of a List.
+
+The basic ArrayList, which excels at randomly accessing elements, but is slower
+when inserting and removing elements in the middle of a List.
+
+The LinkedList, which provides optimal sequential access, with inexpensive
+insertions and deletions from the middle of the List. A LinkedList is relatively
+slow for random access, but it has a larger feature set than the ArrayList.
+
+You can find out whether an object is in the list using the contains( ) method.
+If you want to remove an object, you can pass that object’s reference to the
+remove( ) method. Also, if you have a reference to an object, you can discover
+the index number where that object is located in the List using indexOf( )
+
+When deciding whether an element is part of a List, discovering the index of an
+element, and removing an element from a List by reference, the equals( ) method
+(part of the root class Object) is used.
+
+The subList( ) method allows you to easily create a slice out of a larger list,
+and this naturally produces a true result when passed to containsAll( ) for that
+larger list. It’s also interesting to note that order is unimportant—you can see
+in output lines 11 and 12 that calling the intuitively named Collections.sort( )
+and Collections.shuffle( ) on sub doesn’t affect the outcome of containsAll( ).
+subList( ) produces a list backed by the original list. Therefore, changes in
+the returned list are reflected in the original list, and vice versa.
+
+The retainAll( ) method is effectively a "set intersection" operation, in this
+case keeping all the elements in copy
+
+The removeAll( ) method also operates based on the equals( ) method. As the name
+implies, it removes all the objects from the List that are in the argument List.
+The set( ) method is rather unfortunately named because of the potential
+confusion with the Set class— "replace" might have been a better name here, be
+
+You can convert any Collection to an array using toArray( ).
+
+This is an overloaded method; the no-argument version returns an array of
+Object, but if you pass an array of the target type to the overloaded version,
+it will produce an array of the type specified (assuming it passes type
+checking). If the argument array is too small to hold all the objects in the
+List (as is the case here), to Array( ) will create a new array of the
+appropriate size.
+
+```java
+String[] test = collection.toArray(new String[0]);
+```
+
+## Iterator
+In any container, you must have a way to insert elements and fetch them out
+again. After all, that’s the primary job of a container—to hold things. In a
+List, add( ) is one way to insert elements, and get( ) is one way to fetch
+elements.
+
+If you want to start thinking at a higher level, there’s a drawback: You need to
+program to the exact type of the container in order to use it. This might not
+seem bad at first, but what if you write code for a List, and later on you
+discover that it would be convenient to apply that same code to a Set? Or
+suppose you’d like to write, from the beginning, a piece of general- purpose
+code that doesn’t know or care what type of container it’s working with, so that
+it can be used on different types of containers without rewriting that code?
+
+An iterator is an object whose job is to move through a sequence and select each
+object in that sequence without the client programmer knowing or caring about
+the underlying structure of that sequence. In addition, an iterator is usually
+what’s called a lightweight object: one that’s cheap to create. For that reason,
+you’ll often find seemingly strange constraints for iterators; for example, the
+Java Iterator can move in only one direction.  There’s not much you can do with
+an Iterator except:
+
+##HERE
   1. Ask a Collection to hand you an Iterator using a method called iterator( ).
   That Iterator will be ready to return the first element in the sequence.
 
