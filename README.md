@@ -18,3 +18,23 @@ Tiny snippets of code for my memory...
 ### CMake
 - http://www.cmake.org/cmake/help/cmake_tutorial.html
 - http://www.cmake.org/Wiki/CMake_Useful_Variables
+
+### Python
+- http://www.python.org/dev/peps/pep-0008/
+- http://python.net/~goodger/projects/pycon/2007/idiomatic/
+- https://www.memonic.com/user/pneff/folder/python/id/1bufp
+
+### Cpp
+- C++ Primer (5th edition)
+
+### C
+- C: A Modern Approach
+
+### Java
+- Thinking in Java (4th edition)
+
+### Rails
+-
+
+### Ruby
+- The Ruby Programming Language
