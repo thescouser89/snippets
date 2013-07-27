@@ -157,3 +157,51 @@ the files will be installed.
 
 At the end of the top level CMakeLists file we can add a number of basic tests
 to verify that the application is working correctly.
+
+```cmake
+add_test (TutorialRuns Tutorial 25)
+set_tests_properties (TutorialComp25
+  PROPERTIES PASS_REGULAR_EXPRESSION "25 is 5")
+
+add_test (TutorialNegative Tutorial -25)
+set_tests_properties (TutorialNegative
+  PROPERTIES PASS_REGULAR_EXPRESSION "-25 is 0")
+```
+
+If you wanted to add a lot of tests to test different input values you might
+consider creating a macro like the following:
+
+```cmake
+macro (do_test arg result)
+  add_test (TutorialComp${arg} Tutorial ${arg})
+  set_tests_properties (TutorialComp${arg}
+    PROPERTIES PASS_REGULAR_EXPRESSION ${result})
+endmacro (do_test)
+
+# do a bunch of result based tests
+do_test (25 "25 is 5")
+do_test (-25 "-25 is 0")
+```
+
+## Adding System Introspection
+Next let us consider adding some code to our project that depends on features
+the target platform may not have. For this example we will add some code that
+depends on whether or not the target platform has the log and exp functions.
+
+```cmake
+# does this system provide the log and exp functions?
+include (CheckFunctionExists.cmake)
+check_function_exists (log HAVE_LOG)
+check_function_exists (exp HAVE_EXP)
+```
+
+```cpp
+// does the platform provide exp and log functions?
+#cmakedefine HAVE_LOG
+#cmakedefine HAVE_EXP
+
+// if we have both log and exp then use them
+#if defined (HAVE_LOG) && defined (HAVE_EXP)
+  result = exp(log(x)*0.5);
+#else // otherwise use an iterative approach
+```
