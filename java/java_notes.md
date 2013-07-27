@@ -2254,968 +2254,496 @@ you’ll often find seemingly strange constraints for iterators; for example, th
 Java Iterator can move in only one direction.  There’s not much you can do with
 an Iterator except:
 
-##HERE
-  1. Ask a Collection to hand you an Iterator using a method called iterator( ).
-  That Iterator will be ready to return the first element in the sequence.
+1. Ask a Collection to hand you an Iterator using a method called iterator( ).
+That Iterator will be ready to return the first element in the sequence.
 
-  2. Get the next object in the sequence with next( ).
-  3. See if there are any more objects in the sequence with hasNext( ).
+2. Get the next object in the sequence with next( ).
+3. See if there are any more objects in the sequence with hasNext( ).
 
-  4. Remove the last element returned by the iterator with remove( ).
+4. Remove the last element returned by the iterator with remove( ).
 
-        e.g List<Pet> pets = Pets.arrayList(12);
-        Iterator<Pet> it = pets.iterator();
+```java
+List<Pet> pets = Pets.arrayList(12);
+Iterator<Pet> it = pets.iterator();
 
-        while(it.hasNext()) {
-            Pet p = it.next();
-            System.out.print(p.id() + ":" + p + " ");
+while(it.hasNext()) {
+    Pet p = it.next();
+    System.out.print(p.id() + ":" + p + " ");
+}
+
+//simpler approach
+for (Pet p : pets)
+    System.out.print(p.id() + ":" + p + " ");
+
+// an iterator can also remove elements
+it = pets.iterator();
+
+for(int i = 0; i < 6; i++) {
+    it.next();
+    it.remove();
+}
+```
+
+With an Iterator, you don’t need to worry about the number of elements in the
+container.  That’s taken care of for you by hasNext( ) and next( ).  If you’re
+simply moving forward through the List and not trying to modify the List object
+itself, you can see that the foreach syntax is more succinct.
+
+### Linked list
+The LinkedList also implements the basic List interface like ArrayList does, but
+it performs certain operations (insertion and removal in the middle of the List)
+more efficiently than does ArrayList. Conversely, it is less efficient for
+random-access operations.
+
+LinkedList also adds methods that allow it to be used as a stack, a Queue or a
+double-ended queue (deque).
+
+### Stack
+A stack is sometimes referred to as a "last-in, first-out" (LIFO) container.
+It’s sometimes called a pushdown stack, because whatever you "push" on the stack
+last is the first item you can "pop" off of the stack. An often-used analogy is
+of cafeteria trays in a spring-loaded holder—the last ones that go in are the
+first ones that come out.
+
+LinkedList has methods that directly implement stack functionality, so you can
+also just use a LinkedList rather than making a stack class.  However, a stack
+class can sometimes tell the story better
+
+```java
+public class Stack<T> {
+    private LinkedList<T> storage = new LinkedList<T>();
+    public void push(T v) { storage.addFirst(v); }
+    public T peek() { return storage.getFirst(); }
+    public T pop() { return storage.removeFirst(); }
+    public boolean empty() { return storage.isEmpty(); }
+    public String toString() { return storage.toString(); }
+}
+```
+If you want only stack behavior, inheritance is inappropriate here because it
+would produce a class with all the rest of the LinkedList methods (you’ll see in
+the Containers in Depth chapter that this very mistake was made by the Java l.o
+designers when they created java.util.Stack).
+
+### Set
+A Set refuses to hold more than one instance of each object value. If you try to
+add more than one instance of an equivalent object, the Set prevents
+duplication. The most common use for a Set is to test for membership, so that
+you can easily ask whether an object is in a Set.  Because of this, lookup is
+typically the most important operation for a Set, so you’ll usually choose a
+HashSet implementation, which is optimized for rapid lookup.
+
+Set has the same interface as Collection, so there isn’t any extra functionality
+like there is in the two different types of List. Instead, the Set is exactly a
+Collection—it just has different behavior. (This is the ideal use of inheritance
+and polymorphism: to express different behavior.) A Set determines membership
+based on the "value" of an object, a more complex topic that you will learn
+about in the Containers in Depth chapter.
+
+If you want the results to be sorted, one approach is to use a TreeSet instead
+of a HashSet
+
+If you’d like to sort a set alphabetically, you can pass the
+String.CASE_INSENSITIVE_ORDER Comparator (a comparator is an object that
+establishes order) to the TreeSet constructor
+
+```java
+Set<String> words = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+```
+### Map
+The ability to map objects to other objects can be an immensely powerful way to
+solve programming problems. For example, consider a program to examine the
+randomness of Java’s Random class. Ideally, Random would produce a perfect
+distribution of numbers, but to test this you need to generate many random
+numbers and count the ones that fall in the various ranges. A Map easily solves
+the problem; in this case, the key is the number produced by Random, and the
+value is the number of times that number appears
+
+Maps, like arrays and Collections, can easily be expanded to multiple
+dimensions; you simply make a Map whose values are Maps (and the values of those
+Maps can be other containers, even other Maps). Thus, it’s quite easy to combine
+containers to quickly produce powerful data structures. For example, suppose you
+are keeping track of people who have multiple pets—all you need is a Map<Person,
+List<Pet>>:
+
+### Queue
+A queue is typically a “first-in, first-out" (FIFO) container. That is, you put
+things in at one end and pull them out at the other, and the order in which you
+put them in will be the same order in which they come out. Queues are commonly
+used as a way to reliably transfer objects from one area of a program to
+another. Queues are especially important in concurrent programming, as you will
+see in the Concurrency chapter, because they safely transfer objects from one
+task to another.
+
+LinkedList has methods to support queue behavior and it implements the Queue
+interface, so a LinkedList can be used as a Queue implementation. By upcasting a
+LinkedList to a Queue, this example uses the Queuespecific methods in the Queue
+interface:
+
+```java
+Queue<Character> qc = new LinkedList<Character>();
+```
+The Queue interface narrows access to the methods of LinkedList so that only the
+appropriate methods are available, and you are thus less tempted to use
+LinkedList methods (here, you could actually cast queue back to a LinkedList,
+but you are at least discouraged from doing so).
+
+```java
+public class QueueDemo {
+    public static void printQ(Queue queue) {
+        while(queue.peek() != null)
+            System.out.print(queue.remove() + " ");
+        System.out.println();
+    }
+    public static void main(String[] args) {
+        Queue<Integer> queue = new LinkedList<Integer>();
+        Random rand = new Random(47);
+        for(int i = 0; i < 10; i++)
+            queue.offer(rand.nextInt(i + 10));
+        printQ(queue);
+        Queue<Character> qc = new LinkedList<Character>();
+        for(char c : "Brontosaurus".toCharArray())
+            qc.offer(c);
+        printQ(qc);
+    }
+}
+```
+### Priority Queue
+First-in, first-out (FIFO) describes the most typical queuing discipline. A
+queuing discipline is what decides, given a group of elements in the queue,
+which one goes next. First-in, first- out says that the next element should be
+the one that was waiting the longest.
+
+Apriority queue says that the element that goes next is the one with the
+greatest need (the highest priority). For example, in an airport, a customer
+might be pulled out of a queue if their plane is about to leave. If you build a
+messaging system, some messages will be more important than others, and should
+be dealt with sooner, regardless of when they arrive. The PriorityQueue was
+added in Java SE5 to provide an automatic implementation for this behavior.
+
+When you offer( ) an object onto a PriorityQueue, that object is sorted into the
+queue. The default sorting uses the natural order of the objects in the queue,
+but you can modify the order by providing your own Comparator.  The
+PriorityQueue ensures that when you call peek( ), poll( ) or remove( ), the
+element you get will be the one with the highest priority.
+
+Integer, String and Character work with PriorityQueue because these classes
+already have natural ordering built in. If you want you use your own class in a
+PriorityQueue, you must include additional functionality to produce natural
+ordering, or provide your own Comparator. There’s a more sophisticated example
+that demonstrates this in the Containers in Depth chapter.
+
+The use of Iterator becomes compelling when you implement a foreign class, one
+that is not a Collection, in which it would be difficult or annoying to make it
+implement the Collection interface.
+
+Producing an Iterator is the least-coupled way of connecting a sequence to a
+method that consumes that sequence, and puts far fewer constraints on the
+sequence class than does implementing Collection.
+
+## foreach and iterators
+So far, the foreach syntax has been primarily used with arrays, but it also
+works with any Collection object.
+
+The reason that this works is that Java SE5 introduced a new interface called
+Iterable which contains an iterator( ) method to produce an Iterator, and the
+Iterable interface is what foreach uses to move through a sequence. So if you
+create any class that implements Iterable, you can use it in a foreach statement
+
+```java
+public class IterableClass implements Iterable<String> {
+    public Iterator<String> iterator() {
+        return new Iterator<String>() {
         }
-
-        //simpler approach
-        for (Pet p : pets)
-            System.out.print(p.id() + ":" + p + " ");
-
-        // an iterator can also remove elements
-        it = pets.iterator();
-
-        for(int i = 0; i < 6; i++) {
-            it.next();
-            it.remove();
-        }
-
-
-  With an Iterator, you don’t need to worry about the number of elements in the
-  container.  That’s taken care of for you by hasNext( ) and next( ).  If you’re
-  simply moving forward through the List and not trying to modify the List
-  object itself, you can see that the foreach syntax is more succinct.
-
-  An Iterator will also remove the last element produced by next( ), which means
-  you must call next( ) before you call remove( ).
-
-      e.g
-
-      public static void display(Iterator<Pet> it) {
-          while(it.hasNext()) {
-              Pet p = it.next();
-              System.out.print(p.id() + ":" + p + " ");
-          }
-          System.out.println();
-      }
-
-
-* Note that display( ) contains no information about the type of
-* sequence that it is traversing, and this shows the true power of the
-* Iterator: the ability to separate the operation of traversing a
-* sequence from the underlying structure of that sequence. For this
-* reason, we sometimes say that iterators unify access to containers.
-
- [sequence could be  a map, set, list etc]
-
-
-  The ListIterator is a more powerful subtype of Iterator that is produced only
-  by List classes. While Iterator can only move forward, ListIterator is
-  bidirectional. It can also produce the indexes of the next and previous
-  elements relative to where the iterator is pointing in the list, and it can
-  replace the last element that it visited using the set( ) method.  You can
-  produce a ListIterator that points to the beginning of the List by calling
-  listIterator( ), and you can also create a ListIterator that starts out
-  pointing to an index n in the list by calling listIterator(n).
-
-
-  - Linked list
-
-    The LinkedList also implements the basic List interface like ArrayList does,
-    but it performs certain operations (insertion and removal in the middle of
-    the List) more efficiently than does ArrayList. Conversely, it is less
-    efficient for random-access operations.
-
-    LinkedList also adds methods that allow it to be used as a stack, a Queue or
-    a double- ended queue (deque).
-
-    Some of these methods are aliases or slight variations of each other, to
-    produce names that are more familiar within the context of a particular
-    usage (Queue, in particular). For example, getFirst( ) and element( ) are
-    identical—they return the head (first element) of the list without removing
-    it, and throw NoSuchElementException if the List is empty.  peek( ) is a
-    slight variation of those two that returns null if the list is empty.
-
-    removeFirst( ) and remove( ) are also identical—they remove and return the
-    head of the list, and throw NoSuchElementException for an empty list, and
-    poll( ) is a slight variation that returns null if this list is empty.
-
-    addFirst( ) inserts an element at the beginning of the list.
-
-    offer( ) is the same as add( ) and addLast( ). They all add an element to
-    the tail (end) of a list.
-
-    removeLast( ) removes and returns the last element of the list.
-
-  - Stack
-
-    A stack is sometimes referred to as a "last-in, first-out" (LIFO) container.
-    It’s sometimes called a pushdown stack, because whatever you "push" on the
-    stack last is the first item you can "pop" off of the stack. An often-used
-    analogy is of cafeteria trays in a spring-loaded holder—the last ones that
-    go in are the first ones that come out.
-
-    LinkedList has methods that directly implement stack functionality, so you
-    can also just use a LinkedList rather than making a stack class.  However, a
-    stack class can sometimes tell the story better
-
-        public class Stack<T> {
-            private LinkedList<T> storage = new LinkedList<T>();
-            public void push(T v) { storage.addFirst(v); }
-            public T peek() { return storage.getFirst(); }
-            public T pop() { return storage.removeFirst(); }
-            public boolean empty() { return storage.isEmpty(); }
-            public String toString() { return storage.toString(); }
-        }
-
-    This introduces the simplest possible example of a class definition using
-    generics. The <T> after the class name tells the compiler that this will be
-    a parameterized type, and that the type parameter—the one that will be
-    substituted with a real type when the class is used—is T.  Basically, this
-    says, "We’re defining a Stack that holds objects of type T." The Stack is
-    implemented using a LinkedList, and the LinkedList is also told that it is
-    holding type T.  Notice that push( ) takes an object of type T, while peek(
-    ) and pop( ) return an object of type T. The peek( ) method provides you
-    with the top element without removing it from the top of the stack, while
-    pop( ) removes and returns the top element.
-
-
-    If you want only stack behavior, inheritance is inappropriate here because
-    it would produce a class with all the rest of the LinkedList methods (you’ll
-    see in the Containers in Depth chapter that this very mistake was made by
-    the Java l.o designers when they created java.util.Stack).
-
-
-  - Set
-
-    A Set refuses to hold more than one instance of each object value. If you
-    try to add more than one instance of an equivalent object, the Set prevents
-    duplication. The most common use for a Set is to test for membership, so
-    that you can easily ask whether an object is in a Set.  Because of this,
-    lookup is typically the most important operation for a Set, so you’ll
-    usually choose a HashSet implementation, which is optimized for rapid
-    lookup.
-
-    Set has the same interface as Collection, so there isn’t any extra
-    functionality like there is in the two different types of List. Instead, the
-    Set is exactly a Collection—it just has different behavior. (This is the
-    ideal use of inheritance and polymorphism: to express different behavior.) A
-    Set determines membership based on the "value" of an object, a more complex
-    topic that you will learn about in the Containers in Depth chapter.
-
-
-    e.g about adding numbers to a set
-
-    Ten thousand random numbers from o up to 29 are added to the Set, so you can
-    imagine that each value has many duplications. And yet you can see that only
-    one instance of each appears in the result.  You’ll also notice that the
-    output is in no discernible order. This is because a HashSet uses hashing
-    for speed—hashing is covered in the Containers in Depth chapter. The order
-    maintained by a HashSet is different from a TreeSet or a LinkedHashSet,
-    since each implementation has a different way of storing elements.
-    TreeSet keeps elements sorted into a red-black tree data structure,
-    whereas HashSet uses the hashing function.  LinkedHashSet also uses
-    hashing for lookup speed, but appears to maintain elements in insertion
-    order using a linked list.
-
-    *** If you want the results to be sorted, one approach is to use a TreeSet
-    instead of a HashSet:
-
-    One of the most common operations you will perform is a test for set
-    membership using contains( ), but there are also operations that will remind
-    you of the Venn diagrams you may have been taught in elementary school
-
-
-    the sorting is done lexicographically so that the uppercase and lowercase
-    letters are in separate groups. [ for TreeSet ]
-
-    If you’d like to sort a set alphabetically, you can pass the
-    String.CASE_INSENSITIVE_ORDER Comparator (a comparator is an object that
-    establishes order) to the TreeSet constructor
-
-        Set<String> words = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-
-  - Map
-
-    The ability to map objects to other objects can be an immensely powerful way
-    to solve programming problems. For example, consider a program to examine
-    the randomness of Java’s Random class. Ideally, Random would produce a
-    perfect distribution of numbers, but to test this you need to generate many
-    random numbers and count the ones that fall in the various ranges. A Map
-    easily solves the problem; in this case, the key is the number produced by
-    Random, and the value is the number of times that number appears
-
-    In main( ), autoboxing converts the randomly generated int into an Integer
-    reference that can be used with the HashMap (you can’t use primitives with
-    containers). The get( ) method returns null if the key is not already in the
-    container (which means that this is the first time the number has been
-    found). Otherwise, the get( ) method produces the associated Integer value
-    for the key, which is incremented (again, autoboxing simplifies the
-    expression but there are actually conversions to and from Integer taking
-    place).
-
-   It also shows how you can test a Map to see if it contains a key or a value
-   with containsKey( ) and containsValue( ):
-
-   Maps, like arrays and Collections, can easily be expanded to multiple
-   dimensions; you simply make a Map whose values are Maps (and the values of
-   those Maps can be other containers, even other Maps). Thus, it’s quite easy
-   to combine containers to quickly produce powerful data structures. For
-   example, suppose you are keeping track of people who have multiple pets—all
-   you need is a Map<Person, List<Pet>>:
-
-  - Queue
-
-    A queue is typically a “first-in, first-out" (FIFO) container. That is, you
-    put things in at one end and pull them out at the other, and the order in
-    which you put them in will be the same order in which they come out. Queues
-    are commonly used as a way to reliably transfer objects from one area of a
-    program to another. Queues are especially important in concurrent
-    programming, as you will see in the Concurrency chapter, because they safely
-    transfer objects from one task to another.
-
-    LinkedList has methods to support queue behavior and it implements the Queue
-    interface, so a LinkedList can be used as a Queue implementation. By
-    upcasting a LinkedList to a Queue, this example uses the Queuespecific
-    methods in the Queue interface:
-
-       e.g Queue<Character> qc = new LinkedList<Character>();
-
-    The Queue interface narrows access to the methods of LinkedList so that only
-    the appropriate methods are available, and you are thus less tempted to use
-    LinkedList methods (here, you could actually cast queue back to a
-    LinkedList, but you are at least discouraged from doing so).
-
-    Notice that the Queue-specific methods provide complete and standalone
-    functionality. That is, you can have a usable Queue without any of the
-    methods that are in Collection, from which it is inherited.
-
-        public class QueueDemo {
-            public static void printQ(Queue queue) {
-                while(queue.peek() != null)
-                    System.out.print(queue.remove() + " ");
-                System.out.println();
-            }
-            public static void main(String[] args) {
-                Queue<Integer> queue = new LinkedList<Integer>();
-                Random rand = new Random(47);
-                for(int i = 0; i < 10; i++)
-                    queue.offer(rand.nextInt(i + 10));
-                printQ(queue);
-                Queue<Character> qc = new LinkedList<Character>();
-                for(char c : "Brontosaurus".toCharArray())
-                    qc.offer(c);
-                printQ(qc);
-            }
-        }
-
-
-  - Priority Queue
-
-
-    First-in, first-out (FIFO) describes the most typical queuing discipline. A
-    queuing discipline is what decides, given a group of elements in the queue,
-    which one goes next. First-in, first- out says that the next element should
-    be the one that was waiting the longest.
-
-    Apriority queue says that the element that goes next is the one with the
-    greatest need (the highest priority). For example, in an airport, a customer
-    might be pulled out of a queue if their plane is about to leave. If you
-    build a messaging system, some messages will be more important than others,
-    and should be dealt with sooner, regardless of when they arrive. The
-    PriorityQueue was added in Java SE5 to provide an automatic implementation
-    for this behavior.
-
-
-    When you offer( ) an object onto a PriorityQueue, that object is sorted into
-    the queue. 5 The default sorting uses the natural order of the objects in
-    the queue, but you can modify the order by providing your own Comparator.
-    The PriorityQueue ensures that when you call peek( ), poll( ) or remove( ),
-    the element you get will be the one with the highest priority.
-
-
-    Integer, String and Character work with PriorityQueue because these classes
-    already have natural ordering built in. If you want you use your own class
-    in a PriorityQueue, you must include additional functionality to produce
-    natural ordering, or provide your own Comparator. There’s a more
-    sophisticated example that demonstrates this in the Containers in Depth
-    chapter.
-
-
-- Collection vs Iterator
-
-  Collection is the root interface that describes what is common for all
-  sequence containers.  It might be thought of as an "incidental interface," one
-  that appeared because of commonality between other interfaces. In addition,
-  the java.utiLAbstractCollection class provides a default implementation for a
-  Collection, so that you can create a new subtype of AbstractCollection without
-  unnecessary code duplication.
-
-  One argument for having an interface is that it allows you to create more
-  generic code. By writing to an interface rather than an implementation, your
-  code can be applied to more types of objects.
-
-  So if I write a method that takes a Collection, that method can be applied to
-  any type that implements Collection—and this allows a new class to choose to
-  implement Collection in order to be used with my method. It’s interesting to
-  note, however, that the Standard C++ Library has no common base class for its
-  containers—all commonality between containers is achieved through iterators.
-  In Java, it might seem sensible to follow the C++ approach, and to express
-  commonality between containers using an iterator rather than a Collection.
-  However, the two approaches are bound together, since implementing Collection
-  also means providing an iterator( ) method
-
-  [Some people advocate the automatic creation of an interface for every
-  possible combination of methods in a class— sometimes for every single class.
-  I believe that an interface should have more meaning than a mechanical
-  duplication of method combinations, so I tend to wait until I see the value
-  added by an interface before creating one.
-  ] [ comment from the book ]
-
-  Both versions of display( ) work with Map objects as well as with subtypes of
-  Collection, and both the Collection interface and the Iterator decouple the
-  display( ) methods from knowing about the particular implementation of the
-  underlying container.  In this case the two approaches come up even. In fact,
-  Collection pulls ahead a bit because it is Iterable, and so in the
-  implementation of display(Collection) the foreach construct can be used, which
-  makes the code a little cleaner.
-
-      public static void display(Iterator<Pet> it) {
-          while(it.hasNext()) {
-              Pet p = it.next();
-              System.out.print(p.id() + ":" + p + " ");
-          }
-          System.out.println();
-      }
-      public static void display(Collection<Pet> pets) {
-          for(Pet p : pets)
-              System.out.print(p.id() + ":" + p + " ");
-          System.out.println();
-      }
-
-
-  The use of Iterator becomes compelling when you implement a foreign class, one
-  that is not a Collection, in which it would be difficult or annoying to make
-  it implement the Collection interface. For example, if we create a Collection
-  implementation by inheriting from a class that holds Pet objects, we must
-  implement all the Collection methods, even if we don’t need to use them within
-  the display( ) method. Although this can easily be accomplished by inheriting
-  from AbstractCollection, you’re forced to implement iterator( ) anyway, along
-  with size( ), in order to provide the methods that are not implemented by
-  AbstractCollection, but that are used by the other methods in
-  AbstractCollection
-
-  The remove( ) method is an "optional operation," which you will learn about in
-  the Containers in Depth chapter.
-
-  From this example, you can see that if you implement Collection, you also
-  implement iterator( ), and just implementing iterator( ) alone requires only
-  slightly less effort than inheriting from AbstractCoUection. However, if your
-  class already inherits from another class, then you cannot also inherit from
-  AbstractCollection. In that case, to implement Collection you’d have to
-  implement all the methods in the interface. In this case it would be much
-  easier to inherit and add the ability to create an iterator
-
-  *** Producing an Iterator is the least-coupled way of connecting a sequence to
-  a method that consumes that sequence, and puts far fewer constraints on the
-  sequence class than does implementing Collection.
-
-
-- foreach and iterators
-
-  So far, the foreach syntax has been primarily used with arrays, but it also
-  works with any Collection object.
-
-  The reason that this works is that Java SE5 introduced a new interface called
-  Iterable which contains an iterator( ) method to produce an Iterator, and the
-  Iterable interface is what foreach uses to move through a sequence. So if you
-  create any class that implements Iterable, you can use it in a foreach
-  statement
-
-      public class IterableClass implements Iterable<String> {
-          ...
-              public Iterator<String> iterator() {
-                  ...
-                      return new Iterator<String>() {
-                          ...
-                      }
-              }
-          ...
-      }
-
-  * Note that you cannot use an iterator inside a for each loop, only an object
-  * that implements the iteratble object
-
-  The iterator( ) method returns an instance of an anonymous inner
-  implementation of Iterator<String> which delivers each word in the array.
-
-  In Java SE5, a number of classes have been made Iterable, primarily all
-  Collection classes (but not Maps).
-
-
-  A foreach statement works with an array or anything Iterable, but that doesn’t
-  mean that an array is automatically an Iterable, nor is there any autoboxing
-  that takes place
-
-      public class ArrayIsNotIterable {
-          static <T> void test(Iterable<T> ib) {
-              for(T t : ib)
-                  System.out.print(t + " ");
-          }
-          public static void main(String[] args) {
-              test(Arrays.asList(1, 2, 3));
-              String[] strings = { "A", "B", "C" };
-              // An array works in foreach, but it’s not Iterable:
-              //! test(strings);
-              // You must explicitly convert it to an Iterable:
-              test(Arrays.asList(strings));
-          }
-      }
-
-   System.getenv( )  returns a Map, entrySet( ) produces a Set of Map.Entry
-   elements, and a Set is Iterable so it can be used in a foreach loop.
-
-- The Adapter Method idiom
-
-  What if you have an existing class that is Iterable, and you’d like to add one
-  or more new ways to use this class in a foreach statement? For example,
-  suppose you’d like to choose whether to iterate through a list of words in
-  either a forward or reverse direction. If you simply inherit from the class
-  and override the iterator( ) method, you replace the existing method and you
-  don’t get a choice.
-
-  One solution is what I call the Adapter Method idiom. The "Adapter" part comes
-  from design patterns, because you must provide a particular interface to
-  satisfy the foreach statement.  When you have one interface and you need
-  another one, writing an adapter solves the problem. Here, I want to add the
-  ability to produce a reverse iterator to the default forward iterator, so I
-  can’t override. Instead, I add a method that produces an Iterable object which
-  can then be used in the foreach statement. As you see here, this allows us to
-  provide multiple ways to use foreach
-
-
-      class ReversibleArrayList<T> extends ArrayList<T> {
-          public ReversibleArrayList(Collection<T> c) { super(c); }
-          /**
-           * Using anonymous inner class!
-           * to implement an Iterable object
-           */
-          public Iterable<T> reversed() {
-              return new Iterable<T>() {
-                  public Iterator<T> iterator() {
-                      return new Iterator<T>() {
-                          int current = size() - 1;
-                          public boolean hasNext() { return current > -1; }
-                          public T next() { return get(current--); }
-                          public void remove() { // Not implemented
-                              throw new UnsupportedOperationException();
-                          }
-                      };
-                  }
-              };
-          }
-      }
-
-       public class AdapterMethodIdiom {
-           public static void main(String[] args) {
-               ReversibleArrayList<String> ral =
-                   new ReversibleArrayList<String>(
-                           Arrays.asList("To be or not to be".split(" ")));
-               // Grabs the ordinary iterator via iterator():
-               for(String s : ral)
-                   System.out.print(s + " ");
-               System.out.println();
-               // Hand it the Iterable of your choice
-
-               /** NOTE THE SYNTAX **/
-               for(String s : ral.reversed())
-                   System.out.print(s + " ");
-           }
-       } /* Output:
-      To be or not to be
-      be to not or be To
-      *///:~
-
-
-  If you simply put the ral object in the foreach statement, you get the
-  (default) forward iterator. But if you call reversed( ) on the object, it
-  produces different behavior.
-
-
-      public Iterable<String> randomized() {
-          return new Iterable<String>() {
-              public Iterator<String> iterator() {
-                  List<String> shuffled =
-                      new ArrayList<String>(Arrays.asList(words));
-                  Collections.shuffle(shuffled, new Random(47));
-                  return shuffled.iterator();
-              }
-          };
-      }
-
-  Notice that the second method, random( ), doesn’t create its own Iterator but
-  simply returns the one from the shuffled List.
-
-  You can see from the output that the Collections.shuffle( ) method doesn’t
-  affect the original array, but only shuffles the references in shuffled. This
-  is only true because the randomized( ) method wraps an ArrayList around the
-  result of Arrays.asList( ). If the List produced by Arrays.asList( ) is
-  shuffled directly, it will modify the underlying array
-
-
-  In the first case, the output of Arrays.asList( ) is handed to the ArrayList(
-  ) constructor, and this creates an ArrayList that references the elements of
-  ia. Shuffling these references doesn’t modify the array. However, if you use
-  the result of Arrays.asList(ia) directly, shuffling modifies the order of ia.
-  It’s important to be aware that Arrays.asList( ) produces a List object that
-  uses the underlying array as its physical implementation. If you do anything
-  to that List that modifies it, and you don’t want the original array modified,
-  you should make a copy into another container.
-
-
-- Summary
-
-  Java provides a number of ways to hold objects:
-
-  1. An array associates numerical indexes to objects. It holds objects of a
-  known type so that you don’t have to cast the result when you’re looking up an
-  object. It can be multidimensional, and it can hold primitives. However, its
-  size cannot be changed once you create it.
-
-  2. A Collection holds single elements, and a Map holds associated pairs. With
-  Java generics, you specify the type of object to be held in the containers, so
-  you can’t put the wrong type into a container and you don’t have to cast
-  elements when you fetch them out of a container. Both Collections and Maps
-  automatically resize themselves as you add more elements. A container won’t
-  hold primitives, but autoboxing takes care of translating primitives back and
-  forth to the wrapper types held in the container.
-
-  3. Like an array, a List also associates numerical indexes to objects— thus,
-  arrays and Lists are ordered containers.
-
-  4. Use an ArrayList if you’re doing a lot of random accesses, but a LinkedList
-  if you will be doing a lot of insertions and removals in the middle of the
-      list.
-
-  5. The behavior of Queues and stacks is provided via the LinkedList.
-
-  6. A Map is a way to associate not integral values, but objects with other
-  objects.  HashMaps are designed for rapid access, whereas a TreeMap keeps its
-  keys in sorted order, and thus is not as fast as a HashMap. A LinkedHashMap
-  keeps its elements in insertion order, but provides rapid access with hashing.
-
-  7. A Set only accepts one of each type of object. HashSets provide maximally
-  fast lookups, whereas TreeSets keep the elements in sorted order.
-  LinkedHashSets keep elements in insertion order.
-
-  8. There’s no need to use the legacy classes Vector, Hashtable, and Stack in
-  new code.
-
-  You’ll see that there are really only four basic container components—Map,
-  List, Set, and Queue—and only two or three implementations of each one
-
-  [diagram about the relationship between everything in pg 331]
-
-
-  You can see that all Sets except TreeSet have exactly the same interface as
-  Collection. List and Collection differ significantly, although List requires
-  methods that are in Collection.  On the other hand, the methods in the Queue
-  interface stand alone; the Collection methods are not required to create a
-  functioning Queue implementation. Finally, the only intersection between Map
-  and Collection is the fact that a Map can produce Collections using the
-  entrySet( ) and values( ) methods.
-
-  Notice the tagging interface java.util.RandomAccess, which is attached to
-  ArrayList but not to LinkedList. This provides information for algorithms that
-  might want to dynamically change their behavior depending on the use of a
-  particular List.
-
-
-* Error Handling with Exceptions
-
-  The ideal time to catch an error is at compile time, before you even try to
-  run the program.  However, not all errors can be detected at compile time. The
-  rest of the problems must be handled at run time through some formality that
-  allows the originator of the error to pass appropriate information to a
-  recipient who will know how to handle the difficulty properly.
-
-  The goals for exception handling in Java are to simplify the creation of
-  large, reliable programs using less code than currently possible, and to do so
-  with more confidence that your application doesn’t have an unhandled error.
-  Exceptions are not terribly difficult to learn, and are one of those features
-  that provide immediate and significant benefits to your project.
-
-  C and other earlier languages often had multiple error-handling schemes, and
-  these were generally established by convention and not as part of the
-  programming language. Typically, you returned a special value or set a flag,
-  and the recipient was supposed to look at the value or the flag and determine
-  that something was amiss.
-
-  The solution is to take the casual nature out of error handling and to enforce
-  formality. This actually has a long history, because implementations of
-  exception handling go back to operating systems in the 1960s, and even to
-  BASIC’S "on error goto."
-
-  The word "exception" is meant in the sense of "I take exception to that." At
-  the point where the problem occurs, you might not know what to do with it, but
-  you do know that you can’t just continue on merrily; you must stop, and
-  somebody, somewhere, must figure out what to do. But you don’t have enough
-  information in the current context to fix the problem. So you hand the problem
-  out to a higher context where someone is qualified to make the proper
-  decision.
-
-  The other rather significant benefit of exceptions is that they tend to reduce
-  the complexity of error-handling code. Without exceptions, you must check for
-  a particular error and deal with it at multiple places in your program. With
-  exceptions, you no longer need to check for errors at the point of the method
-  call, since the exception will guarantee that someone catches it.  You only
-  need to handle the problem in one place, in the so-called exception handler.
-  This saves you code, and it separates the code that describes what you want to
-  do during normal execution from the code that is executed when things go awry.
-  In general, reading, writing, and debugging code becomes much clearer with
-  exceptions than when using the old way of error handling.
-
-  An exceptional condition is a problem that prevents the continuation of the
-  current method or scope. It’s important to distinguish an exceptional
-  condition from a normal problem, in which you have enough information in the
-  current context to somehow cope with the difficulty. With an exceptional
-  condition, you cannot continue processing because you don’t have the
-  information necessary to deal with the problem in the current context. All you
-  can do is jump out of the current context and relegate that problem to a
-  higher context. This is what happens when you throw an exception.
-
-  Division is a simple example. If you’re about to divide by zero, it’s worth
-  checking for that condition. But what does it mean that the denominator is
-  zero? Maybe you know, in the context of the problem you’re trying to solve in
-  that particular method, how to deal with a zero denominator. But if it’s an
-  unexpected value, you can’t deal with it and so must throw an exception rather
-  than continuing along that execution path.
-
-  When you throw an exception, several things happen. First, the exception
-  object is created in the same way that any Java object is created: on the
-  heap, with new. Then the current path of execution (the one you couldn’t
-  continue) is stopped and the reference for the exception object is ejected
-  from the current context. At this point the exception-handling mechanism takes
-  over and begins to look for an appropriate place to continue executing the
-  program.  This appropriate place is the exception handler, whose job is to
-  recover from the problem so the program can either try another tack or just
-  continue.
-
-  You can send information about the error into a larger context by creating an
-  object representing your information and "throwing" it out of your current
-  context. This is called throwing an exception.
-
-
-          throw new NullPointerException();
-
-  This throws the exception, which allows you—in the current context—to abdicate
-  responsibility for thinking about the issue further. It’s just magically
-  handled somewhere else. Precisely where will be shown shortly.
-
-- Like any object in Java, you always create exceptions on the heap using new,
-  which allocates storage and calls a constructor. There are two constructors in
-  all standard exceptions; The first one is the default constructor, and the
-  second takes a string argument so you can place pertinent information in the
-  exception:
-
-        throw new NullPointerException("t = null" );
-
-  The string can later be extracted using various methods.
-
-  *** You can throw any type of _Throwable_ ( the exception root class) object
-  that you want.
-
-
-  One of the most important aspects of exceptions is that if something bad
-  happens, they don’t allow a program to continue along its ordinary path. This
-  has been a real problem in languages like C and C++; especially C, which had
-  no way to force a program to stop going down a path if a problem occurred, so
-  it was possible to ignore problems for a long time and get into a completely
-  inappropriate state. Exceptions allow you to (if nothing else) force the
-  program to stop and tell you what went wrong, or (ideally) force the program
-  to deal with the problem and return to a stable state.
-
-  A simplistic way to think about exception handling is as a different kind of
-  return mechanism, although you get into trouble if you take that analogy too
-  far. You can also exit from ordinary scopes by throwing an exception. In
-  either case, an exception object is returned, and the method or scope exits.
-
-  Any similarity to an ordinary return from a method ends here, because where
-  you return is someplace completely different from where you return for a
-  normal method call. (You end up in an appropriate exception handler that might
-  be far away—many levels on the call stack— from where the exception was
-  thrown.
-
-  The information about the error is represented both inside the exception
-  object and implicitly in the name of the exception class, so someone in the
-  bigger context can figure out what to do with your exception. (Often, the only
-  information is the type of exception, and nothing meaningful is stored within
-  the exception object.)
-
-- Catching an exception
-
-  To see how an exception is caught, you must first understand the concept of a
-  guarded region. This is a section of code that might produce exceptions and is
-  followed by the code to handle those exceptions.
-
-  If you’re inside a method and you throw an exception (or another method that
-  you call within this method throws an exception), that method will exit in the
-  process of throwing. If you don’t want a throw to exit the method, you can set
-  up a special block within that method to capture the exception. This is called
-  the try block because you "try" your various method calls there. The try block
-  is an ordinary scope preceded by the keyword try
-
-  If you were checking for errors carefully in a programming language that
-  didn’t support exception handling, you’d have to surround every method call
-  with setup and error-testing code, even if you call the same method several
-  times. With exception handling, you put everything in a try block and capture
-  all the exceptions in one place. This means your code is much easier to write
-  and read because the goal of the code is not confused with the error checking.
-
-
-  Of course, the thrown exception must end up someplace. This "place" is the
-  exception handler, and there’s one for every exception type you want to catch.
-  Exception handlers immediately follow the try block and are denoted by the
-  keyword catch
-
-
-      try {
-
-      } catcch (Typ1 id1) {
-
-      } catch (Typ2 id2) {
-
-      }
-
-  Each catch clause (exception handler) is like a little method that takes one
-  and only one argument of a particular type. The identifier (id1, id2, and so
-  on) can be used inside the handler, just like a method argument. Sometimes you
-  never use the identifier because the type of the exception gives you enough
-  information to deal with the exception, but the identifier must still be
-  there.
-
-  The handlers must appear directly after the try block. If an exception is
-  thrown, the exception-handling mechanism goes hunting for the first handler
-  with an argument that matches the type of the exception. Then it enters that
-  catch clause, and the exception is considered handled. The search for handlers
-  stops once the catch clause is finished. Only the matching catch clause
-  executes; it’s not like a switch statement in which you need a break after
-  each case to prevent the remaining ones from executing. Note that within the
-  try block, a number of different method calls might generate the same
-  exception, but you need only one handler.
-
-* Termination v/s resumption
-- Two basic models in exception handling theory.
-
-    - Termination - assume that the error is so critical that there's no way to
-                    get back to where the exception occurred
-
-
-    - Resumption - exception handler is expected to do something to rectify the
-                   situation, and then the faulting method is retried, presuming
-                               success the second time.
-
-
-  If you want resumption-like behavior in Java, don’t throw an exception when
-  you encounter an error. Instead, call a method that fixes the problem.
-  Alternatively, place your try block inside a while loop that keeps reentering
-  the try block until the result is satisfactory.
-
-
-- Creating your own exceptions
-
-  To create your own exception class, you must inherit from an existing
-  exception class, preferably one that is close in meaning to your new exception
-  (although this is often not possible). The most trivial way to create a new
-  type of exception is just to let the compiler create the default constructor
-  for you, so it requires almost no code at all
-
-  As you’ll see, the most important thing about an exception is the class name
-
-  However, you may want to send error output to the standard error stream by
-  writing to System.err. This is usually a better place to send error
-  information than System.out, which may be redirected. If you send output to
-  System.err, it will not be redirected along with System.out so the user is
-  more likely to notice it.
-
-      e.g class MyException extends Exception {
-          public MyException() {}
-          public MyException(String msg) { super(msg); }
-      }
-
-
-  printStackTrace() - produces information about the sequence of methods that
-                      were called to get to the point where the exception
-                      happened. By default, the information goes to the standard
-                      error stream, but overloaded versions allow you to send
-                      the results to any other stream as well.
-
-
-  getMessage() -      will return the string that you gave to the constructor
-
-  getMessage( ) is something like toString( ) for exception classes.
-
-
-- Exceptions and logging
-
-  You may also want to log the output using the java.util.logging facility.
-  [pg 342]
-
-- The exception specification
-
-  In Java, you’re encouraged to inform the client programmer, who calls your
-  method, of the exceptions that might be thrown from your method. This is
-  civilized, because the caller can then know exactly what code to write to
-  catch all potential exceptions. Of course, if the source code is available,
-  the client programmer could hunt through and look for throw statements, but a
-  library might not come with sources. To prevent this from being a problem,
-  Java provides syntax (and forces you to use that syntax) to allow you to
-  politely tell the client programmer what exceptions this method throws, so the
-  client programmer can handle them. This is the exception specification and
-  it’s part of the method declaration, appearing after the argument list.
-
-        void f() throws TooBig, TooSmall, DivZero {
-
-  There is one place you can lie: You can claim to throw an exception that you
-  really don’t. The compiler takes your word for it, and forces the users of
-  your method to treat it as if it really does throw that exception. This has
-  the beneficial effect of being a placeholder for that exception, so you can
-  actually start throwing the exception later without requiring changes to
-  existing code. It’s also important for creating abstract base classes and
-  interfaces whose derived classes or implementations may need to throw
-  exceptions.
-
-- Catching any exception
-
-  It is possible to create a handler that catches any type of exception. You do
-  this by catching the base-class exception type Exception (there are other
-  types of base exceptions, but Exception is the base that’s pertinent to
-  virtually all programming activities):
-
-  This will catch any exception, so if you use it you’ll want to put it at the
-  end of your list of handlers to avoid preempting any exception handlers that
-  might otherwise follow it.
-
-  Since the Exception class is the base of all the exception classes that are
-  important to the programmer, you don’t get much specific information about the
-  exception, but you can call the methods that come from its base type Throwable
-
-        String getLocalizedMessage( )
-        Gets the detail message, or a message adjusted for this particular
-        locale.
-
-        void printStackTrace( )
-        voidprintStackTrace(PrintStream)
-        voidprintStackTrace(java.io.PrintWriter)
-
-        Throwable fillInStackTrace( )
-        Records information within this Throwable object about the current state
-        of the stack frames. Useful when an application is rethrowing an error
-        or exception
-
-- The Stack Trace
-
-  The information provided by printStackTrace( ) can also be accessed directly
-  using getStackTrace( ). This method returns an array of stack trace elements,
-  each representing one stack frame. Element zero is the top of the stack, and
-  is the last method invocation in the sequence (the point this Throwable was
-  created and thrown). The last element of the array and the bottom of the stack
-  is the first method invocation in the sequence.
-
-
-* If you inherit exceptions from RuntimeException, you don't need to tell your
-* method to throw the exception ( methodName() throws FunkyException ) if you
-* don't catch that exception in the method when you throw it
-
-
-   Since the Exception class is the base of all the exception classes that are
-   important to the programmer, you don't get much specific information about
-   the exception, but you can call the methods that come from its base type
-   Throwable
-
-        ...
+    }
+}
+```
+Note that you cannot use an iterator inside a for each loop, only an object that
+implements the iteratble object
+
+The iterator( ) method returns an instance of an anonymous inner implementation
+of Iterator<String> which delivers each word in the array.
+
+In Java SE5, a number of classes have been made Iterable, primarily all
+Collection classes (but not Maps).
+
+A foreach statement works with an array or anything Iterable, but that doesn’t
+mean that an array is automatically an Iterable, nor is there any autoboxing
+that takes place.
+
+## Summary
+Java provides a number of ways to hold objects:
+
+1. An array associates numerical indexes to objects. It holds objects of a known
+   type so that you don’t have to cast the result when you’re looking up an
+   object. It can be multidimensional, and it can hold primitives. However, its
+   size cannot be changed once you create it.
+
+2. A Collection holds single elements, and a Map holds associated pairs. With
+   Java generics, you specify the type of object to be held in the containers,
+   so you can’t put the wrong type into a container and you don’t have to cast
+   elements when you fetch them out of a container. Both Collections and Maps
+   automatically resize themselves as you add more elements. A container won’t
+   hold primitives, but autoboxing takes care of translating primitives back and
+   forth to the wrapper types held in the container.
+
+3. Like an array, a List also associates numerical indexes to objects— thus,
+   arrays and Lists are ordered containers.
+
+4. Use an ArrayList if you’re doing a lot of random accesses, but a LinkedList
+   if you will be doing a lot of insertions and removals in the middle of the
+       list.
+
+5. The behavior of Queues and stacks is provided via the LinkedList.
+
+6. A Map is a way to associate not integral values, but objects with other
+   objects.  HashMaps are designed for rapid access, whereas a TreeMap keeps its
+   keys in sorted order, and thus is not as fast as a HashMap. A LinkedHashMap
+   keeps its elements in insertion order, but provides rapid access with
+   hashing.
+
+7. A Set only accepts one of each type of object. HashSets provide maximally
+   fast lookups, whereas TreeSets keep the elements in sorted order.
+   LinkedHashSets keep elements in insertion order.
+
+8. There’s no need to use the legacy classes Vector, Hashtable, and Stack in new
+   code.
+
+You’ll see that there are really only four basic container components—Map,
+List, Set, and Queue—and only two or three implementations of each one
+
+You can see that all Sets except TreeSet have exactly the same interface as
+Collection. List and Collection differ significantly, although List requires
+methods that are in Collection.  On the other hand, the methods in the Queue
+interface stand alone; the Collection methods are not required to create a
+functioning Queue implementation. Finally, the only intersection between Map and
+Collection is the fact that a Map can produce Collections using the entrySet( )
+and values( ) methods.
+
+Notice the tagging interface java.util.RandomAccess, which is attached to
+ArrayList but not to LinkedList. This provides information for algorithms that
+might want to dynamically change their behavior depending on the use of a
+particular List.
+
+
+# Error Handling with Exceptions
+When you throw an exception, several things happen. First, the exception object
+is created in the same way that any Java object is created: on the heap, with
+new. Then the current path of execution (the one you couldn’t continue) is
+stopped and the reference for the exception object is ejected from the current
+context. At this point the exception-handling mechanism takes over and begins to
+look for an appropriate place to continue executing the program.  This
+appropriate place is the exception handler, whose job is to recover from the
+problem so the program can either try another tack or just continue.
+
+Like any object in Java, you always create exceptions on the heap using new,
+which allocates storage and calls a constructor. There are two constructors in
+all standard exceptions; The first one is the default constructor, and the
+second takes a string argument so you can place pertinent information in the
+exception:
+
+```java
+throw new NullPointerException("t = null" );
+```
+
+The string can later be extracted using various methods.
+
+You can throw any type of _Throwable_ ( the exception root class) object that
+you want.
+
+The information about the error is represented both inside the exception object
+and implicitly in the name of the exception class, so someone in the bigger
+context can figure out what to do with your exception. (Often, the only
+information is the type of exception, and nothing meaningful is stored within
+the exception object.)
+
+## Catching an exception
+To see how an exception is caught, you must first understand the concept of a
+guarded region. This is a section of code that might produce exceptions and is
+followed by the code to handle those exceptions.
+
+If you’re inside a method and you throw an exception (or another method that you
+call within this method throws an exception), that method will exit in the
+process of throwing. If you don’t want a throw to exit the method, you can set
+up a special block within that method to capture the exception. This is called
+the try block because you "try" your various method calls there. The try block
+is an ordinary scope preceded by the keyword try
+
+Of course, the thrown exception must end up someplace. This "place" is the
+exception handler, and there’s one for every exception type you want to catch.
+Exception handlers immediately follow the try block and are denoted by the
+keyword catch
+
+```java
+try {
+
+} catcch (Typ1 id1) {
+
+} catch (Typ2 id2) {
+
+}
+```
+Each catch clause (exception handler) is like a little method that takes one and
+only one argument of a particular type. The identifier (id1, id2, and so on) can
+be used inside the handler, just like a method argument. Sometimes you never use
+the identifier because the type of the exception gives you enough information to
+deal with the exception, but the identifier must still be there.
+
+## Creating your own exceptions
+
+To create your own exception class, you must inherit from an existing exception
+class, preferably one that is close in meaning to your new exception (although
+this is often not possible). The most trivial way to create a new type of
+exception is just to let the compiler create the default constructor for you, so
+it requires almost no code at all
+
+As you’ll see, the most important thing about an exception is the class name
+
+However, you may want to send error output to the standard error stream by
+writing to System.err. This is usually a better place to send error information
+than System.out, which may be redirected. If you send output to System.err, it
+will not be redirected along with System.out so the user is more likely to
+notice it.
+
+```java
+class MyException extends Exception {
+    public MyException() {}
+    public MyException(String msg) { super(msg); }
+}
+```
+
+printStackTrace()
+: produces information about the sequence of methods that were called to get to
+  the point where the exception happened. By default, the information goes to
+  the standard error stream, but overloaded versions allow you to send the
+  results to any other stream as well.
+
+getMessage()
+: will return the string that you gave to the constructor
+
+getMessage( ) is something like toString( ) for exception classes.
+
+## The exception specification
+In Java, you’re encouraged to inform the client programmer, who calls your
+method, of the exceptions that might be thrown from your method. This is
+civilized, because the caller can then know exactly what code to write to catch
+all potential exceptions.
+
+Java provides syntax (and forces you to use that syntax) to allow you to
+politely tell the client programmer what exceptions this method throws, so the
+client programmer can handle them. This is the exception specification and it’s
+part of the method declaration, appearing after the argument list.
+
+```java
+void f() throws TooBig, TooSmall, DivZero {
+```
+There is one place you can lie: You can claim to throw an exception that you
+really don’t. The compiler takes your word for it, and forces the users of your
+method to treat it as if it really does throw that exception. This has the
+beneficial effect of being a placeholder for that exception, so you can actually
+start throwing the exception later without requiring changes to existing code.
+It’s also important for creating abstract base classes and interfaces whose
+derived classes or implementations may need to throw exceptions.
+
+## Catching any exception
+
+It is possible to create a handler that catches any type of exception. You do
+this by catching the base-class exception type Exception (there are other types
+of base exceptions, but Exception is the base that’s pertinent to virtually all
+programming activities).
+
+Since the Exception class is the base of all the exception classes that are
+important to the programmer, you don’t get much specific information about the
+exception, but you can call the methods that come from its base type Throwable
+
+```java
+String getLocalizedMessage( )
+Gets the detail message, or a message adjusted for this particular
+locale.
+
+void printStackTrace( )
+voidprintStackTrace(PrintStream)
+voidprintStackTrace(java.io.PrintWriter)
+
+Throwable fillInStackTrace( )
+: Records information within this Throwable object about the current state of
+  the stack frames. Useful when an application is rethrowing an error or exception
+```
+## The Stack Trace
+The information provided by printStackTrace( ) can also be accessed directly
+using getStackTrace( ). This method returns an array of stack trace elements,
+each representing one stack frame. Element zero is the top of the stack, and is
+the last method invocation in the sequence (the point this Throwable was created
+and thrown). The last element of the array and the bottom of the stack is the
+first method invocation in the sequence.
+
+If you inherit exceptions from RuntimeException, you don't need to tell your
+method to throw the exception ( methodName() throws FunkyException ) if you
+don't catch that exception in the method when you throw it
+
+Since the Exception class is the base of all the exception classes that are
+important to the programmer, you don't get much specific information about the
+exception, but you can call the methods that come from its base type Throwable
+
+```java
+} catch (Exception e) {
+    for (StackTraceElement ste : e.getStackTrace()) {
+        System.out.println (ste.getMethodName());
+    }
+}
+```
+Here, we just print the method name, but you can also print the entire
+StackTraceElement, which contains additional information.
+
+
+## Rethrowing an Exception
+Sometimes you'll want to rethrow the exception that you just caught,
+particularly when you use Exception to catch any exception.
+
+```java
+catch(Exception e) {
+    println("An exception was thrown");
+    throw e;
+}
+```
+If you simply rethrow the current exception, the information that you print
+about the exception in printStackTrace() will pertain to the exception's origin,
+not the place where you rethrow it.
+
+Any further catch clauses for the same try block are still ignored.
+
+If you simply rethrow the current exception, the information that you print
+about that exception in printStackTrace( ) will pertain to the exception’s
+origin, not the place where you rethrow it.
+
+If you want to install new stack trace information, you can do so by calling
+fillInStackTrace(), which returns a Throwable object that it creates by stuffing
+the current stack information into the old exception object.
+
+```java
+public static void g() throws Exception {
+    try {
+        f();
+    } catch (Exception e) {
+        e.printStackTrace();
+
+        // throw e;// keep the original stack trace
+        // the stack trace always remembers its true point of origin no
+        // matter how many time it gets rethrown
+
+        throw e.fillInStackTrace(); // replacing the stack trace to make as
+        //  if it was thrown here
+
+    }
+    public static void main(String[] args) {
+        try {
+            g();
         } catch (Exception e) {
-            for (StackTraceElement ste : e.getStackTrace()) {
-                System.out.println (ste.getMethodName());
-            }
+
         }
 
-  Here, we just print the method name, but you can also print the entire
-  StackTraceElement, which contains additional information.
-
-
-* Rethrowing an Exception
-
-- Sometimes you'll want to rethrow the exception that you just caught,
-  particularly when you use Exception to catch any exception.
-
-      catch(Exception e) {
-          println("An exception was thrown");
-          throw e;
-      }
-
-  ** The handler at the higher context that catches the specific exception type
-  can extract all the information from that object.
-
-  ** If you simply rethrow the current exception, the information that you print
-  about the exception in printStackTrace() will pertain to the exception's
-  origin, not the place where you rethrow it.
-
-  ** Any further catch clauses for the same try block are still ignored.
-
-  If you simply rethrow the current exception, the information that you print
-  about that exception in printStackTrace( ) will pertain to the exception’s
-  origin, not the place where you rethrow it.
-
-  If you want to install new stack trace information, you can do so by calling
-  fillInStackTrace(), which returns a Throwable object that it creates by
-  stuffing the current stack information into the old exception object.
-
-      public static void g() throws Exception {
-          try {
-              f();
-          } catch (Exception e) {
-              e.printStackTrace();
-
-              // throw e;// keep the original stack trace
-              // the stack trace always remembers its true point of origin no
-              // matter how many time it gets rethrown
-
-              throw e.fillInStackTrace(); // replacing the stack trace to make as
-              //  if it was thrown here
-
-          }
-          public static void main(String[] args) {
-              try {
-                  g();
-              } catch (Exception e) {
-
-              }
-
-          }
-
-- Also possible to rethrow a different exception from the one you caught.
-
-  It’s also possible to rethrow a different exception from the one you caught.
-  If you do this, you get a similar effect as when you use fillInStackTrace( )—
-  the information about the original site of the exception is lost, and what
-  you’re left with is the information pertaining to the new throw:
-
-  [with fillInStackTrace(), it makes as if the exception started at where
-  e.fillInStackTrace() is being thrown, but this apparently needs to be cast to
-  an Exception or in your method header, throws Throwable and try {} catch
-  (Throwable e){};]
-
-          ...
-          } catch (OneException e) {
-              throw new TwoException("blabla");
-          }
-
-
-
+    }
+}
+```
           Throwable
              / \
             /   \
@@ -3225,2114 +2753,518 @@ an Iterator except:
                       |
                RuntimeException
 
-* Exception chaining -  Keep the information about the originating exception --
-
-- Often you want to catch one exception and throw another, but still keep the
-  information about the originating exception - this is called _exception
-  chaining_
-
-- All Throwable subclasses may take a _cause_ object in their constructor. The
-  cause is intended to be the originating exception, and by passing it in you
-  maintain the stack trace back to its origin, even though you're creating and
-  throwing a new exception at this point.
-
-  The cause is intended to be the originating exception, and by passing it in
-  you maintain the stack trace back to its origin, even though you’re creating
-  and throwing a new exception.
-
-- It's interesting to note that the only Throwable subclasses that provide the
-  cause argument in the constructor are the three fundamental exception classes
-  Error (used by JVM to report system errors), Exception, and RuntimeException.
-
-  If you want to chain any other exception types, you do it through the
-  initCause() method rather than the constructor.
-
-
-  ************* USE initCause !!!! ****************************
-
-  e.g
-
-      // Most Exceptions don't have a "cause" constructor.
-      // In these cases you must use initCase()
-      // available in all Throwable subclasses.
-
-      DynamicFieldsException dfe = new DynamicFieldsException();
-      dfe.initCause(new NullPointerException());
-      // create a new DynamicFieldsException and insert a NullPointerException as
-      // the cause
-      throw dfe;
-      }
-      ...
-
-      // use constructor that takes "cause"
-
-      ...
-      } catch(NoSuchFieldException e) {
-              throw new RuntimeException(e);
-      }
-      ...
-
-      Output:
-
-         DynamicFieldsException
-                    at
-                    at
-         Caused by: java.lang.NullPointerException
-                    at
-
-= Standard Java exceptions
-
-- The Java class Throwable describes anything that can be thrown as an
-  Exception. There are two general types of Throwable objects.
-
-  - Error represents compile-time and system errors that you don't worry about
-    catching.
-
-  - Exception is the basic type that can be thrown from any of the standard Java
-    library class methods and from your methods and run-time accidents. So the
-    Java programmer's base type of interest is usually Exception.
-
-* - The basic idea is that the name of the exception represents the problem that
-        occurred, and the exception name is intended to be relatively
-        self-explanatory.
-
-    SIDE-NOTE: it seems that they put the exception class inside source code
-    instead of it existing on its own file.
-
-    I guess they extend the Exception class so that the new exception class
-    created has a more meaningful name.
-
-        e.g
-
-        // DynamicFields.java
-        class DynamicFieldsException extends Exception {}
-
-        public class DynamicFields {
-        ...
-        }
-
-- Runtime Exception -- You never need to write an exception specification saying
-  that a method might throw a RuntimeException, because they are _unchecked_
-  exceptions.
-
-
-    There’s a whole group of exception types that are in this category. They’re
-    always thrown automatically by Java and you don’t need to include them in
-    your exception specifications.  Conveniently enough, they’re all grouped
-    together by putting them under a single base class called RuntimeException,
-    which is a perfect example of inheritance: It establishes a family of types
-    that have some characteristics and behaviors in common. Also, you never need
-    to write an exception specification saying that a method might throw a
-    RuntimeException (or any type inherited from RuntimeException), because they
-    are unchecked exceptions.
-
-    Because they indicate bugs, you don't usually catch a RuntimeException -
-    it's dealt with automatically. If you were forced to check for
-    RuntimeExceptions, your code could get too messy. Even though you don't
-    typically catch RuntimeExceptions, in your own packages you might choose to
-    throw some of the RuntimeExceptions.
-
-    What happens when you don’t catch such exceptions? Since the compiler
-    doesn’t enforce exception specifications for these, it’s quite plausible
-    that a RuntimeException could percolate all the way out to your main( )
-    method without being caught.
-
-    Keep in mind that you can ONLY ignore exceptions of type RuntimeException in
-    your coding, since all other handling is carefully enforced by the compiler.
-
-
-    The reasoning is that a RuntimeException represents a programming error:
-
-    - An error that you cannot anticipate
-    - An error that you, as a programmer, should have checked for in your code
-      (such as ArrayIndexOutOfBoundsException)
-
-  You can already see that a RuntimeException (or anything inherited from it) is
-  a special case, since the compiler doesn’t require an exception specification
-  for these types. The output is reported to System.err:
-
-          throw new RuntimeException("From f()");
-
-  If a RuntimeException gets all the way out to main( ) without being caught,
-  printStackTrace( ) is called for that exception as the program exits.
-
-
-* Performing Cleanup with finally
-
-  In a language without garbage collection and without automatic destructor
-  calls, 5 finally is important because it allows the programmer to guarantee
-  the release of memory regardless of what happens in the try block. But Java
-  has garbage collection, so releasing memory is virtually never a problem.
-  Also, it has no destructors to call. So when do you need to use finally in
-  Java?
-
-- finally is necessary when you need to set something other than memory back to
-  its original state. This is some kind of cleanup like an open file or network
-  connection, something you've drawn on the screen, or even a switch in the
-  outside world.
-
-  finally clause is executed whether or not an exception is thrown.
-
-  This program also gives a hint for how you can deal with the fact that
-  exceptions in Java do not allow you to resume back to where the exception was
-  thrown, as discussed earlier. If you place your try block in a loop, you can
-  establish a condition that must be met before you continue the program. You
-  can also add a static counter or some other device to allow the loop to try
-  several different approaches before giving up. This way you can build a
-  greater level of robustness into your programs.
-
-  *** Using finally during return
-
-  Because a finally clause is always executed, it’s possible to return from
-  multiple points within a method and still guarantee that important cleanup
-  will be performed
-
-      try {
-          print("Point 1");
-          if(i == 1) return;
-          print("Point 2");
-          if(i == 2) return;
-          print("Point 3");
-          if(i == 3) return;
-          print("End");
-          return;
-      } finally {
-          print("Performing cleanup");
-      }
-
-
-* Pitfall -the lost exception
-
-- There's a flaw in Java's exception implementation. Although exceptions are an
-  indication of a crisis in your program and should never be ignored, it's
-  possible for an exception to simply be lost.
-
-  This happens with a particular configuration using a finally clause
-
-  e.g
-
-        lm.f() throws VeryImportantException();
-        lm.dispose() throws HoHumException();
-
-        class HoHumException extends Exception {
-            public String toString() {
-                return "A trivial exception";
-            }
-        }
-
-        // code in question
-        try {
-            lm.f();
-        } finally {
-            lm.dispose();
-        }
-
-          // what is printed
-
-          Exxception in thread main "A trivial Exception"
-
- This occurs because there is no catch() - it is simply replaced by the
- HoHumException in the finally clause.
-
- You can see from the output that there’s no evidence of the
- VerylmportantException, which is simply replaced by the HoHumException in the
- finally clause. This is a rather serious pitfall, since it means that an
- exception can be completely lost, and in a far more subtle and
- difficult-to-detect fashion than the preceding example.
-
-  An even simpler way to lose an exception is just to return from inside a
-  finally clause
-
-          try {
-              throw new RuntimeException();
-          } finally {
-              // Using ‘return’ inside the finally block
-              // will silence any thrown exception.
-              return;
-          }
-
-* Exception Restrictions
-
-- When you override a method, you can throw only the exceptions that have been
-  specified in the base-class version of the method. This is a useful
-  restriction, since it means that the code that works with the base class will
-  automatically work with any object derived from the base class.
-
-
-- IMPORTANT: you can use "throws" in a method even though you never throw that
-  method in case of error:
-
-  e.g int haha() throws PlotException {
-          ...
-       }
-
-  This is legal because it allows you to force the user to catch any exceptions
-  that might be added in overriden versions.
-
-
-
-          class BaseballException extends Exception {}
-          class Foul extends BaseballException {}
-          class Strike extends BaseballException {}
-          abstract class Inning {
-              public Inning() throws BaseballException {}
-              public void event() throws BaseballException {
-                  // Doesn’t actually have to throw anything
-              }
-              public abstract void atBat() throws Strike, Foul;
-              public void walk() {} // Throws no checked exceptions
-          }
-          class StormException extends Exception {}
-          class RainedOut extends StormException {}
-          class PopFoul extends Foul {}
-
-
-          interface Storm {
-              public void event() throws RainedOut;
-              public void rainHard() throws RainedOut;
-          }
-          public class StormyInning extends Inning implements Storm {
-              // OK to add new exceptions for constructors, but you
-              // must deal with the base constructor exceptions:
-              public StormyInning()
-                  throws RainedOut, BaseballException {}
-              public StormyInning(String s)
-                  throws Foul, BaseballException {}
-              // Regular methods must conform to base class:
-              //! void walk() throws PopFoul {} //Compile error
-              // Interface CANNOT add exceptions to existing
-              // methods from the base class:
-              //! public void event() throws RainedOut {}
-              // If the method doesn’t already exist in the
-              // base class, the exception is OK:
-              public void rainHard() throws RainedOut {}
-              // You can choose to not throw any exceptions,
-              // even if the base version does:
-              public void event() {}
-              // Overridden methods can throw inherited exceptions:
-              public void atBat() throws PopFoul {}
-              public static void main(String[] args) {
-                  try {
-                      StormyInning si = new StormyInning();
-                      si.atBat();
-                  } catch(PopFoul e) {
-                      System.out.println("Pop foul");
-                  } catch(RainedOut e) {
-                      System.out.println("Rained out");
-                  } catch(BaseballException e) {
-                      System.out.println("Generic baseball exception");
-                  }
-                  // Strike not thrown in derived version.
-                  try {
-                      // What happens if you upcast?
-                      Inning i = new StormyInning();
-                      i.atBat();
-                      // You must catch the exceptions from the
-                      // base-class version of the method:
-                  } catch(Strike e) {
-                      System.out.println("Strike");
-                  } catch(Foul e) {
-                      System.out.println("Foul");
-                  } catch(RainedOut e) {
-                      System.out.println("Rained out");
-                  } catch(BaseballException e) {
-                      System.out.println("Generic baseball exception");
-                  }
-              }
-
-
-  The interface Storm is interesting because it contains one method (event( ))
-  that is defined in Inning, and one method that isn’t. Both methods throw a new
-  type of exception, RainedOut. When Stormylnning extends Inning and implements
-  Storm, you’ll see that the event( ) method in Storm cannot change the
-  exception interface of event( ) in Inning. Again, this makes sense because
-  otherwise you’d never know if you were catching the correct thing when working
-  with the base class. Of course, if a method described in an interface is not
-  in the base class, such as rainHard( ), then there’s no problem if it throws
-  exceptions.
-
-  The restriction on exceptions does not apply to constructors. You can see in
-  Stormylnning that a constructor can throw anything it wants, regardless of
-  what the base-class constructor throws. However, since a base-class
-  constructor must always be called one way or another (here, the default
-  constructor is called automatically), the derived-class constructor must
-  declare any base-class constructor exceptions in its exception specification.
-
-  *** A derived-class constructor cannot catch exceptions thrown by its
-  base-class constructor.  [Why? Probably because if the base constructor throws
-  an exception, the base object has not been properly initialized!]
-
-
-  The reason StormyInning.walk( ) will not compile is that it throws an
-  exception, but Inning.walk( ) does not. If this were allowed, then you could
-  write code that called Inning.walk( ) and that didn’t have to handle any
-  exceptions, but then when you substituted an object of a class derived from
-  Inning, exceptions would be thrown so your code would break. By forcing the
-  derived-class methods to conform to the exception specifications of the
-  base-class methods, substitutability of objects is maintained.
-
-  The overridden event( ) method shows that a derived-class version of a method
-  may choose not to throw any exceptions, even if the base-class version does.
-  Again, this is fine since it doesn’t break code that is written assuming the
-  base-class version throws exceptions. Similar logic applies to atBat( ), which
-  throws PopFoul, an exception that is derived from Foul thrown by the
-  base-class version of atBat( ). This way, if you write code that works with
-  Inning and calls atBat( ), you must catch the Foul exception. Since PopFoul is
-  derived from Foul, the exception handler will also catch PopFoul.
-
-  The last point of interest is in main( ). Here, you can see that if you’re
-  dealing with exactly a StormyInning object, the compiler forces you to catch
-  only the exceptions that are specific to that class, but if you upcast to the
-  base type, then the compiler (correctly) forces you to catch the exceptions
-  for the base type. All these constraints produce much more robust
-  exceptionhandling code.
-
-  Although exception specifications are enforced by the compiler during
-  inheritance, the exception specifications are not part of the type of a
-  method, which comprises only the method name and argument types. Therefore,
-  you cannot overload methods based on exception specifications. In addition,
-  just because an exception specification exists in a base- class version of a
-  method doesn’t mean that it must exist in the derived-class version of the
-  method. This is quite different from inheritance rules, where a method in the
-  base class must also exist in the derived class. Put another way, the
-  "exception specification interface" for a particular method may narrow during
-  inheritance and overriding, but it may not widen—this is precisely the
-  opposite of the rule for the class interface during inheritance.
-
-
-    // Overridden methods can throw inherited exceptions:
-
-
-- Constructor
-
-  It’s important that you always ask, "If an exception occurs, will everything
-  be properly cleaned up?" Most of the time you’re fairly safe, but with
-  constructors there’s a problem. The constructor puts the object into a safe
-  starting state, but it might perform some operation— such as opening a
-  filethat doesn’t get cleaned up until the user is finished with the object and
-  calls a special cleanup method. If you throw an exception from inside a
-  constructor, these cleanup behaviors might not occur properly. This means that
-  you must be especially diligent while you write your constructor.
-
-  You might think that finally is the solution. But it’s not quite that simple,
-  because finally performs the cleanup code every time. If a constructor fails
-  partway through its execution, it might not have successfully created some
-  part of the object that will be cleaned up in the finally clause.
-
-      public class InputFile {
-          private BufferedReader in;
-          public InputFile(String fname) throws Exception {
-              try {
-                  in = new BufferedReader(new FileReader(fname));
-                  // Other code that might throw exceptions
-              } catch(FileNotFoundException e) {
-                  System.out.println("Could not open " + fname);
-                  // Wasn’t open, so don’t close it
-                  throw e;
-              } catch(Exception e) {
-                  // All other exceptions must close it
-                  try {
-                      in.close();
-                  } catch(IOException e2) {
-                      System.out.println("in.close() unsuccessful");
-                  }
-                  throw e; // Rethrow
-              } finally {
-                  // Don’t close it here!!!
-              }
-          }
-          public String getLine() {
-              String s;
-              try {
-                  s = in.readLine();
-              } catch(IOException e) {
-                  throw new RuntimeException("readLine() failed");
-              }
-              return s;
-          }
-          public void dispose() {
-              try {
-                  in.close();
-                  System.out.println("dispose() successful");
-              } catch(IOException e2) {
-                  throw new RuntimeException("in.close() failed");
-              }
-          }
-      }
-
-
-  The constructor for InputFile takes a String argument, which is the name of
-  the file you want to open. Inside a try block, it creates a FileReader using
-  the file name. A FileReader isn’t particularly useful until you use it to
-  create a BufferedReader. One of the benefits of InputFile is that it combines
-  these two actions.
-
-
-  If the FileReader constructor is unsuccessful, it throws a
-  FileNotFoundException. This is the one case in which you don’t want to close
-  the file, because it wasn’t successfully opened. Any other catch clauses must
-  close the file because it was opened by the time those catch clauses are
-  entered. (Of course, this gets trickier if more than one method can throw a
-  FileNotFoundException. In that case, you’ll usually have to break things into
-  several try blocks.) The close( ) method might throw an exception so it is
-  tried and caught even though it’s within the block of another catch
-  clause—it’s just another pair of curly braces to the Java compiler. After
-  performing local operations, the exception is rethrown, which is appropriate
-  because this constructor failed, and you don’t want the calling method to
-  assume that the object has been properly created and is valid.
-
-
-  In this example, the finally clause is definitely not the place to close( )
-  the file, since that would close it every time the constructor completed. We
-  want the file to be open for the useful lifetime of the InputFile object.
-
-  One of the design issues with exceptions is whether to handle an exception
-  completely at this level, to handle it partially and pass the same exception
-  (or a different one) on, or whether to simply pass it on. Passing it on, when
-  appropriate, can certainly simplify coding. In this situation, the getLine( )
-  method converts the exception to a RuntimeException to indicate a programming
-  error.
-
-  The dispose( ) method must be called by the user when the InputFile object is
-  no longer needed. This will release the system resources (such as file
-  handles) that are used by the BufferedReader and/or FileReader objects. You
-  don’t want to do this until you’re finished with the InputFile object. You
-  might think of putting such functionality into a finalize( ) method, but as
-  mentioned in the Initialization & Cleanup chapter, you can’t always be sure
-  that finalize( ) will be called (even if you can be sure that it will be
-  called, you don’t know when). This is one of the downsides to Java: All
-  cleanupother than memory cleanup—doesn’t happen automatically, so you must
-  inform the client programmers that they are responsible.
-
-
-  The safest way to use a class which might throw an exception during
-  construction and which requires cleanup is to use nested try blocks:
-
-          public class Cleanup {
-              public static void main(String[] args) {
-                  try {
-                      InputFile in = new InputFile("Cleanup.java");
-                      try {
-                          String s;
-                          int i = 1;
-                          while((s = in.getLine()) != null)
-                              ; // Perform line-by-line processing here...
-                      } catch(Exception e) {
-                          System.out.println("Caught Exception in main");
-                          e.printStackTrace(System.out);
-                      } finally {
-                          in.dispose();
-                      }
-                  } catch(Exception e) {
-                      System.out.println("InputFile construction failed");
-                  }
-              }
-          }
-
-  Look carefully at the logic here: The construction of the InputFile object is
-  effectively in its own try block. If that construction fails, the outer catch
-  clause is entered and dispose( ) is not called. However, if construction
-  succeeds then you want to make sure the object is cleaned up, so immediately
-  after construction you create a new try block. The finally that performs
-  cleanup is associated with the inner try block; this way, the finally clause
-  is not executed if construction fails, and it is always executed if
-  construction succeeds.
-
-  This general cleanup idiom should still be used if the constructor throws no
-  exceptions. The basic rule is: Right after you create an object that requires
-  cleanup, begin a try-finally
-
-          try {
-              // ...
-          } finally {
-              nc1.dispose();
-          }
-
-- Exception Matching
-
-  When an exception is thrown, the exception-handling system looks through the
-  "nearest" handlers in the order they are written. When it finds a match, the
-  exception is considered handled, and no further searching occurs.
-
-  Matching an exception doesn’t require a perfect match between the exception
-  and its handler. A derived-class object will match a handler for the base
-  class
-
-        class Annoyance extends Exception {}
-        class Sneeze extends Annoyance {}
-        public class Human {
-            public static void main(String[] args) {
-                // Catch the exact type:
-                try {
-                    throw new Sneeze();
-                } catch(Sneeze s) {
-                    System.out.println("Caught Sneeze");
-                } catch(Annoyance a) {
-                    System.out.println("Caught Annoyance");
-                }
-                // Catch the base type:
-                try {
-                    throw new Sneeze();
-                } catch(Annoyance a) {
-                    System.out.println("Caught Annoyance");
-                }
-            }
-        }
-
-  The Sneeze exception will be caught by the first catch clause that it matches,
-  which is the first one, of course. However, if you remove the first catch
-  clause, leaving only the catch clause for Annoyance, the code still works
-  because it’s catching the base class of Sneeze.  Put another way,
-  catch(Annoyance a) will catch an Annoyance or any class derived from it. This
-  is useful because if you decide to add more derived exceptions to a method,
-  then the client programmer’s code will not need changing as long as the client
-  catches the base- class exceptions.
-
-  If you try to "mask" the derived-class exceptions by putting the base-class
-  catch clause first, like this:
-
-          try {
-              throw new Sneeze();
-          } catch(Annoyance a) {
-              // ...
-          } catch(Sneeze s) {
-              // ...
-          }
-
-  the compiler will give you an error message, since it sees that the Sneeze
-  catch clause can never be reached.
-
-- Alternative approaches
-
-  An exception-handling system is a trapdoor that allows your program to abandon
-  execution of the normal sequence of statements. The trapdoor is used when an
-  "exceptional condition" occurs, such that normal execution is no longer
-  possible or desirable. Exceptions represent conditions that the current method
-  is unable to handle. The reason exception-handling systems were developed is
-  because the approach of dealing with each possible error condition produced by
-  each function call was too onerous, and programmers simply weren’t doing it.
-  As a result, they were ignoring the errors. It’s worth observing that the
-  issue of programmer convenience in handling errors was a prime motivation for
-  exceptions in the first place.
-
-  One of the important guidelines in exception handling is "Don’t catch an
-  exception unless you know what to do with it." In fact, one of the important
-  goals of exception handling is to move the error-handling code away from the
-  point where the errors occur. This allows you to focus on what you want to
-  accomplish in one section of your code, and how you’re going to deal with
-  problems in a distinct separate section of your code. As a result, your
-  mainline code is not cluttered with error-handling logic, and it’s much easier
-  to understand and maintain.
-
-  Exception handling also tends to reduce the amount of error-handling code, by
-  allowing one handler to deal with many error sites.  Checked exceptions
-  complicate this scenario a bit, because they force you to add catch clauses in
-  places where you may not be ready to handle an error. This results in the
-  "harmful if swallowed" problem
-
-          try {
-              // ... to do something useful
-          } catch(ObligatoryException e) {} // Gulp!
-
-  Programmers (myself included, in the 1st edition of this book) would just do
-  the simplest thing, and "swallow" the exception—often unintentionally, but
-  once you do it, the compiler has been satisfied, so unless you remember to
-  revisit and correct the code, the exception will be lost. The exception
-  happens, but it vanishes completely when swallowed. Because the compiler
-  forces you to write code right away to handle the exception, this seems like
-  the easiest solution even though it’s probably the worst thing you can do.
-
-
-  Horrified upon realizing that I had done this, in the 2nd edition I "fixed"
-  the problem by printing the stack trace inside the handler (as is still seen—
-  appropriately—in a number of examples in this chapter). While this is useful
-  to trace the behavior of exceptions, it still indicates that you don’t really
-  know what to do with the exception at that point in your code.  In this
-  section you’ll learn about some of the issues and complications arising from
-  checked exceptions, and options that you have when dealing with them.
-
-  This topic seems simple. But it is not only complicated, it is also an issue
-  of some volatility.  There are people who are staunchly rooted on either side
-  of the fence and who feel that the correct answer (theirs) is blatantly
-  obvious. I believe the reason for one of these positions is the distinct
-  benefit seen in going from a poorly typed language like pre-ANSI C to a
-  strong, statically typed language (that is, checked at compile time) like C++
-  or Java. When you make that transition (as I did), the benefits are so
-  dramatic that it can seem like static type checking is always the best answer
-  to most problems. My hope is to relate a little bit of my own evolution that
-  has brought the absolute value of static type checking into question; clearly,
-  it’s very helpful much of the time, but there’s a fuzzy line we cross when it
-  begins to get in the way and become a hindrance (one of my favorite quotes is
-  "All models are wrong.  Some are useful.")
-
-- History
-
-  Exception handling originated in systems like PL/1 and Mesa, and later
-  appeared in CLU, Smalltalk, Modula-3, Ada, Eiffel, C++, Python, Java, and the
-  post-Java languages Ruby and C#. The Java design is similar to C++, except in
-  places where the Java designers felt that the C++ approach caused problems. To
-  provide programmers with a framework that they were more likely to use for
-  error handling and recovery, exception handling was added to C++ rather late
-  in the standardization process, promoted by Bjarne Stroustrup, the language’s
-  original author. The model for C++ exceptions came primarily from CLU.
-  However, other languages existed at that time that also supported exception
-  handling: Ada, Smalltalk (both of these had exceptions but no exception
-  specifications) and Modula-3 (which included both exceptions and
-  specifications).
-
-  In their seminal paper 7 on the subject, Liskov and Snyder observe that a
-  major defect of languages like C, which report errors in a transient fashion,
-  is that:
-
-  "...every invocation must be followed by a conditional test to determine what
-  the outcome was. This requirement leads to programs that are difficult to
-  read, and probably inefficient as well, thus discouraging programmers from
-  signaling and handling exceptions."
-
-  Thus one of the original motivations of exception handling was to prevent this
-  requirement, but with checked exceptions in Java we commonly see exactly this
-  kind of code. They go on to say:
-
-  "...requiring that the text of a handler be attached to the invocation that
-  raises the exception would lead to unreadable programs in which expressions
-  were broken up with handlers."
-
-  Following the CLU approach when designing C++ exceptions, Stroustrup stated
-  that the goal was to reduce the amount of code required to recover from
-  errors. I believe that he was observing that programmers were typically not
-  writing error-handling code in C because the amount and placement of such code
-  was daunting and distracting. As a result, they were used to doing it the C
-  way, ignoring errors in code and using debuggers to track down problems.
-
-  To use exceptions, these C programmers had to be convinced to write
-  "additional" code that they weren’t normally writing. Thus, to draw them into
-  a better way of handling errors, the amount of code they would need to "add"
-  must not be onerous. I think it’s important to keep this goal in mind when
-  looking at the effects of checked exceptions in Java.
-
-  C++ brought an additional idea over from CLU: the exception specification, to
-  programmatically state in the method signature the exceptions that could
-  result from calling that method. The exception specification really has two
-  purposes. It can say, "I’m originating this exception in my code; you handle
-  it." But it can also mean, "I’m ignoring this exception that can occur as a
-  result of my code; you handle it." We’ve been focusing on the "you handle it"
-  part when looking at the mechanics and syntax of exceptions, but here I’m
-  particularly interested in the fact that we often ignore exceptions and that’s
-  what the exception specification can state.
-
-  In C++ the exception specification is not part of the type information of a
-  function. The only compile-time checking is to ensure that exception
-  specifications are used consistently; for example, if a function or method
-  throws exceptions, then the overloaded or derived versions must also throw
-  those exceptions. Unlike Java, however, no compile-time checking occurs to
-  determine whether or not the function or method will actually throw that
-  exception, or whether the exception specification is complete (that is,
-  whether it accurately describes all exceptions that maybe thrown). That
-  validation does happen, but only at run time. If an exception is thrown that
-  violates the exception specification, the C++ program will call the standard
-  library function unexpected( ).
-
-  It is interesting to note that, because of the use of templates, exception
-  specifications are not used at all in the Standard C++ Library. In Java, there
-  are restrictions on the way that Java generics can be used with exception
-  specifications.
-
-- Perspectives
-
-  First, it’s worth noting that Java effectively invented the checked exception
-  (clearly inspired by C++ exception specifications and the fact that C++
-  programmers typically don’t bother with them). However, it was an experiment
-  which no subsequent language has chosen to duplicate.
-
-  Secondly, checked exceptions appear to be an "obvious good thing" when seen in
-  introductory examples and in small programs. It has been suggested that the
-  subtle difficulties begin to appear when programs start to get large. Of
-  course, largeness usually doesn’t happen overnight; it creeps. Languages that
-  may not be suited for large-scale projects are used for small projects. These
-  projects grow, and at some point we realize that things have gone from
-  "manageable" to "difficult." This is what I’m suggesting may be the case with
-  too much type checking; in particular, with checked exceptions.
-
-  The scale of the program seems to be a significant issue. This is a problem
-  because most discussions tend to use small programs as demonstrations. One of
-  the C# designers observed that:
-
-      "Examination of small programs leads to the conclusion that requiring
-      exception specifications could both enhance developer productivity and
-      enhance code quality, but experience with large software projects suggests
-      a different result—decreased productivity and little or no increase in
-      code quality."
-
-  In reference to uncaught exceptions, the CLU creators stated:
-
-      "We felt it was unrealistic to require the programmer to provide handlers
-      in situations where no meaningful action can be taken." 9
-
-  When explaining why a function declaration with no specification means that it
-  can throw any exception, rather than no exceptions, Stroustrup states:
-
-      "However, that would require exception specifications for essentially
-      every function, would be a significant cause for recompilation, and would
-      inhibit cooperation with software written in other languages.  This would
-      encourage programmers to subvert the exception-handling mechanisms and to
-      write spurious code to suppress exceptions. It would provide a false sense
-      of security to people who failed to notice the exception." 10
-
-  We see this very behavior—subverting the exceptions—happening with checked
-  exceptions in Java.
-
-  Martin Fowler (author of UML Distilled, Refactoring, and Analysis Patterns)
-  wrote the following to me:
-
-      "...on the whole I think that exceptions are good, but Java checked
-      exceptions are more trouble than they are worth."
-
-  I now think that Java’s important step was to unify the error-reporting model,
-  so that all errors are reported using exceptions. This wasn’t happening with
-  C++, because for backward compatibility with C the old model of just ignoring
-  errors was still available. But if you have consistent reporting with
-  exceptions, then exceptions can be used if desired, and if not, they will
-  propagate out to the highest level (the console or other container program).
-  When Java modified the C++ model so that exceptions were the only way to
-  report errors, the extra enforcement of checked exceptions may have become
-  less necessary.
-
-  In the past, I have been a strong believer that both checked exceptions and
-  static type checking were essential to robust program development. However,
-  both anecdotal and direct experience 11 with languages that are more dynamic
-  than static has led me to think that the great benefits actually come from:
-
-  1. A unified error-reporting model via exceptions, regardless of whether the
-  programmer is forced by the compiler to handle them.
-
-  2. Type checking, regardless of when it takes place. That is, as long as
-  proper use of a type is enforced, it often doesn’t matter if it happens at
-  compile time or run time.
-
-  On top of this, there are very significant productivity benefits to reducing
-  the compile-time constraints upon the programmer. Indeed, reflection and
-  generics are required to compensate for the overconstraining nature of static
-  typing, as you shall see in a number of examples throughout the book.
-
-  I’ve already been told by some that what I say here constitutes blasphemy, and
-  by uttering these words my reputation will be destroyed, civilizations will
-  fall, and a higher percentage of programming projects will fail. The belief
-  that the compiler can save your project by pointing out errors at compile time
-  runs strong, but it’s even more important to realize the limitation of what
-  the compiler is able to do; in the supplement you will find at
-  http://MindView.net/Books/BetterJava, I emphasize the value of an automated
-  build process and unit testing, which give you far more leverage than you get
-  by trying to turn everything into a syntax error. It’s worth keeping in mind
-  that:
-
-      "A good programming language is one that helps programmers write good
-      programs.  No programming language will prevent its users from writing bad
-      programs." 12
-
-  In any event, the likelihood of checked exceptions ever being removed from
-  Java seems dim.  It would be too radical of a language change, and proponents
-  within Sun appear to be quite strong. Sun has a history and policy of absolute
-  backwards compatibility—to give you a sense of this, virtually all Sun
-  software runs on all Sun hardware, no matter how old. However, if you find
-  that some checked exceptions are getting in your way, or especially if you
-  find yourself being forced to catch exceptions, but you don’t know what to do
-  with them, there are some alternatives.
-
-- Passing exceptions to the console
-
-  In simple programs, like many of those in this book, the easiest way to
-  preserve the exceptions without writing a lot of code is to pass them out of
-  main( ) to the console. For example, if you want to open a file for reading
-  (something you’ll learn about in detail in the I/O chapter), you must open and
-  close a FilelnputStream, which throws exceptions. For a simple program, you
-  can do this (you’ll see this approach used in numerous places throughout this
-  book):
-
-      public class MainException {
-          // Pass all exceptions to the console:
-          public static void main(String[] args) throws Exception {
-              // Open the file:
-              FileInputStream file =
-                  new FileInputStream("MainException.java");
-              // Use the file ...
-              // Close the file:
-              file.close();
-          }
-      }
-
- Note that main( ) is also a method that may have an exception specification,
- and here the type of exception is Exception, the root class of all checked
- exceptions. By passing it out to the console, you are relieved from writing
- try-catch clauses within the body of main( ).
-
-- Converting checked to unchecked exceptions
-
-  Throwing an exception from main( ) is convenient when you’re writing simple
-  programs for your own consumption, but is not generally useful. The real
-  problem is when you are writing an ordinary method body, and you call another
-  method and realize, "I have no idea what to do with this exception here, but I
-  don’t want to swallow it or print some banal message." With chained
-  exceptions, a new and simple solution prevents itself. You simply "wrap" a
-  checked exception inside a RuntimeException by passing it to the
-  RuntimeException constructor, like this:
-
-          try{
-              // ... to do something useful
-          } catch(IDontKnowWhatToDoWithThisCheckedException e) {
-              throw new RuntimeException(e);
-          }
-
-   This seems to be an ideal solution if you want to "turn off the checked
-   exception—you don’t swallow it, and you don’t have to put it in your method’s
-   exception specification, but because of exception chaining you don’t lose any
-   information from the original exception.
-
-
-
-   #############################################################################
-   This technique provides the option to ignore the exception and let it bubble
-   up the call stack without being required to write try-catch clauses and/or
-   exception specifications. However, you may still catch and handle the
-   specific exception by using getCause( ), as seen here:
-   #############################################################################
-
-       class WrapCheckedException {
-           void throwRuntimeException(int type) {
-               try {
-                   switch(type) {
-                       case 0: throw new FileNotFoundException();
-                       case 1: throw new IOException();
-                       case 2: throw new RuntimeException("Where am I?");
-                       default: return;
-                   }
-               } catch(Exception e) { // Adapt to unchecked:
-                   throw new RuntimeException(e);
-               }
-           }
-       }
-
-       ...
-      } catch(RuntimeException re) {
-          try {
-              throw re.getCause();
-          } catch(FileNotFoundException e) {
-              print("FileNotFoundException: " + e);
-          } catch(IOException e) {
-              print("IOException: " + e);
-          } catch(Throwable e) {
-              print("Throwable: " + e);
-          }
-      }
-
-  WrapCheckedException.throwRuntimeException( ) contains code that generates
-  different types of exceptions. These are caught and wrapped inside
-  RuntimeException objects, so they become the "cause" of those exceptions.
-
-  Lastly, you catch RuntimeException and throw the result of getCause( ) (the
-  wrapped exception). This extracts the originating exceptions, which can then
-  be handled in their own catch clauses.
-
-
-  The technique of wrapping a checked exception in a RuntimeException will be
-  used when appropriate throughout the rest of this book. Another solution is to
-  create your own subclass of RuntimeException. This way, it doesn’t need to be
-  caught, but someone can catch it if they want to.
-
-
-- Exception guidelines
-
-  Use exceptions to:
-
-
-  1. Handle problems at the appropriate level. (Avoid catching exceptions unless
-  you know what to do with them.)
-
-  2. Fix the problem and call the method that caused the exception again.
-
-  3. Patch things up and continue without retrying the method.
-
-  4. Calculate some alternative result instead of what the method was supposed
-  to produce.
-
-  5. Do whatever you can in the current context and rethrow the same exception
-  to a higher context.
-
-  6. Do whatever you can in the current context and throw a different exception
-  to a higher context.
-
-  7. Terminate the program.
-
-  8. Simplify. (If your exception scheme makes things more complicated, then it
-  is painful and annoying to use.)
-
-  9. Make your library and program safer. (This is a short-term investment for
-  debugging, and a long-term investment for application robustness.)
-
-  One of the advantages of exception handling is that it allows you to
-  concentrate on the problem you’re trying to solve in one place, and then deal
-  with the errors from that code in another place. And although exceptions are
-  generally explained as tools that allow you to report and recover from errors
-  at run time, I have come to wonder how often the "recovery" aspect is
-  implemented, or even possible.
-
-  My perception is that it is less than 10 percent of the time, and even then it
-  probably amounts to unwinding the stack to a known stable state rather than
-  actually performing any kind of resumptive behavior. Whether or not this is
-  true, I have come to believe that the "reporting" function is where the
-  essential value of exceptions lie.
-
-  The fact that Java effectively insists that all errors be reported in the form
-  of exceptions is what gives it a great advantage over languages like C++,
-  which allow you to report errors in a number of different ways, or not at all.
-  A consistent error- reporting system means that you no longer have to ask the
-  question "Are errors slipping through the cracks?" with each piece of code you
-  write (as long as you don’t "swallow" the exceptions, that is!).
-
-  As you will see in future chapters, by laying this question to rest—even if
-  you do so by throwing a RuntimeException—your design and implementation
-  efforts can be focused on more interesting and challenging issues.
-
-* Strings
-
-- Immutable Strings
-
-  Objects of the String class are immutable. If you examine the JDK
-  documentation for the String class, you’ll see that every method in the class
-  that appears to modify a String actually creates and returns a brand new
-  String object containing the modification. The original String is left
-  untouched.
-
-- Overloading '+' vs StringBuilder
-
-  Since String objects are immutable, you can alias to a particular String as
-  many times as you want. Because a String is read-only, there’s no possibility
-  that one reference will change something that will affect the other
-  references.
-
-  Immutability can have efficiency issues. A case in point is the operator ‘+’
-  that has been overloaded for String objects. Overloading means that an
-  operation has been given an extra meaning when used with a particular class.
-  (The ‘+’ and ‘+=‘ for String are the only operators that are overloaded in
-  Java, and Java does not allow the programmer to overload any others.) The’+’
-  operator allows you to concatenate Strings
-
-        String s = "abc" + mango + "def" + 47;
-
-          /* Output:
-          abcmangodef47
-          */
-
-  You could imagine how this might work. The String "abc" could have a method
-  append( ) that creates a new String object containing "abc" concatenated with
-  the contents of mango.  The new String object would then create another new
-  String that added "def," and so on.
-
-
-  This would certainly work, but it requires the creation of a lot of String
-  objects just to put together this new String, and then you have a bunch of
-  intermediate String objects that need to be garbage collected. I suspect that
-  the Java designers tried this approach first (which is a lesson in software
-  design—you don’t really know anything about a system until you try it out in
-  code and get something working). I also suspect that they discovered it
-  delivered unacceptable performance.
-
-  To see what really happens, you can decompile the above code using the javap
-  tool that comes as part of the JDK. Here’s the command line:
-
-        javap -c Concatenation
-
-
-  If you’ve had experience with assembly language, this may look familiar to
-  you—statements like dup and invokevirtual are the Java Virtual Machine (JVM)
-  equivalent of assembly language. If you’ve never seen assembly language, don’t
-  worry about it—the important part to notice is the introduction by the
-  compiler of the java.lang.StringBuilder class. There was no mention of
-  StringBuilder in the source code, but the compiler decided to use it anyway,
-  because it is much more efficient.
-
-  In this case, the compiler creates a StringBuilder object to build the String
-  s, and calls append( ) four times, one for each of the pieces. Finally, it
-  calls toString( ) to produce the result, which it stores (with astore_2) as s.
-
-  Before you assume that you should just use Strings everywhere and that the
-  compiler will make everything efficient, let’s look a little more closely at
-  what the compiler is doing. Here’s an example that produces a String result in
-  two ways: using Strings, and by hand-coding with StringBuilder
-
-      public class WhitherStringBuilder {
-          public String implicit(String[] fields) {
-              String result = "";
-              for(int i = 0; i < fields.length; i++)
-                  result += fields[i];
-              return result;
-          }
-          public String explicit(String[] fields) {
-              StringBuilder result = new StringBuilder();
-              for(int i = 0; i < fields.length; i++)
-                  result.append(fields[i]);
-              return result.toString();
-          }
-      }
-
-      [on implicit]
-
-  The important thing to note is that the StringBuilder construction happens
-  inside this loop, which means you’re going to get a new StringBuilder object
-  every time you pass through the loop.
-
-      [on explicit]
-
-  Not only is the loop code shorter and simpler, the method only creates a
-  single StringBuilder object. Creating an explicit StringBuilder also allows
-  you to preallocate its size if you have extra information about how big it
-  might need to be, so that it doesn’t need to constantly reallocate the buffer.
-
-      [ read more on page 380]
-
-  Thus, when you create a toString( ) method, if the operations are simple ones
-  that the compiler can figure out on its own, you can generally rely on the
-  compiler to build the result in a reasonable fashion. But if looping is
-  involved, you should explicitly use a StringBuilder in your toString( ),
-
-  Notice that each piece of the result is added with an append( ) statement. If
-  you try to take shortcuts and do something like append(a + ": " + c), the
-  compiler will jump in and start making more StringBuilder objects again.
-
-  If you are in doubt about which approach to use, you can always run javap to
-  double-check.
-
-
-  Although StringBuilder has a full complement of methods, including insert( ),
-  replace(), substring( ) and even reverse( ), the ones you will generally use
-  are append( ) and toString( ). Note the use of delete( ) to remove the last
-  comma and space before adding the closing square bracket.
-
-
-  StringBuilder was introduced in Java SE5. Prior to this, Java used
-  StringBuffer, which ensured thread safety (see the Concurrency chapter) and so
-  was significantly more expensive. Thus, string operations in Java SE5/6 should
-  be faster.
-
-- Unintended recursion
-
-  Because (like every other class) the Java standard containers are ultimately
-  inherited from Object, they contain a toString( ) method. This has been
-  overridden so that they can produce a String representation of themselves,
-  including the objects they hold.  ArrayList.toString( ), for example, steps
-  through the elements of the Array List and calls toString( ) for each one:
-
-      public class ArrayListDisplay {
-          public static void main(String[] args) {
-              ArrayList<Coffee> coffees = new ArrayList<Coffee>();
-              for(Coffee c : new CoffeeGenerator(10))
-                  coffees.add(c);
-              System.out.println(coffees);
-          }
-      }
-
-      /* Output:
-         [Americano 0, Latte 1, Americano 2, Mocha 3, Mocha 4, Breve 5, Americano
-         6, Latte 7, Cappuccino 8, Cappuccino 9]
-       */
-
-  Suppose you’d like your toString( ) to print the address of your class. It
-  seems to make sense to simply refer to this:
-
-          public class InfiniteRecursion {
-              public String toString() {
-                  return " InfiniteRecursion address: " + this + "\n";
-              }
-              public static void main(String[] args) {
-                  List<InfiniteRecursion> v =
-                      new ArrayList<InfiniteRecursion>();
-                  for(int i = 0; i < 10; i++)
-                      v.add(new InfiniteRecursion());
-                  System.out.println(v);
-              }
-          }
-
-
-   If you create an InfiniteRecursion object and then print it, you’ll get a
-   very long sequence of exceptions. This is also true if you place the
-   InfiniteRecursion objects in an ArrayList and print that ArrayList as shown
-   here. What’s happening is automatic type conversion for Strings. When you
-   say:
-
-      "InfiniteRecursion address: " + this
-
-  The compiler sees a String followed by a’+’ and something that’s not a String,
-  so it tries to convert this to a String. It does this conversion by calling
-  toString( ), which produces a recursive call.
-
-  If you really do want to print the address of the object, the solution is to
-  call the ObjecttoString( ) method, which does just that. So instead of saying
-  this, you’d say super.toString( ).
-
-
-  You can see that every String method carefully returns a new String object
-  when it’s necessary to change the contents. Also notice that if the contents
-  don’t need changing, the method will just return a reference to the original
-  String. This saves storage and overhead.
-
-- Formatting output
-
-  One of the long-awaited features that has finally appeared in Java SE5 is
-  output formatting in the style of C’s printf( ) statement. Not only does this
-  allow for simplified output code, but it also gives Java developers powerful
-  control over output formatting and alignment.
-
-
-  C’s printf( ) doesn’t assemble strings the way Java does, but takes a single
-  format string and inserts values into it, formatting as it goes. Instead of
-  using the overloaded ‘+’ operator (which C doesn’t overload) to concatenate
-  quoted text and variables, printf( ) uses special placeholders to show where
-  the data should go. The arguments that are inserted into the format string
-  follow in a comma-separated list.
-
-  For example:
-        printf("Row 1: [%d %f]\n", x, y);
-
-  At run time, the value of x is inserted into %d and the value of y is inserted
-  into %f. These placeholders are called/ormaf specifiers and, in addition to
-  telling where to insert the value, they also tell what kind of variable is to
-  be inserted and how to format it. For instance, the ‘%d’ above says that x is
-  an integer and the ‘%f says y is a floating point value (a float or double).
-
-
-  - System.out.format()
-
-    Java SE5 introduced the format( ) method, available to PrintStream or
-    PrintWriter objects (which you’ll learn more about in the I/O chapter),
-    which includes System.out. The format( ) method is modeled after C’s printf(
-    ). There’s even a convenience printf( ) method that you can use if you’re
-    feeling nostalgic, which just calls format( ). Here’s a simple example
-
-        public class SimpleFormat {
-            public static void main(String[] args) {
-                int x = 5;
-                double y = 5.332542;
-                // The old way:
-                System.out.println("Row 1: [" + x + " " + y + "]");
-                // The new way:
-                System.out.format("Row 1: [%d %f]\n", x, y);
-                // or
-                System.out.printf("Row 1: [%d %f]\n", x, y);
-            }
-        }
-
-
-   You can see that format( ) and printf( ) are equivalent. In both cases,
-   there’s only a single format string, followed by one argument for each format
-   specifier.
-
-
-- The Formatter class
-
-  All of Java’s new formatting functionality is handled by the Formatter class
-  in the java.util package. You can think of Formatter as a translator that
-  converts your format string and data into the desired result. When you create
-  a Formatter object, you tell it where you want this result to go by passing
-  that information to the constructor:
-
-
-          import java.io.*;
-           import java.util.*;
-           public class Turtle {
-               private String name;
-               private Formatter f;
-               public Turtle(String name, Formatter f) {
-                   this.name = name;
-                   this.f = f;
-               }
-               public void move(int x, int y) {
-                   f.format("%s The Turtle is at (%d,%d)\n", name, x, y);
-               }
-               public static void main(String[] args) {
-                   PrintStream outAlias = System.out;
-                   Turtle tommy = new Turtle("Tommy",
-                           new Formatter(System.out));
-                   Turtle terry = new Turtle("Terry",
-                           new Formatter(outAlias));
-                   tommy.move(0,0);
-                   terry.move(4,8);
-                   tommy.move(3,4);
-                   terry.move(2,5);
-                   tommy.move(3,3);
-                   terry.move(3,3);
-               }
-           }
-           /* Output:
-           Tommy The Turtle is at (0,0)
-           Terry The Turtle is at (4,8)
-           Tommy The Turtle is at (3,4)
-           Terry The Turtle is at (2,5)
-           Tommy The Turtle is at (3,3)
-           Terry The Turtle is at (3,3)
-           */
-
-
-  All the tommy output goes to System.out and all the terry output goes to an
-  alias of System.out. The constructor is overloaded to take a range of output
-  locations, but the most useful are PrintStreams (as above), OutputStreams, and
-  Files. You’ll learn more about these in the I/O chapter.
-
-  The previous example uses a new format specifier, ‘%s’. This indicates a
-  String argument and is an example of the simplest kind of format specifier-one
-  that has only a conversion type.
-
-
-- Format Specifiers
-
-  To control spacing and alignment when data is inserted, you need more
-  elaborate format specifiers. Here’s the general syntax:
-
-         %[argument_index$][flags][width][.precision]conversion
-
-  Often, you’ll need to control the minimum size of a field. This can be
-  accomplished by specifying a width. The Formatter guarantees that a field is
-  at least a certain number of characters wide by padding it with spaces if
-  necessary. By default, the data is right justified, but this can be overridden
-  by including a ‘-’ in the flags section.
-
-
-  The opposite of width is precision, which is used to specify a maximum. Unlike
-  the width, which is applicable to all of the data conversion types and behaves
-  the same with each, precision has a different meaning for different types. For
-  Strings, the precision specifies the maximum number of characters from the
-  String to print. For floating point numbers, precision specifies the number of
-  decimal places to display (the default is 6), rounding if there are too many
-  or adding trailing zeroes if there are too few. Since integers have no
-  fractional part, precision isn’t applicable to them and you’ll get an
-  exception if you use precision with an integer conversion type.
-
-
-      public class Receipt {
-          private double total = 0;
-          private Formatter f = new Formatter(System.out);
-          public void printTitle() {
-              f.format("%-15s %5s %10s\n", "Item", "Qty", "Price");
-              f.format("%-15s %5s %10s\n", "----", "---", "-----");
-          }
-          public void print(String name, int qty, double price) {
-              f.format("%-15.15s %5d %10.2f\n", name, qty, price);
-              total += price;
-          }
-          public void printTotal() {
-              f.format("%-15s %5s %10.2f\n", "Tax", "", total*0.06);
-              f.format("%-15s %5s %10s\n", "", "", "-----");
-              f.format("%-15s %5s %10.2f\n", "Total", "",
-                      total * 1.06);
-          }
-          public static void main(String[] args) {
-              Receipt receipt = new Receipt();
-              receipt.printTitle();
-              receipt.print("Jack’s Magic Beans", 4, 4.25);
-              receipt.print("Princess Peas", 3, 5.1);
-              receipt.print("Three Bears Porridge", 1, 14.29);
-              receipt.printTotal();
-          }
-      }
-
-  As you can see, the Formatter provides powerful control over spacing and
-  alignment with fairly concise notation. Here, the format strings are simply
-  copied in order to produce the appropriate spacing.
-
-- Formatter conversions
-
-  These are the conversions you’ll come across most frequently:
-
-      d Integral (as decimal)
-      c Unicode character
-      b Boolean value
-      s String
-      f Floating point (as decimal)
-      e Floating point (in scientific notation)
-      x Integral (as hex)
-      h Hash code (as hex)
-      % Literal "%"
-
-
-      public class Conversion {
-          public static void main(String[] args) {
-              Formatter f = new Formatter(System.out);
-              char u = ‘a’;
-              System.out.println("u = ‘a’");
-              f.format("s: %s\n", u);
-              // f.format("d: %d\n", u);
-              f.format("c: %c\n", u);
-              f.format("b: %b\n", u);
-              // f.format("f: %f\n", u);
-              // f.format("e: %e\n", u);
-              // f.format("x: %x\n", u);
-              f.format("h: %h\n", u);
-              int v = 121;
-              System.out.println("v = 121");
-              f.format("d: %d\n", v);
-              f.format("c: %c\n", v);
-              f.format("b: %b\n", v);
-              f.format("s: %s\n", v);
-              // f.format("f: %f\n", v);
-              // f.format("e: %e\n", v);
-              f.format("x: %x\n", v);
-              f.format("h: %h\n", v);
-              BigInteger w = new BigInteger("50000000000000");
-              System.out.println(
-                      "w = new BigInteger(\"50000000000000\")");
-
-              f.format("d: %d\n", w);
-              // f.format("c: %c\n", w);
-              f.format("b: %b\n", w);
-              f.format("s: %s\n", w);
-              // f.format("f: %f\n", w);
-              // f.format("e: %e\n", w);
-              f.format("x: %x\n", w);
-              f.format("h: %h\n", w);
-
-              double x = 179.543;
-              System.out.println("x = 179.543");
-              // f.format("d: %d\n", x);
-              // f.format("c: %c\n", x);
-              f.format("b: %b\n", x);
-              f.format("s: %s\n", x);
-              f.format("f: %f\n", x);
-              f.format("e: %e\n", x);
-              // f.format("x: %x\n", x);
-              f.format("h: %h\n", x);
-
-
-              Conversion y = new Conversion();
-              System.out.println("y = new Conversion()");
-              // f.format("d: %d\n", y);
-              // f.format("c: %c\n", y);
-              f.format("b: %b\n", y);
-              f.format("s: %s\n", y);
-              // f.format("f: %f\n", y);
-              // f.format("e: %e\n", y);
-              // f.format("x: %x\n", y);
-              f.format("h: %h\n", y);
-              boolean z = false;
-              System.out.println("z = false");
-              // f.format("d: %d\n", z);
-              // f.format("c: %c\n", z);
-              f.format("b: %b\n", z);
-              f.format("s: %s\n", z);
-              // f.format("f: %f\n", z);
-              // f.format("e: %e\n", z);
-              // f.format("x: %x\n", z);
-              f.format("h: %h\n", z);
-
-
-              /* Output: (Sample)
-              u = ‘a’
-              s: a
-              c: a
-              b: true
-              h: 61
-              v = 121
-              d: 121
-              c: y
-              b: true
-              s: 121
-              x: 79
-              h: 79
-              w = new BigInteger("50000000000000")
-              d: 50000000000000
-              b: true
-              s: 50000000000000
-              x: 2d79883d2000
-              h: 8842a1a7
-              x = 179.543
-              b: true
-              s: 179.543
-              f: 179.543000
-              e: 1.795430e+02
-              h: 1ef462c
-              y = new Conversion()
-              b: true
-              s: Conversion@9cab16
-              h: 9cab16
-              z = false
-              b: false
-              s: false
-              h: 4d5
-              */
-
-
-  The commented lines show conversions that are invalid for that particular
-  variable type; executing them will trigger an exception.
-
-
-  Notice that the ‘b’ conversion works for each variable above. Although it’s
-  valid for any argument type, it might not behave as you’d expect. For boolean
-  primitives or Boolean objects, the result will be true or false, accordingly.
-  However, for any other argument, as long as the argument type is not null the
-  result is always true. Even the numeric value of zero, which is synonymous
-  with false in many languages (including C), will produce true, so be careful
-  when using this conversion with non-boolean types.
-
-  There are more obscure conversion types and other format specifier options.
-  You can read about these in the JDK documentation for the Formatter class.
-
-- String.format()
-
-  Java SE5 also took a cue from C’s sprintf( ), which is used to create Strings.
-  String.format( ) is a static method which takes all the same arguments as
-  Formatter’s format( ) but returns a String. It can come in handy when you only
-  need to call format( ) once:
-
-           super(String.format("(t%d, q%d) %s", transactionID,
-           queryID, message));
-
-
-  Under the hood, all String.format( ) does is instantiate a Formatter and pass
-  your arguments to it, but using this convenience method can often be clearer
-  and easier than doing it by hand.
-
-
-- A hex dump tool
-
-  As a second example, often you want to look at the bytes inside a binary file
-  using hex format.  Here’s a small utility that displays a binary array of
-  bytes in a readable hex format, using String.format( )
-
-      public class Hex {
-          public static String format(byte[] data) {
-              StringBuilder result = new StringBuilder();
-              int n = 0;
-              for(byte b : data) {
-                  if(n % 16 == 0)
-                      result.append(String.format("%05X: ", n));
-                  result.append(String.format("%02X ", b));
-                  n++;
-                  if(n % 16 == 0) result.append("\n");
-              }
-              result.append("\n");
-              return result.toString();
-          }
-          public static void main(String[] args) throws Exception {
-              if(args.length == 0)
-                  // Test by displaying this class file:
-                  System.out.println(
-                          format(BinaryFile.read("Hex.class")));
-              else
-                  System.out.println(
-                          format(BinaryFile.read(new File(args[0]))));
-          }
-      }
-
-    /* Output: (Sample)
-            00000: CA FE BA BE 00 00 00 31 00 52 0A 00 05 00 22 07
-            00010: 00 23 0A 00 02 00 22 08 00 24 07 00 25 0A 00 26
-            00020: 00 27 0A 00 28 00 29 0A 00 02 00 2A 08 00 2B 0A
-            00030: 00 2C 00 2D 08 00 2E 0A 00 02 00 2F 09 00 30 00
-            00040: 31 08 00 32 0A 00 33 00 34 0A 00 15 00 35 0A 00
-            00050: 36 00 37 07 00 38 0A 00 12 00 39 0A 00 33 00 3A
-            ...
-            */
-
-- Regular Expressions
-
-  Regular expressions have long been integral to standard Unix utilities like
-  sed and awk, and languages like Python and Perl (some would argue that they
-  are the predominant reason for Perl’s success). String manipulation tools were
-  previously delegated to the String, StringBuffer, and StringTokenizer classes
-  in Java, which had relatively simple facilities compared to regular
-  expressions.
-
-  Regular expressions are powerful and flexible text-processing tools. They
-  allow you to specify, programmatically, complex patterns of text that can be
-  discovered in an input string.  Once you discover these patterns, you can then
-  react to them any way you want. Although the syntax of regular expressions can
-  be intimidating at first, they provide a compact and dynamic language that can
-  be employed to solve all sorts of string processing, matching and selection,
-  editing, and verification problems in a completely general way.
-
-
-- Basics
-
-  A regular expression is a way to describe strings in general terms, so that
-  you can say, "If a string has these things in it, then it matches what I’m
-  looking for." For example, to say that a number might or might not be preceded
-  by a minus sign, you put in the minus sign followed by a question mark, like
-  this:
-
-       -?
-
-  To describe an integer, you say that it’s one or more digits. In regular
-  expressions, a digit is described by saying ‘\d’. If you have any experience
-  with regular expressions in other languages, you’ll immediately notice a
-  difference in the way backslashes are handled. In other languages, ‘\\’ means
-  "I want to insert a plain old (literal) backslash in the regular expression.
-  Don’t give it any special meaning." In Java, ‘ \ \ ‘ means "I’m inserting a
-  regular expression backslash, so that the following character has special
-  meaning." For example, if you want to indicate a digit, your regular
-  expression string will be ‘\\d’. If you want to insert a literal backslash,
-  you say ‘\\\\’- However, things like newlines and tabs just use a single
-  backslash: ‘\n\t’.
-
-
-  To indicate "one or more of the preceding expression," you use a ‘+’. So to
-  say, "possibly a minus sign, followed by one or more digits," you write:
-
-           -?\\d+
-
-  The simplest way to use regular expressions is to use the functionality built
-  into the String class.
-
-      public class IntegerMatch {
-          public static void main(String[] args) {
-              System.out.println("-1234".matches("-?\\d+"));
-              System.out.println("5678".matches("-?\\d+"));
-              System.out.println("+911".matches("-?\\d+"));
-              System.out.println("+911".matches("(-|\\+)?\\d+"));
-          }
-      } /* Output:
-           true
-           true
-           false
-           true
-         */
-
-  The first two expressions match, but the third one starts with a ‘+’, which is
-  a legitimate sign but means the number doesn’t match the regular expression.
-  So we need a way to say, "may start with a + or a -." In regular expressions,
-  parentheses have the effect of grouping an expression, and the vertical bar
-  ‘|’ means OR.
-
-           (-|\\+)?
-
-   means that this part of the string may be either a ‘-’ or a ‘+’ or nothing
-   (because of the ‘?’).  Because the ‘+’ character has special meaning in
-   regular expressions, it must be escaped with a ‘\\’ in order to appear as an
-   ordinary character in the expression.
-
-
-   A useful regular expression tool that’s built into String is split( ), which
-   means, "Split this string around matches of the given regular expression."
-
-
-       public static void main(String[] args) {
-           split(" "); // Doesn’t have to contain regex chars
-           split("\\W+"); // Non-word characters
-           split("n\\W+"); // ‘n’ followed by non-word characters
-       }
-
-
-  First, note that you may use ordinary characters as regular expressions—a
-  regular expression doesn’t have to contain special characters, as you can see
-  in the first call to split( ), which just splits on whitespace.
-
-
-  The second and third calls to split( ) use ‘\W’, which means a non-word
-  character (the lowercase version, ‘\w’, means a word character)—you can see
-  that the punctuation has been removed in the second case. The third call to
-  split( ) says, "the letter n followed by one or more non-word characters." You
-  can see that the split patterns do not appear in the result.
-
-
-  An overloaded version of String. split( ) allows you to limit the number of
-  splits that occur.
-
-
-  The final regular expression tool built into String is replacement. You can
-  either replace the first occurrence, or all of them:
-
-
-         print(s.replaceFirst("f\\w+", "located"));
-         print(s.replaceAll("shrubbery|tree|herring","banana"));
-
-
-  The first expression matches the letter f followed by one or more word
-  characters (note that the w is lowercase this time). It only replaces the
-  first match that it finds, so the word "found" is replaced by the word
-  "located."
-
-  The second expression matches any of the three words separated by the OR
-  vertical bars, and it replaces all matches that it finds.
-
-  You’ll see that the non-String regular expressions have more powerful
-  replacement tools— for example, you can call methods to perform replacements.
-  Non-String regular expressions are also significantly more efficient if you
-  need to use the regular expression more than once.
-
-- Creating regular expressions
-
-  You can begin learning regular expressions with a subset of the possible
-  constructs. A complete list of constructs for building regular expressions can
-  be found in the JDK documentation for the Pattern class for package
-  java.util.regex.
-
-  The power of regular expressions begins to appear when you are defining
-  character classes.  Here are some typical ways to create character classes,
-  and some predefined classes:
-
-        .                   Any character
-       [abc]                Any of the characters a, b, or c (same as a|b|c)
-       [^abc]               Any character except a, b, and c (negation)
-       [a-zA-Z]             Any character a through z or A through Z (range)
-       [abc[hij]]           Any of a,b,c,h,I,j (same as a|b|c|h|i|j) (union)
-       [a-z&&[hij]]         Either h, i, or j (intersection)
-
-       \s                   A whitespace character (space, tab, newline, form
-                            feed, carriage return)
-       \S                   A non-whitespace character ([^\s])
-       \d                   A numeric digit [0-9]
-       \D                   A non-digit [^o-9]
-       \w                   A word character [a-zA-Z_0-9]
-       \W                   A non-word character [^\w]
-
-
-        XY                      X followed by Y
-        X|Y                     X or Y
-        (X)                     A capturing group.
-
-        ^                       Beginning of line
-        $                       End of line
-        \b                      Word boundary
-        \B                      Non-word boundary
-        \G                      End of previous match
-
-   Of course, your goal should not be to create the most obfuscated regular
-   expression, but rather the simplest one necessary to do the job. You’ll find
-   that, once you start writing regular expressions, you’ll often use your code
-   as a reference when writing new regular expressions.
-
-
-   - Quantifiers
-
-     A quantifier describes the way that a pattern absorbs input text:
-
-         Greedy: Quantifiers are greedy unless otherwise altered. A greedy
-                 expression finds as many possible matches for the pattern as
-                 possible. A typical cause of problems is to assume that your
-                 pattern will only match the first possible group of characters,
-                 when it’s actually greedy and will keep going until it’s
-                 matched the largest possible string.
-
-     Reluctant: Specified with a question mark, this quantifier matches the
-                minimum number of characters necessary to satisfy the pattern.
-                Also called lazy, minimal matching, non-greedy, or ungreedy.
-
-     Possessive: Currently this is only available in Java (not in other
-                 languages) and is more advanced, so you probably won’t use it
-                 right away. As a regular expression is applied to a string, it
-                 generates many states so that it can backtrack if the match
-                 fails.
-
-                 Possessive quantifiers do not keep those intermediate states,
-                 and thus prevent backtracking. They can be used to prevent a
-                 regular expression from running away and also to make it
-                 execute more efficiently.
-
-pg 396 for more explanation on that ^
-
-        abc+
-
-        might seem like it would match the sequence 'abc' one or more times, and
-        if you apply it to the input string abcabcabc you will in fact get thee
-        matches. However, the expression actually says, "Match 'ab' followed
-        by one or more occurences of 'c'." To match the entire string 'abc'
-        one or more times, you must say
-
-            (abc)+
-
-- CharSequence
-
-  The interface called CharSequence establishes a generalized definition of a
-  character sequence abstracted form the CharBuffer, String, StringBuffer, or
-  StringBuilder classes:
-
-      interface CharSequence {
-          charAt(int i);
-          length();
-          subSequence(int start, int end);
-          toString();
-      }
-
-  The aforementioned classes implement this interface. Many regular expression
-  operation take CharSequence arguments.
-
-
-- Pattern and Matcher
-
-  In general, you’ll compile regular expression objects rather than using the
-  fairly limited String utilities. To do this, you import java.util.regex, then
-  compile a regular expression by using the static Pattern.compile( ) method.
-  This produces a Pattern object based on its String argument. You use the
-  Pattern by calling the matcher( ) method, passing the string that you want to
-  search. The matcher( ) method produces a Matcher object, which has a set of
-  operations to choose from (you can see all of these in the JDK documentation
-  for java.util.regex.Matcher). For example, the replaceAll( ) method replaces
-  all the matches with its argument.
-
-
-      for(String arg : args) {
-          print("Regular expression: \"" + arg + "\"");
-          Pattern p = Pattern.compile(arg);
-          Matcher m = p.matcher(args[0]);
-          while(m.find()) {
-              print("Match \"" + m.group() + "\" at positions " +
-                      m.start() + "-" + (m.end() - 1));
-          }
-      }
-
-    Input: "abcabcabcdefabc"
-    Regular expression: "abcabcabcdefabc"
-    Match "abcabcabcdefabc" at positions 0-14
-    Regular expression: "abc+"
-    Match "abc" at positions 0-2
-    Match "abc" at positions 3-5
-    Match "abc" at positions 6-8
-    Match "abc" at positions 12-14
-    Regular expression: "(abc)+"
-    Match "abcabcabc" at positions 0-8
-    Match "abc" at positions 12-14
-    Regular expression: "(abc){2,}"
-    Match "abcabcabc" at positions 0-8
-
-
-
-  A Pattern object represents the compiled version of a regular expression. As
-  seen in the preceding example, you can use the matcher( ) method and the input
-  string to produce a Matcher object from the compiled Pattern object. Pattern
-  also has a static method:
-
-            static boolean matches(String regex, CharSequence input)
-
-  to check whether regex matches the entire input CharSequence, and a split( )
-  method that produces an array of String that has been broken around matches of
-  the regex.
-
-
-  A Matcher object is generated by calling Pattern.matcher( ) with the input
-  string as an argument. The Matcher object is then used to access the results,
-  using methods to evaluate the success or failure of different types of
-  matches:
-
-         boolean matches()
-         boolean lookingAt()
-         boolean find()
-         boolean find(int start)
-
-  The matches ( ) method is successful if the pattern matches the entire input
-  string, while lookingAt( ) is successful if the input string, starting at the
-  beginning, is a match to the pattern.
-
-- find()
-
-  Matcher.find( ) can be used to discover multiple pattern matches in the
-  CharSequence to which it is applied. For example:
-
-       //: strings/Finding.java
-       import java.util.regex.*;
-       import static net.mindview.util.Print.*;
-       public class Finding {
-           public static void main(String[] args) {
-               Matcher m = Pattern.compile("\\w+")
-                   .matcher("Evening is full of the linnet’s wings");
-               while(m.find())
-                   printnb(m.group() + " ");
-               print();
-               int i = 0;
-               while(m.find(i)) {
-                   printnb(m.group() + " ");
-                   i++;
-               }
-           }
-       } /* Output:
-            Evening is full of the linnet s wings
-            Evening vening ening ning ing ng g is is s full full ull ll l of of f
-            the the he e linnet linnet innet nnet net et t s s wings wings ings ngs
-            gs s
-          *///:~
-
-
-  The pattern ‘\\w+’ splits the input into words. find( ) is like an iterator,
-  moving forward through the input string. However, the second version of find(
-  ) can be given an integer argument that tells it the character position for
-  the beginning of the search—this version resets the search position to the
-  value of the argument, as you can see from the output.
-
-
-- Group
-
-  Groups are regular expressions set off by parentheses that can be called up
-  later with their group number. Group o indicates the whole expression match,
-  group l is the first parenthesized group, etc. Thus in
-
-         A(B(C))D
-
-  there are three groups: Group 0 is ABCD, group 1 is BC, and group 2 is C.
-
- The Matcher object has methods to give you information about groups:
-
-    public int groupCount( ) returns the number of groups in this
-    matcher’s pattern. Group o is not included in this count.
-
-    public String group( ) returns group 0 (the entire match) from the
-    previous match operation (find( ), for example).
-
-    public String group(int i) returns the given group number during the
-    previous match operation. If the match was successful, but the group
-    specified failed to match any part of the input string, then null is
-    returned.
-
-    public int start(int group) returns the start index of the group
-    found in the previous match operation.
-
-     public int end(int group) returns the index of the last character,
-     plus one, of the group found in the previous match operation.
-
-          //: strings/Groups.java
-          import java.util.regex.*;
-          import static net.mindview.util.Print.*;
-          public class Groups {
-              static public final String POEM =
-                  "Twas brillig, and the slithy toves\n" +
-                  "Did gyre and gimble in the wabe.\n" +
-                  "All mimsy were the borogoves,\n" +
-                  "And the mome raths outgrabe.\n\n" +
-                  "Beware the Jabberwock, my son,\n" +
-                  "The jaws that bite, the claws that catch.\n" +
-                  "Beware the Jubjub bird, and shun\n" +
-                  "The frumious Bandersnatch.";
-              public static void main(String[] args) {
-                  Matcher m =
-                      Pattern.compile("(?m)(\\S+)\\s+((\\S+)\\s+(\\S+))$")
-                      .matcher(POEM);
-                  while(m.find()) {
-                      for(int j = 0; j <= m.groupCount(); j++)
-                          printnb("[" + m.group(j) + "]");
-                      print();
-                  }
-              }
-          } /* Output:
-               [the slithy toves][the][slithy toves][slithy][toves]
-               [in the wabe.][in][the wabe.][the][wabe.]
-               [were the borogoves,][were][the borogoves,][the][borogoves,]
-               [mome raths outgrabe.][mome][raths outgrabe.][raths][outgrabe.]
-               [Jabberwock, my son,][Jabberwock,][my son,][my][son,]
-               [claws that catch.][claws][that catch.][that][catch.]
-               [bird, and shun][bird,][and shun][and][shun]
-               [The frumious Bandersnatch.][The][frumious
-               Bandersnatch.][frumious][Bandersnatch.]
-             *///:~
-
-  The poem is the first part of Lewis Carroll’s "Jabberwocky," from Through the
-  Looking Glass.  You can see that the regular expression pattern has a number
-  of parenthesized groups, consisting of any number of non-whitespace characters
-  (‘\S+’) followed by any number of whitespace characters (‘\s+’). The goal is
-  to capture the last three words on each line; the end of a line is delimited
-  by ‘$’. However, the normal behavior is to match ‘$’ with the end of the
-  entire input sequence, so you must explicitly tell the regular expression to
-  pay attention to newlines within the input. This is accomplished with the
-  ‘(?m)’ pattern flag at the beginning of the sequence (pattern flags will be
-  shown shortly).
-
-
-pg 401 - 413 --- finish java string
-
-
-
-pg 415
-
-* Type Information
-
-  Runtime type information (RTTI) allows you to discover and use type
-  information while a program is running.
-
-  It frees you from the constraint of doing type-oriented things only at compile
-  time, and can enable some very powerful programs.
-
-
-  This takes two forms:
-  "traditional" RTTI, which assumes that you have all the types available at
-  compile time, and the reflection mechanism, which allows you to discover and
-  use class information solely at run time.
-
-
-- The need for RTTI
-
-  Consider the now-familiar example of a class hierarchy that uses polymorphism.
-  The generic type is the base class Shape, and the specific derived types are
-  Circle, Square, and Triangle:
-
-  This is a typical class hierarchy diagram, with the base class at the top and
-  the derived classes growing downward. The normal goal in object-oriented
-  programming is for your code to manipulate references to the base type (Shape,
-  in this case), so if you decide to extend the program by adding a new class
-  (such as Rhomboid, derived from Shape), the bulk of the code is not affected.
-  In this example, the dynamically bound method in the Shape interface is draw(
-  ), so the intent is for the client programmer to call draw( ) through a
-  generic Shape reference. In all of the derived classes, draw( ) is overridden,
-  and because it is a dynamically bound method, the proper behavior will occur
-  even though it is called through a generic Shape reference. That’s
-  polymorphism.
-
-  Thus, you generally create a specific object (Circle, Square, or Triangle),
-  upcast it to a Shape (forgetting the specific type of the object), and use
-  that anonymous Shape reference in the rest of the program.
-
-  The base class contains a draw( ) method that indirectly uses toString( ) to
-  print an identifier for the class by passing this to System.out.println( )
-  (notice that toString( ) is declared abstract to force inheritors to override
-  it, and to prevent the instantiation of a plain Shape). If an object appears
-  in a string concatenation expression (involving ‘+’ and String objects), the
-  toString( ) method is automatically called to produce a String representation
-  for that object. Each of the derived classes overrides the toString( ) method
-  (from Object) so that draw( ) ends up (polymorphically) printing something
-  different in each case.
-
-  In this example, the upcast occurs when the shape is placed into the
-  List<Shape>. During the upcast to Shape, the fact that the objects are
-  specific types of Shape is lost. To the array, they are just Shapes.
-
-  At the point that you fetch an element out of the array, the container—which
-  is actually holding everything as an Object—automatically casts the result
-  back to a Shape. This is the most basic form of RTTI, because all casts are
-  checked at run time for correctness. That’s what RTTI means: At run time, the
-  type of an object is identified.
-
-  In this case, the RTTI cast is only partial: The Object is cast to a Shape,
-  and not all the way to a Circle, Square, or Triangle. That’s because the only
-  thing you know at this point is that the List<Shape> is full of Shapes. At
-  compile time, this is enforced by the container and the Java generic system,
-  but at run time the cast ensures it.
-
-  Now polymorphism takes over and the exact code that’s executed for the Shape
-  is determined by whether the reference is for a Circle, Square, or Triangle.
-  And in general, this is how it should be; you want the bulk of your code to
-  know as little as possible about specific types of objects, and to just deal
-  with the general representation of a family of objects (in this case, Shape).
-  As a result, your code will be easier to write, read, and maintain, and your
-  designs will be easier to implement, understand, and change. So polymorphism
-  is a general goal in object-oriented programming.
-
-  But what if you have a special programming problem that’s easiest to solve if
-  you know the exact type of a generic reference? For example, suppose you want
-  to allow your users to highlight all the shapes of any particular type by
-  turning them a special color. This way, they can find all the triangles on the
-  screen by highlighting them. Or perhaps your method needs to "rotate" a list
-  of shapes, but it makes no sense to rotate a circle so you’d like to skip the
-  circles. With RTTI, you can ask a Shape reference the exact type that it’s
-  referring to, and thus select and isolate special cases.
-
-- The class object
-
-  To understand how RTTI works in Java, you must first know how type information
-  is represented at run time. This is accomplished through a special kind of
-  object called the Class object, which contains information about the class. In
-  fact, the Class object is used to create all of the "regular" objects of your
-  class. Java performs its RTTI using the Class object, even if you’re doing
-  something like a cast. The class Class also has a number of other ways you can
-  use RTTI.
-
-  There’s one Class object for each class that is part of your program. That is,
-  each time you write and compile a new class, a single Class object is also
-  created (and stored, appropriately enough, in an identically named .class
-  file). To make an object of that class, the Java Virtual Machine (JVM) that’s
-  executing your program uses a subsystem called a class loader.
-
-
-  The class loader subsystem can actually comprise a chain of class loaders, but
-  there’s only one primordial class loader, which is part of the JVM
-  implementation. The primordial class loader loads so-called trusted classes,
-  including Java API classes, typically from the local disk. It’s usually not
-  necessary to have additional class loaders in the chain, but if you have
-  special needs (such as loading classes in a special way to support Web server
-  applications, or downloading classes across a network), then you have a way to
-  hook in additional class loaders.
-
-
-  All classes are loaded into the JVM dynamically, upon the first use of a
-  class. This happens when the program makes the first reference to a static
-  member of that class. It turns out that the constructor is also a static
-  method of a class, even though the static keyword is not used for a
-  constructor. Therefore, creating a new object of that class using the new
-  operator also counts as a reference to a static member of the class.
-
-  Thus, a Java program isn’t completely loaded before it begins, but instead
-  pieces of it are loaded when necessary. This is different from many
-  traditional languages. Dynamic loading enables behavior that is difficult or
-  impossible to duplicate in a statically loaded language like C++.
-
-
-  The class loader first checks to see if the Class object for that type is
-  loaded. If not, the default class loader finds the .class file with that name
-  (an add-on class loader might, for example, look for the bytecodes in a
-  database instead). As the bytes for the class are loaded, they are verified to
-  ensure that they have not been corrupted and that they do not comprise bad
-  Java code (this is one of the lines of defense for security in Java).
-
-  Once the Class object for that type is in memory, it is used to create all
-  objects of that type.
-
-      class Candy {
-          static { print("Loading Candy"); }
-      }
-      class Gum {
-          static { print("Loading Gum"); }
-      }
-      class Cookie {
-          static { print("Loading Cookie"); }
-      }
-      public class SweetShop {
-          public static void main(String[] args) {
-              print("inside main");
-              new Candy();
-              print("After creating Candy");
-              try {
-                  Class.forName("Gum");
-              } catch(ClassNotFoundException e) {
-                  print("Couldn’t find Gum");
-              }
-              print("After Class.forName(\"Gum\")");
-              new Cookie();
-              print("After creating Cookie");
-          }
-      } /* Output:
-           inside main
-           Loading Candy
-           After creating Candy
-           Loading Gum
-           After Class.forName("Gum")
-           Loading Cookie
-           After creating Cookie
-
-
-  Each of the classes Candy, Gum, and Cookie has a static clause that is
-  executed as the class is loaded for the first time. Information will be
-  printed to tell you when loading occurs for that class. In main( ), the object
-  creations are spread out between print statements to help detect the time of
-  loading.
-
-  You can see from the output that each Class object is loaded only when it’s
-  needed, and the static initialization is performed upon class loading.
-
-  A particularly interesting line is:
-
-         Class.forName("Gum");
-
-  All Class objects belong to the class Class. A Class object is like any other
-  object, so you can get and manipulate a reference to it (that’s what the
-  loader does). One of the ways to get a reference to the Class object is the
-  static forName( ) method, which takes a String containing the textual name
-  (watch the spelling and capitalization!) of the particular class you want a
-  reference for. It returns a Class reference, which is being ignored here; the
-  call to forName( ) is being made for its side effect, which is to load the
-  class Gum if it isn’t already loaded. In the process of loading, Gum’s static
-  clause is executed.
-
-  Anytime you want to use type information at run time, you must first get a
-  reference to the appropriate Class object. Class.forName( ) is one convenient
-  way to do this, because you don’t need an object of that type in order to get
-  the Class reference. However, if you already have an object of the type you’re
-  interested in, you can fetch the Class reference by calling a method that’s
-  part of the Object root class: getClass( ). This returns the Class reference
-  representing the actual type of the object. Class has many interesting
-  methods; here are a few of them:
-
-
+## Exception chaining - Keep the information about the originating exception --
+
+Often you want to catch one exception and throw another, but still keep the
+information about the originating exception - this is called _exception
+chaining_
+
+All Throwable subclasses may take a _cause_ object in their constructor. The
+cause is intended to be the originating exception, and by passing it in you
+maintain the stack trace back to its origin, even though you're creating and
+throwing a new exception at this point.
+
+The cause is intended to be the originating exception, and by passing it in you
+maintain the stack trace back to its origin, even though you’re creating and
+throwing a new exception.
+
+It's interesting to note that the only Throwable subclasses that provide the
+cause argument in the constructor are the three fundamental exception classes
+Error (used by JVM to report system errors), Exception, and RuntimeException.
+
+If you want to chain any other exception types, you do it through the
+initCause() method rather than the constructor.
+
+```java
+// initCause
+DynamicFieldsException dfe = new DynamicFieldsException();
+dfe.initCause(new NullPointerException());
+
+// cause
+throw new RuntimeException(e);
+```
+
+## Standard Java exceptions
+The Java class Throwable describes anything that can be thrown as an Exception.
+There are two general types of Throwable objects.
+
+- Error represents compile-time and system errors that you don't worry about
+  catching.
+
+- Exception is the basic type that can be thrown from any of the standard Java
+  library class methods and from your methods and run-time accidents. So the
+  Java programmer's base type of interest is usually Exception.
+
+The basic idea is that the name of the exception represents the problem that
+occurred, and the exception name is intended to be relatively self-explanatory.
+
+## Runtime Exception
+You never need to write an exception specification saying that a method might
+throw a RuntimeException, because they are _unchecked_ exceptions.
+
+Because they indicate bugs, you don't usually catch a RuntimeException - it's
+dealt with automatically. If you were forced to check for RuntimeExceptions,
+your code could get too messy. Even though you don't typically catch
+RuntimeExceptions, in your own packages you might choose to throw some of the
+RuntimeExceptions.
+
+The reasoning is that a RuntimeException represents a programming error:
+- An error that you cannot anticipate
+- An error that you, as a programmer, should have checked for in your code
+  (such as ArrayIndexOutOfBoundsException)
+
+You can already see that a RuntimeException (or anything inherited from it) is a
+special case, since the compiler doesn’t require an exception specification for
+these types. The output is reported to System.err:
+
+```java
+throw new RuntimeException("From f()");
+```
+If a RuntimeException gets all the way out to main( ) without being caught,
+printStackTrace( ) is called for that exception as the program exits.
+
+## Performing Cleanup with finally
+finally is necessary when you need to set something other than memory back to
+its original state. This is some kind of cleanup like an open file or network
+connection, something you've drawn on the screen, or even a switch in the
+outside world.
+
+finally clause is executed whether or not an exception is thrown.
+
+Because a finally clause is always executed, it’s possible to return from
+multiple points within a method and still guarantee that important cleanup will
+be performed
+
+```java
+try {
+    print("Point 1");
+    if(i == 1) return;
+    print("Point 2");
+    if(i == 2) return;
+    print("Point 3");
+    if(i == 3) return;
+    print("End");
+    return;
+} finally {
+    print("Performing cleanup");
+}
+```
+
+## Pitfall -the lost exception
+
+There's a flaw in Java's exception implementation. Although exceptions are an
+indication of a crisis in your program and should never be ignored, it's
+possible for an exception to simply be lost.
+
+This happens with a particular configuration using a finally clause
+
+```java
+lm.f() throws VeryImportantException();
+lm.dispose() throws HoHumException();
+
+class HoHumException extends Exception {
+    public String toString() {
+        return "A trivial exception";
+    }
+}
+
+// code in question
+try {
+    lm.f();
+} finally {
+    lm.dispose();
+}
+
+// what is printed
+Exception in thread main "A trivial Exception"
+```
+his occurs because there is no catch() - it is simply replaced by the
+HoHumException in the finally clause.
+
+You can see from the output that there’s no evidence of the
+VerylmportantException, which is simply replaced by the HoHumException in the
+finally clause. This is a rather serious pitfall, since it means that an
+exception can be completely lost, and in a far more subtle and
+difficult-to-detect fashion than the preceding example.
+
+An even simpler way to lose an exception is just to return from inside a finally
+clause
+
+```java
+try {
+    throw new RuntimeException();
+} finally {
+    // Using ‘return’ inside the finally block
+    // will silence any thrown exception.
+    return;
+}
+```
+## Exception Restrictions
+When you override a method, you can throw only the exceptions that have been
+specified in the base-class version of the method. This is a useful restriction,
+since it means that the code that works with the base class will automatically
+work with any object derived from the base class.
+
+IMPORTANT: you can use "throws" in a method even though you never throw that
+method in case of error:
+
+```java
+int haha() throws PlotException {
+}
+```
+This is legal because it allows you to force the user to catch any exceptions
+that might be added in overriden versions.
+
+A derived-class constructor cannot catch exceptions thrown by its base-class
+constructor. [Why? Probably because if the base constructor throws an
+exception, the base object has not been properly initialized!]
+
+# Strings
+
+## Overloading '+' vs StringBuilder
+Since String objects are immutable, you can alias to a particular String as many
+times as you want. Because a String is read-only, there’s no possibility that
+one reference will change something that will affect the other references.
+
+Immutability can have efficiency issues. A case in point is the operator ‘+’
+that has been overloaded for String objects. Overloading means that an operation
+has been given an extra meaning when used with a particular class.  (The ‘+’ and
+`+=` for String are the only operators that are overloaded in Java, and Java
+does not allow the programmer to overload any others.) The’+’ operator allows
+you to concatenate Strings
+
+```java
+String s = "abc" + mango + "def" + 47;
+
+/* Output:
+   abcmangodef47
+ */
+```
+You could imagine how this might work. The String "abc" could have a method
+append( ) that creates a new String object containing "abc" concatenated with
+the contents of mango.  The new String object would then create another new
+String that added "def," and so on.
+
+This would certainly work, but it requires the creation of a lot of String
+objects just to put together this new String, and then you have a bunch of
+intermediate String objects that need to be garbage collected.
+
+To see what really happens, you can decompile the above code using the javap
+tool that comes as part of the JDK. Here’s the command line:
+
+Although StringBuilder has a full complement of methods, including insert( ),
+replace(), substring( ) and even reverse( ), the ones you will generally use are
+append( ) and toString( ). Note the use of delete( ) to remove the last comma
+and space before adding the closing square bracket.
+
+StringBuilder was introduced in Java SE5. Prior to this, Java used StringBuffer,
+which ensured thread safety (see the Concurrency chapter) and so was
+significantly more expensive. Thus, string operations in Java SE5/6 should be
+faster.
+
+## Formatting output
+One of the long-awaited features that has finally appeared in Java SE5 is output
+formatting in the style of C’s printf( ) statement. Not only does this allow for
+simplified output code, but it also gives Java developers powerful control over
+output formatting and alignment.
+
+ Java SE5 introduced the format( ) method, available to PrintStream or
+ PrintWriter objects (which you’ll learn more about in the I/O chapter), which
+ includes System.out. The format( ) method is modeled after C’s printf().
+ There’s even a convenience printf( ) method that you can use if you’re feeling
+ nostalgic, which just calls format( ). Here’s a simple example
+
+```java
+public class SimpleFormat {
+    public static void main(String[] args) {
+        int x = 5;
+        double y = 5.332542;
+        System.out.println("Row 1: [" + x + " " + y + "]");
+        System.out.format("Row 1: [%d %f]\n", x, y);
+        System.out.printf("Row 1: [%d %f]\n", x, y);
+    }
+}
+```
+## The Formatter class
+All of Java’s new formatting functionality is handled by the Formatter class in
+the java.util package. You can think of Formatter as a translator that converts
+your format string and data into the desired result. When you create a Formatter
+object, you tell it where you want this result to go by passing that information
+to the constructor:
+
+```java
+import java.io.*;
+import java.util.*;
+public class Turtle {
+    private String name;
+    private Formatter f;
+    public Turtle(String name, Formatter f) {
+        this.name = name;
+        this.f = f;
+    }
+    public void move(int x, int y) {
+        f.format("%s The Turtle is at (%d,%d)\n", name, x, y);
+    }
+    public static void main(String[] args) {
+        PrintStream outAlias = System.out;
+        Turtle tommy = new Turtle("Tommy",
+                new Formatter(System.out));
+        Turtle terry = new Turtle("Terry",
+                new Formatter(outAlias));
+        tommy.move(0,0);
+        terry.move(4,8);
+        tommy.move(3,4);
+        terry.move(2,5);
+        tommy.move(3,3);
+        terry.move(3,3);
+    }
+}
+/* Output:
+   Tommy The Turtle is at (0,0)
+   Terry The Turtle is at (4,8)
+   Tommy The Turtle is at (3,4)
+   Terry The Turtle is at (2,5)
+   Tommy The Turtle is at (3,3)
+   Terry The Turtle is at (3,3)
+ */
+```
+
+All the tommy output goes to System.out and all the terry output goes to an
+alias of System.out. The constructor is overloaded to take a range of output
+locations, but the most useful are PrintStreams (as above), OutputStreams, and
+Files. You’ll learn more about these in the I/O chapter.
+
+The previous example uses a new format specifier, ‘%s’. This indicates a String
+argument and is an example of the simplest kind of format specifier-one that has
+only a conversion type.
+
+### Format Specifiers
+To control spacing and alignment when data is inserted, you need more elaborate
+format specifiers. Here’s the general syntax:
+
+```
+[argument_index$][flags][width][.precision]conversion
+```
+Often, you’ll need to control the minimum size of a field. This can be
+accomplished by specifying a width. The Formatter guarantees that a field is at
+least a certain number of characters wide by padding it with spaces if
+necessary. By default, the data is right justified, but this can be overridden
+by including a ‘-’ in the flags section.
+
+The opposite of width is precision, which is used to specify a maximum. Unlike
+the width, which is applicable to all of the data conversion types and behaves
+the same with each, precision has a different meaning for different types. For
+Strings, the precision specifies the maximum number of characters from the
+String to print. For floating point numbers, precision specifies the number of
+decimal places to display (the default is 6), rounding if there are too many or
+adding trailing zeroes if there are too few. Since integers have no fractional
+part, precision isn’t applicable to them and you’ll get an exception if you use
+precision with an integer conversion type.
+
+As you can see, the Formatter provides powerful control over spacing and
+alignment with fairly concise notation. Here, the format strings are simply
+copied in order to produce the appropriate spacing.
+
+Java SE5 also took a cue from C’s sprintf( ), which is used to create Strings.
+String.format( ) is a static method which takes all the same arguments as
+Formatter’s format( ) but returns a String. It can come in handy when you only
+need to call format( ) once:
+
+```java
+super(String.format("(t%d, q%d) %s", transactionID, queryID, message));
+```
+Under the hood, all String.format( ) does is instantiate a Formatter and pass
+your arguments to it, but using this convenience method can often be clearer and
+easier than doing it by hand.
+
+## Regular Expressions
+Regular expressions are powerful and flexible text-processing tools. They allow
+you to specify, programmatically, complex patterns of text that can be
+discovered in an input string. Once you discover these patterns, you can then
+react to them any way you want. Although the syntax of regular expressions can
+be intimidating at first, they provide a compact and dynamic language that can
+be employed to solve all sorts of string processing, matching and selection,
+editing, and verification problems in a completely general way.
+
+### Basics
+A regular expression is a way to describe strings in general terms, so that you
+can say, "If a string has these things in it, then it matches what I’m looking
+for." For example, to say that a number might or might not be preceded by a
+minus sign, you put in the minus sign followed by a question mark, like this:
+
+```
+-?
+```
+To describe an integer, you say that it’s one or more digits. In regular
+expressions, a digit is described by saying ‘\d’. If you have any experience
+with regular expressions in other languages, you’ll immediately notice a
+difference in the way backslashes are handled. In other languages, ‘\\’ means "I
+want to insert a plain old (literal) backslash in the regular expression.  Don’t
+give it any special meaning." In Java, ‘ \ \ ‘ means "I’m inserting a regular
+expression backslash, so that the following character has special meaning." For
+example, if you want to indicate a digit, your regular expression string will be
+‘\\d’. If you want to insert a literal backslash, you say ‘\\\\’- However,
+things like newlines and tabs just use a single backslash: ‘\n\t’.
+
+The simplest way to use regular expressions is to use the functionality built
+into the String class.
+
+```java
+public class IntegerMatch {
+    public static void main(String[] args) {
+        System.out.println("-1234".matches("-?\\d+"));
+        System.out.println("5678".matches("-?\\d+"));
+        System.out.println("+911".matches("-?\\d+"));
+        System.out.println("+911".matches("(-|\\+)?\\d+"));
+    }
+} /* Output:
+     true
+     true
+     false
+     true
+   */
+```
+### Quantifiers
+A quantifier describes the way that a pattern absorbs input text:
+
+Greedy
+: Quantifiers are greedy unless otherwise altered. A greedy expression finds as
+  many possible matches for the pattern as possible. A typical cause of problems
+  is to assume that your pattern will only match the first possible group of
+  characters, when it’s actually greedy and will keep going until it’s matched
+  the largest possible string.
+
+Reluctant
+: Specified with a question mark, this quantifier matches the minimum number of
+  characters necessary to satisfy the pattern.  Also called lazy, minimal
+  matching, non-greedy, or ungreedy.
+
+Possessive
+: Currently this is only available in Java (not in other languages) and is more
+  advanced, so you probably won’t use it right away. As a regular expression is
+  applied to a string, it generates many states so that it can backtrack if the
+  match fails.
+
+Possessive quantifiers do not keep those intermediate states, and thus prevent
+backtracking. They can be used to prevent a regular expression from running away
+and also to make it execute more efficiently.
+
+### Pattern and Matcher
+
+In general, you’ll compile regular expression objects rather than using the
+fairly limited String utilities. To do this, you import java.util.regex, then
+compile a regular expression by using the static Pattern.compile( ) method.
+This produces a Pattern object based on its String argument. You use the Pattern
+by calling the matcher( ) method, passing the string that you want to search.
+The matcher( ) method produces a Matcher object, which has a set of operations
+to choose from (you can see all of these in the JDK documentation for
+java.util.regex.Matcher). For example, the replaceAll( ) method replaces all the
+matches with its argument.
+
+
+```java
+for(String arg : args) {
+    print("Regular expression: \"" + arg + "\"");
+    Pattern p = Pattern.compile(arg);
+    Matcher m = p.matcher(args[0]);
+    while(m.find()) {
+        print("Match \"" + m.group() + "\" at positions " +
+                m.start() + "-" + (m.end() - 1));
+    }
+}
+```
+```
+Input: "abcabcabcdefabc"
+Regular expression: "abcabcabcdefabc"
+Match "abcabcabcdefabc" at positions 0-14
+Regular expression: "abc+"
+Match "abc" at positions 0-2
+Match "abc" at positions 3-5
+Match "abc" at positions 6-8
+Match "abc" at positions 12-14
+Regular expression: "(abc)+"
+Match "abcabcabc" at positions 0-8
+Match "abc" at positions 12-14
+Regular expression: "(abc){2,}"
+Match "abcabcabc" at positions 0-8
+```
+A Pattern object represents the compiled version of a regular expression. As
+seen in the preceding example, you can use the matcher( ) method and the input
+string to produce a Matcher object from the compiled Pattern object. Pattern
+also has a static method:
+
+```java
+static boolean matches(String regex, CharSequence input)
+```
+
+to check whether regex matches the entire input CharSequence, and a split( )
+method that produces an array of String that has been broken around matches of
+the regex.
+
+A Matcher object is generated by calling Pattern.matcher( ) with the input
+string as an argument. The Matcher object is then used to access the results,
+using methods to evaluate the success or failure of different types of matches:
+
+```java
+boolean matches()
+boolean lookingAt()
+boolean find()
+boolean find(int start)
+```
+The matches ( ) method is successful if the pattern matches the entire input
+string, while lookingAt( ) is successful if the input string, starting at the
+beginning, is a match to the pattern.
+
+# Type Information
+
+Runtime type information (RTTI) allows you to discover and use type information
+while a program is running.
+
+All classes are loaded into the JVM dynamically, upon the first use of a class.
+This happens when the program makes the first reference to a static member of
+that class. It turns out that the constructor is also a static method of a
+class, even though the static keyword is not used for a constructor. Therefore,
+creating a new object of that class using the new operator also counts as a
+reference to a static member of the class.
+
+Thus, a Java program isn’t completely loaded before it begins, but instead
+pieces of it are loaded when necessary. This is different from many traditional
+languages. Dynamic loading enables behavior that is difficult or impossible to
+duplicate in a statically loaded language like C++.
+
+The class loader first checks to see if the Class object for that type is
+loaded. If not, the default class loader finds the .class file with that name
+(an add-on class loader might, for example, look for the bytecodes in a database
+instead). As the bytes for the class are loaded, they are verified to ensure
+that they have not been corrupted and that they do not comprise bad Java code
+(this is one of the lines of defense for security in Java).
+
+Once the Class object for that type is in memory, it is used to create all
+objects of that type.
+
+```java```
+Class.forName("Gum");
+```
+All Class objects belong to the class Class. A Class object is like any other
+object, so you can get and manipulate a reference to it (that’s what the loader
+does). One of the ways to get a reference to the Class object is the static
+forName( ) method, which takes a String containing the textual name (watch the
+spelling and capitalization!) of the particular class you want a reference for.
+It returns a Class reference, which is being ignored here; the call to forName(
+) is being made for its side effect, which is to load the class Gum if it isn’t
+already loaded. In the process of loading, Gum’s static clause is executed.
+
+Anytime you want to use type information at run time, you must first get a
+reference to the appropriate Class object. Class.forName( ) is one convenient
+way to do this, because you don’t need an object of that type in order to get
+the Class reference. However, if you already have an object of the type you’re
+interested in, you can fetch the Class reference by calling a method that’s part
+of the Object root class: getClass( ). This returns the Class reference
+representing the actual type of the object. Class has many interesting methods;
+here are a few of them:
+
+
+##HERE
           //: typeinfo/toys/ToyTest.java
           // Testing class Class.
           package typeinfo.toys;
