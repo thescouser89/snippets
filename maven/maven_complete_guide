@@ -1,0 +1,1899 @@
+- The super pom
+
+  Before we dive into some examples of POMs, let’s take a quick look at the
+  Super POM. All Maven project POMs extend the Super POM, which defines a set of
+  defaults shared by all projects.
+
+- The effective pom
+
+        mvn help:effective-pom
+  
+  Executing the effective-pom goal should print out an XML document capturing
+  the merge between the Super POM and the POM
+
+
+- Project Version
+
+        <major version>.<minor version>.<incremental version>-<qualifier>
+
+  The qualifier exists to capture milestone builds: alpha and beta releases, and
+  the qualifier is separated from the major, minor, and incremental versions by
+  a hyphen.
+
+  For example, the version "1.3-beta-01" has a major version of 1, a minor
+  version of 3, and a qualifier of "beta-01".
+
+  Keeping your version numbers aligned with this standard will become very
+  important when you want to start using version ranges in your POMs.
+
+  Version ranges, introduced in Section 3.4.3, “Dependency Version Ranges”,
+  allow you to specify a dependency on a range of versions, and they are only
+  supported because Maven has the ability to sort versions based on the version
+  release number format introduced in this section.
+
+
+  If your version release number does not fit the standard introduced in this
+  section, then your versions will be compared as strings; "1.0.1b" will be
+  compared to "1.2.0b" using a String comparison.
+
+
+  One gotcha for release version numbers is the ordering of the qualifiers. Take
+  the version release numbers “1.2.3-alpha-2” and “1.2.3-alpha-10,” where the
+  “alpha-2” build corresponds to the 2nd alpha build, and the “alpha-10” build
+  corresponds to the 10th alpha build. Even though “alpha-10” should be
+  considered more recent than “alpha-2,” Maven is going to sort “alpha-10”
+  before “alpha-2” due to a known issue in the way Maven handles version
+  numbers.
+
+
+  To get around this limitation, you will need to left-pad your qualified build
+  numbers. If you use "alpha-02" and "alpha-10" this problem will go away, and
+  it will continue to work once Maven properly parses the version build number.
+
+
+- SNAPSHOT versions
+
+  Maven versions can contain a string literal to signify that a project is
+  currently under active development. If a version contains the string
+  “-SNAPSHOT,” then Maven will expand this token to a date and time value
+  converted to UTC (Coordinated Universal Time ) when you install or release
+  this component.
+
+  For example, if your project has a version of “1.0-SNAPSHOT” and you deploy
+  this project’s artifacts to a Maven repository, Maven would expand this
+  version to “1.0-20080207-230803-1” if you were to deploy a release at 11:08 PM
+  on February 7th, 2008 UTC. In other words, when you deploy a snapshot, you are
+  not making a release of a software component; you are releasing a snapshot of
+  a component at a specific time.
+
+
+  Why would you use this? SNAPSHOT versions are used for projects under active
+  development. If your project depends on a software component that is under
+  active development, you can depend on a SNAPSHOT release, and Maven will
+  periodically attempt to download the latest snapshot from a repository when
+  you run a build. Similarly, if the next release of your system is going to
+  have a version "1.4", your project would have a version "1.4-SNAPSHOT" until
+  it was formally released.
+
+- Property References
+
+  preceded by a dollar sign and surrounded by two curly braces. 
+
+  ${project.groupId}-${project.artifactId}
+
+
+
+
+  env
+
+  The env variable exposes environment variables exposed by your operating
+  system or shell. For example, a reference to ${env.PATH} in a Maven POM would
+  be replaced by the ${PATH} environment variable (or %PATH% in Windows ). 
+
+
+  project
+
+  The project variable exposes the POM. You can use a dot-notated (.) path to
+  reference the value of a POM element. For example, in this section we used the
+  groupId and artifactId to set the finalName element in the build
+  configuration. The syntax for this property reference was:
+  ${project.groupId}-${project.artifactId}. 
+
+
+  settings
+
+  The settings variable exposes Maven settings information. You can use a
+  dot-notated (.) path to reference the value of an element in a settings.xml
+  file. For example, ${settings.offline} would reference the value of the
+  offline element in ~/.m2/settings.xml.
+
+
+  Java System Properties
+
+  All properties accessible via getProperties() on java.lang.System are exposed
+  as POM properties. Some examples of system properties are: ${user.name},
+  ${user.home}, ${java.home}, and ${os.name}. A full list of system properties
+  can be found in the Javadoc for the System class. 
+
+
+  x
+
+  Arbitrary properties can be set with a properties element in a pom.xml or
+  settings.xml, or properties can be loaded from external files. If you set a
+  property named fooBar in your pom.xml, that same property is referenced with
+  ${fooBar}. Custom properties come in handy when you are building a system that
+  filters resources and targets different deployment platforms. Here is the
+  syntax for setting ${foo}=bar in a POM: 
+
+  <properties>
+      <foo>bar</foo>
+  </properties>
+
+
+- Project Dependencies
+
+  Maven can manage both internal and external dependencies. An external
+  dependency for a Java project might be a library such as Plexus, the Spring
+  Framework, or Log4J. An internal dependency is illustrated by a web
+  application project depending on another project that contains service
+  classes, model objects, or persistence logic. Project Dependencies shows some
+  examples of project dependencies.
+
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.xfire</groupId>
+                <artifactId>xfire-java5</artifactId>
+                <version>1.2.5</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+
+  You would use a test-scoped dependency when you need to reference this
+  library only during testing.
+
+  You would use a provided scope when the application you are developing needs a
+  library for compilation and testing, but this library is supplied by a
+  container at runtime.
+
+
+- Dependency Scope
+
+  compile 
+
+  compile+ is the default scope; all dependencies are compile-scoped if a scope
+  is not supplied. compile dependencies are available in all classpaths, and
+  they are packaged. 
+
+
+  provided 
+
+  provided+ dependencies are used when you expect the JDK or a container to
+  provide them. For example, if you were developing a web application, you would
+  need the Servlet API available on the compile classpath to compile a servlet,
+  but you wouldn’t want to include the Servlet API in the packaged WAR; the
+  Servlet API JAR is supplied by your application server or servlet container.
+  provided dependencies are available on the compilation classpath (not runtime
+  ). They are not transitive, nor are they packaged. 
+
+
+  runtime 
+
+  runtime+ dependencies are required to execute and test the system, but they
+  are not required for compilation. For example, you may need a JDBC API JAR at
+  compile time and the JDBC driver implementation only at runtime. 
+
+
+  test 
+
+  test+-scoped dependencies are not required during the normal operation of an
+  application, and they are available only during test compilation and execution
+  phases.
+
+
+  system
+
+  The system scope is similar to provided except that you have to provide an
+  explicit path to the JAR on the local file system. This is intended to allow
+  compilation against native objects that may be part of the system libraries.
+  The artifact is assumed to always be available and is not looked up in a
+  repository. If you declare the scope to be system, you must also provide the
+  systemPath element. Note that this scope is not recommended (you should always
+  try to reference dependencies in a public or custom Maven repository). 
+
+
+
+- Optional Dependencies
+
+  Assume that you are working on a library that provides caching behavior.
+  Instead of writing a caching system from scratch, you want to use some of the
+  existing libraries that provide caching on the file system and distributed
+  caches. Also assume that you want to give the end user an option to cache on
+  the file system or to use an in-memory distributed cache. To cache on the file
+  system, you’ll want to use a freely available library called EHCache
+  (http://ehcache.sourceforge.net/), and to cache in a distributed in-memory
+  cache, you want to use another freely available caching library named
+  SwarmCache ( http://swarmcache.sourceforge.net/  ). You’ll code an interface
+  and create a library that can be configured to use either EHCache or
+  SwarmCache, but you want to avoid adding a dependency on both caching
+  libraries to any project that depends on your library.
+
+  In other words, you need both libraries to compile this library project, but
+  you don’t want both libraries to show up as transitive runtime dependencies
+  for the project that uses your library. You can accomplish this by using
+  optional dependencies
+
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>1.4.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>swarmcache</groupId>
+            <artifactId>swarmcache</artifactId>
+            <version>1.0RC2</version>
+            <optional>true</optional>
+        </dependency>
+
+
+  Since you’ve declared these dependencies as optional in my-project, if you’ve
+  defined a project that depends on my-project which needs those dependencies,
+  you’ll have to include them explicitly in the project that depends on
+  my-project. For example, if you were writing an application which depended on
+  my-project and wanted to use the EHCache implementation, you would need to add
+  the following dependency element to your project.
+
+  In an ideal world, you wouldn’t have to use optional dependencies. Instead of
+  having one large project with a series of optional dependencies, you would
+  separate the EHCache-specific code to a my-project-ehcache submodule and the
+  SwarmCache-specific code to a my-project-swarmcache submodule. This way,
+  instead of requiring projects that reference my-project to specifically add a
+  dependency, projects can just reference a particular implementation project
+  and benefit from the transitive dependency.
+
+
+- Dependency Version Ranges
+
+  For example, you can specify that your project depends on version 3.8 or
+  greater of JUnit, or anything between versions 1.2.10 and 1.2.14 of JUnit. You
+  do this by surrounding one or more version numbers with the following
+  characters:
+
+
+  (,  ) 
+
+  Exclusive quantifiers
+
+
+  [,  ]
+
+  Inclusive quantifiers
+
+
+  For example, if you wished to access any JUnit version greater than or equal
+  to 3.8 but less than 4.0,
+
+  <version>[3.8,4.0)</version>
+
+  If you want to depend on any version of JUnit no higher than 3.8.1, you would
+  specify only an upper inclusive boundary,
+
+  <version>[,3.8.1]</version>
+
+
+  A version before or after the comma is not required, and means +/- infinity.
+  For example, "[4.0,)" means any version greater than or equal to 4.0.
+  "(,2.0)" is any version less than 2.0. "[1.2]" means only version 1.2, and
+  nothing else.
+
+
+
+- Transitive Dependencies
+
+  project-a depends on project-b, which in turn depends on project-c, then
+  project-c is considered a transitive dependency of project-a. If project-c
+  depended on project-d, then project-d would also be considered a transitive
+  dependency of project-a. Part of Maven’s appeal is that it can manage
+  transitive dependencies and shield the developer from having to keep track of
+  all of the dependencies required to compile and run an application. You can
+  just depend on something like the Spring Framework and not have to worry about
+  tracking down every last dependency of the Spring Framework.
+
+  Maven accomplishes this by building a graph of dependencies and dealing with
+  any conflicts and overlaps that might occur. For example, if Maven sees that
+  two projects depend on the same groupId and artifactId, it will sort out which
+  dependency to use automatically, always favoring the more recent version of a
+  dependency. Although this sounds convenient, there are some edge cases where
+  transitive dependencies can cause some configuration issues. For these
+  scenarios, you can use a dependency exclusion.
+
+
+- Transitive Dependencies and Scope
+
+  Each of the scopes outlined earlier in the section Section 3.4.1, “Dependency
+  Scope” affects not just the scope of the dependency in the declaring project,
+  but also how it acts as a transitive dependency. The easiest way to convey
+  this information is through a table, as in Table 3.1, “How Scope Affects
+  Transitive Dependencies”. Scopes in the top row represent the scope of a
+  transitive dependency. Scopes in the leftmost column represent the scope of a
+  direct dependency. The intersection of the row and column is the scope that is
+  assigned to a transitive dependency. A blank cell in this table means that the
+  transitive dependency will be omitted.
+
+  http://www.sonatype.com/books/mvnref-book/reference/pom-relationships-sect-project-dependencies.html#pom-relationships-sect-transitive
+
+
+ llustrate the relationship of transitive dependency scope to direct dependency
+ scope, consider the following example. If project-a contains a test scoped
+ dependency on project-b which contains a compile scoped dependency on
+ project-c. project-c would be a test-scoped transitive dependency of project-a.
+
+
+- Conflict Resolution
+
+  There will be times when you need to exclude a transitive dependency, such as
+  when you are depending on a project that depends on another project, but you
+  would like to either exclude the dependency altogether or replace the
+  transitive dependency with another dependency that provides the same
+  functionality.
+
+  Excluding a Transitive Dependency shows an example of a dependency element
+  that adds a dependency on project-a, but excludes the transitive dependency
+  project-b.
+
+
+        <dependency>
+            <groupId>org.sonatype.mavenbook</groupId>
+            <artifactId>project-a</artifactId>
+            <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.sonatype.mavenbook</groupId>
+                    <artifactId>project-b</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+  Often, you will want to replace a transitive dependency with another
+  implementation. For example, if you are depending on a library that depends on
+  the Sun JTA API, you may want to replace the declared transitive dependency.
+  Hibernate is one example. Hibernate depends on the Sun JTA API JAR, which is
+  not available in the central Maven repository because it cannot be freely
+  redistributed. Fortunately, the Apache Geronimo project has created an
+  independent implementation of this library that can be freely redistributed.
+  To replace a transitive dependency with another dependency, you would exclude
+  the transitive dependency and declare a dependency on the project you wanted
+  instead.
+
+
+        <dependencies>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate</artifactId>
+                <version>3.2.5.ga</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.transaction</groupId>
+                        <artifactId>jta</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jta_1.1_spec</artifactId>
+                <version>1.1</version>
+            </dependency>
+        </dependencies>
+
+
+
+  Once you’ve adopted Maven at your super complex enterprise and you have two
+  hundred and twenty inter-related Maven projects, you are going to start
+  wondering if there is a better way to get a handle on dependency versions. If
+  every single project that uses a dependency like the MySQL Java connector
+  needs to independently list the version number of the dependency, you are
+  going to run into problems when you need to upgrade to a new version. Because
+  the version numbers are distributed throughout your project tree, you are
+  going to have to manually edit each of the pom.xml files that reference a
+  dependency to make sure that you are changing the version number everywhere.
+  Even with find, xargs, and awk, you are still running the risk of missing a
+  single POM.
+
+
+  Luckily, Maven provides a way for you to consolidate dependency version
+  numbers in the dependencyManagement element. You’ll usually see the
+  dependencyManagement element in a top-level parent POM for an organization or
+  project. Using the dependencyManagement element in a pom.xml allows you to
+  reference a dependency in a child project without having to explicitly list
+  the version. 
+
+
+
+  Maven will walk up the parent-child hierarchy until it finds a project with a
+  dependencyManagement element, it will then use the version specified in this
+  dependencyManagement element.
+
+
+  For example, if you have a large set of projects which make use of the MySQL
+  Java connector version 5.1.2, you could define the following
+  dependencyManagement element in your multi-module project’s top-level POM.
+
+
+        <dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.2</version>
+                    <scope>runtime</scope>
+                </dependency>
+                ...
+                <dependencies>
+        </dependencyManagement>
+
+  Then, in a child project, you can add a dependency to the MySQL Java Connector
+  using the following dependency XML:
+
+
+        <project>
+            <modelVersion>4.0.0</modelVersion>
+            <parent>
+                <groupId>org.sonatype.mavenbook</groupId>
+                <artifactId>a-parent</artifactId>
+                <version>1.0.0</version>
+            </parent>
+            <artifactId>project-a</artifactId>
+            ...
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                </dependency>
+            </dependencies>
+        </project>
+
+  You should notice that the child project did not have to explicitly list the
+  version of the mysql-connector-java dependency. Because this dependency was
+  defined in the top-level POM’s dependencyManagement element, the version
+  number is going to propagate to the child project’s dependency on
+  mysql-connector-java. Note that if this child project did define a version, it
+  would override the version listed in the top-level POM’s dependencyManagement
+  section. That is, the dependencyManagement version is only used when the child
+  does not declare a version directly.
+
+
+  ******************************************************************************
+  Dependency management in a top-level POM is different from just defining a
+  dependency on a widely shared parent POM. For starters, all dependencies are
+  inherited. If mysql-connector-java were listed as a dependency of the
+  top-level parent project, every single project in the hierarchy would have a
+  reference to this dependency. Instead of adding in unnecessary dependencies,
+  using dependencyManagement allows you to consolidate and centralize the
+  management of dependency versions without adding dependencies which are
+  inherited by all children. In other words, the dependencyManagement element is
+  equivalent to an environment variable which allows you to declare a dependency
+  Dependency management in a top-level POM is different from just defining a
+  anywhere below a project without specifying a version number.
+  ******************************************************************************
+
+
+
+- Project Relationships
+
+  If project-a depends on project-b, Maven is smart enough to know that
+  project-b must be built before project-a.
+
+  Relationships are not only about dependencies and figuring out what one
+  project needs to be able to build an artifact. Maven can model the
+  relationship of a project to a parent, and the relationship of a project to
+  submodules. This section gives an overview of the various relationships
+  between projects and how such relationships are configured.
+
+
+- Project Inheritance
+
+  There are going to be times when you want a project to inherit values from a
+  parent POM. You might be building a large system, and you don’t want to have
+  to repeat the same dependency elements over and over again. You can avoid
+  repeating yourself if your projects make use of inheritance via the parent
+  element. When a project specifies a parent, it inherits the information in the
+  parent project’s POM. It can then override and add to the values specified in
+  this parent POM.
+
+
+  All Maven POMs inherit values from a parent POM. If a POM does not specify a
+  direct parent using the parent element, that POM will inherit values from the
+  Super POM.
+
+
+        <project>
+            <parent>
+                <groupId>com.training.killerapp</groupId>
+                <artifactId>a-parent</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </parent>
+            <artifactId>project-a</artifactId>
+            ...
+        </project>
+
+  When a project specifies a parent project, Maven uses that parent POM as a
+  starting point before it reads the current project’s POM. It inherits
+  everything, including the groupId and version number. You’ll notice that
+  project-a does not specify either, both groupId and version are inherited from
+  a-parent. With a parent element, all a POM really needs to define is an
+  artifactId. This isn’t mandatory, project-a could have a different groupId and
+  version, but by not providing values, Maven will use the values specified in
+  the parent POM. If you start using Maven to manage and build large
+  multi-module projects, you will often be creating many projects which share a
+  common groupId and version.
+
+   The following is a list of items a Maven POM inherits from its parent POM:
+
+
+    identifiers (at least one of groupId or artifactId must be overridden.)
+    dependencies
+    developers and contributors
+    plugin lists
+    reports lists
+    plugin executions (executions with matching ids are merged)
+    plugin configuration
+
+
+  When Maven inherits dependencies, it will add dependencies of child projects
+  to the dependencies defined in parent projects. You can use this feature of
+  Maven to specify widely used dependencies across all projects which inherit
+  from a top-level POM. For example, if your system makes universal use of the
+  Log4J logging framework, you can list this dependency in your top-level POM.
+  Any projects which inherit POM information from this project will
+  automatically have Log4J as a dependency. Similarly, if you need to make sure
+  that every project is using the same version of a Maven plugin, you can list
+  this Maven plugin version explicitly in a top-level parent POM’s
+  pluginManagement section.
+
+
+  Maven assumes that the parent POM is available from the local repository, or
+  available in the parent directory (../pom.xml) of the current project. If
+  neither location is valid this default behavior may be overridden via the
+  relativePath element.
+
+
+        <project>
+            <parent>
+                <groupId>org.sonatype.mavenbook</groupId>
+                <artifactId>a-parent</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <relativePath>../a-parent/pom.xml</relativePath>
+            </parent>
+            <artifactId>project-a</artifactId>
+        </project>
+
+
+* Best practices
+
+- Grouping Dependencies
+
+  If you have a set of dependencies which are logically grouped together. You
+  can create a project with pom packaging that groups dependencies together. For
+  example, let’s assume that your application uses Hibernate, a popular
+  Object-Relational mapping framework. Every project which uses Hibernate might
+  also have a dependency on the Spring Framework and a MySQL JDBC driver.
+  Instead of having to include these dependencies in every project that uses Hibernate, Spring, and MySQL you could create a special POM that does nothing
+  more than declare a set of common dependencies. You could create a project
+  called persistence-deps (short for Persistence Dependencies ), and have every
+  project that needs to do persistence depend on this convenience project:
+
+
+        <project>
+            <groupId>org.sonatype.mavenbook</groupId>
+            <artifactId>persistence-deps</artifactId>
+            <version>1.0</version>
+            <packaging>pom</packaging>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>${hibernateVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <version>${hibernateAnnotationsVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-hibernate3</artifactId>
+                    <version>${springVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysqlVersion}</version>
+                </dependency>
+            </dependencies>
+            ...
+        </project>
+
+  If you create this project in a directory named persistence-deps, all you need
+  to do is create this pom.xml and run mvn install. Since the packaging type is
+  pom, this POM is installed in your local repository. You can now add this
+  project as a dependency and all of its dependencies will be added as
+  transitive dependencies to your project. When you declare a dependency on this
+  persistence-deps project, don’t forget to specify the dependency type as pom.
+
+
+        <project>
+            <description>This is a project requiring JDBC</description>
+            ...
+            <dependencies>
+                ...
+                <dependency>
+                    <groupId>org.sonatype.mavenbook</groupId>
+                    <artifactId>persistence-deps</artifactId>
+                    <version>1.0</version>
+                    <type>pom</type>
+                </dependency>
+            </dependencies>
+        </project>
+
+
+
+- Multi-module vs. Inheritance
+
+  There is a difference between inheriting from a parent project and being
+  managed by a multimodule project. A parent project is one that passes its
+  values to its children. A multimodule project simply manages a group of other
+  subprojects or modules. The multimodule relationship is defined from the
+  topmost level downwards. When setting up a multimodule project, you are simply
+  telling a project that its build should include the specified modules.
+  Multimodule builds are to be used to group modules together in a single build.
+  The parent-child relationship is defined from the leaf node upwards. The
+  parent-child relationship deals more with the definition of a particular
+  project. When you associate a child with its parent, you are telling Maven
+  that a project’s POM is derived from another.
+
+
+  http://www.sonatype.com/books/mvnref-book/reference/pom-relationships-sect-pom-best-practice.html#fig-maven-book
+
+
+  When we build this Maven book you are reading, we run mvn package in a
+  multi-module project named maven-book. This multi-module project includes two
+  submodules: book-examples and book-chapters. Neither of these projects share
+  the same parent, they are related only in that they are modules in the
+  maven-book project. book-examples builds the ZIP and TGZ archives you
+  downloaded to get this book’s example. When we run the book-examples build
+  from book-examples/ directory with mvn package, it has no knowledge that it is
+  a part of the larger maven-book project. book-examples doesn’t really care
+  about maven-book, all it knows in life is that its parent is the top-most
+  sonatype POM and that it creates an archive of examples. In this case, the
+  maven-book project exists only as a convenience and as an aggregator of
+  modules.
+
+
+  http://www.sonatype.com/books/mvnref-book/reference/pom-relationships-sect-pom-best-practice.html#fig-multi-module
+
+  ^^ Multi-module Enterprise Project
+
+
+
+
+- Build Cycle
+
+  A build lifecycle is an organized sequence of phases that exist to give order
+  to a set of goals.
+
+  There are three standard lifecycles in Maven: clean, default (sometimes called
+  build) and site. In this chapter, you are going to learn how Maven ties goals
+  to lifecycle phases and how the lifecycle can be customized.
+
+
+- Clean lifecycle
+
+  Running mvn clean invokes the clean lifecycle which consists of three
+  lifecycle phases:
+
+  pre-clean
+  clean
+  post-clean
+
+
+  The interesting phase in the clean lifecycle is the clean phase. The Clean
+  plugin’s clean goal (clean:clean) is bound to the clean phase in the clean
+  lifecycle. The clean:clean goal deletes the output of a build by deleting the
+  build directory. If you haven’t customized the location of the build directory
+  it will be the ${basedir}/target directory as defined by the Super POM. When
+  you execute the clean:clean goal you do not do so by executing the goal
+  directly with mvn clean:clean, you do so by executing the clean phase of the
+  clean lifecycle. Executing the clean phase gives Maven an opportunity to
+  execute any other goals which may be bound to the pre-clean phase.
+
+  - Trigerring a goal on pre-clean
+
+            <plugins>... <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>file-exists</id>
+                            <phase>pre-clean</phase>
+                            <goals>
+                                <goal>run</goal>
+                                ...
+
+    In addition to configuring Maven to run a goal during the+ pre-clean+ phase,
+    you can also customize the Clean plugin to delete files in addition to the
+    build output directory. You can configure the plugin to remove specific
+    files in a fileSet. The example below configures clean to remove all .class
+    files in a directory named target-other/ using standard Ant file wildcards:
+    \* and \**.
+
+
+            <project>
+                <modelVersion>4.0.0</modelVersion>
+                ...
+                <build>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-clean-plugin</artifactId>
+                            <configuration>
+                                <filesets>
+                                    <fileset>
+                                        <directory>target-other</directory>
+                                        <includes>
+                                            <include>*.class</include>
+                                        </includes>
+                                    </fileset>
+                                </filesets>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </build>
+            </project> 
+
+
+
+
+- Default Lifecycle
+
+  http://www.sonatype.com/books/mvnref-book/reference/lifecycle-sect-structure.html#tbl-default-lifecycle
+
+
+- Site Lifecycle
+
+  Maven does more than build software artifacts from project, it can also
+  generate project documentation and reports about the project, or a collection
+  of projects. Project documentation and site generation have a dedicated
+  lifecycle which contains four phases:
+
+  pre-site
+  site
+  post-site
+  site-deploy
+
+
+
+- Package-specific Lifecycles
+
+ pecific goals bound to each phase default to a set of goals specific to a
+ project’s packaging. A project with packaging jar has a different set of
+ default goals from a project with a packaging of war. The packaging element
+ affects the steps required to build a project. For an example of how the
+ packaging affects the build, consider two projects: one with pom packaging and
+ the other with jar packaging. The project with pom packaging will run the
+ site:attach-descriptor goal during the package phase, and the project with jar
+ packaging will run the jar:jar goal instead.
+
+
+ http://www.sonatype.com/books/mvnref-book/reference/lifecycle-sect-package-specific.html
+
+
+ Many of the packaging lifecycles have similar goals. If you look at the goals
+ bound to the WAR and JAR lifecycles, you’ll see that they differ only in the
+ package phase. The package phase of the WAR lifecycle calls war:war and the
+ package phase of the JAR lifecycle calls jar:jar. 
+
+
+- Process Resources
+
+  The process-resources phase "processes" resources and copies them to the
+  output directory. If you haven’t customized the default directory locations
+  defined in the Super POM, this means that Maven will copy the files from
+  ${basedir}/src/main/resources to ${basedir}/target/classes or the directory
+  defined in ${project.build.outputDirectory}. In addition to copying the
+  resources to the output directory, Maven can also apply a filter to the
+  resources that allows you to replace tokens within resource file. Just like
+  variables are referenced in a POM using ${...} notation, you can reference
+  variables in your project’s resources using the same syntax. Coupled with
+  build profiles, such a facility can be used to produce build artifacts which
+  target different deployment platforms. This is something that is common in
+  environments which need to produce output for development, testing, staging,
+  and production platforms from the same project.
+
+  To illustrate resource filtering, assume that you have a project with an XML
+  file in src/main/resources/META-INF/service.xml. You want to externalize some
+  configuration variables to a properties file. In other words, you might want
+  to reference a JDBC URL, username, and password for your database, and you
+  don’t want to put these values directly into the service.xml file. Instead,
+  you would like to use a properties file to capture all of the configuration
+  points for your program. Doing this will allow you to consolidate all
+  configuration into a single properties file and make it easier to change
+  configuration values when you need to target a new deployment environment.
+  First, take a look at the contents of service.xml in
+  src/main/resources/META-INF.
+
+
+
+        <service>
+            <!-- This URL was set by project version ${project.version} -->
+            <url>${jdbc.url}</url>
+            <user>${jdbc.username}</user>
+            <password>${jdbc.password}</password>
+        </service>
+
+  This XML file uses the same property reference syntax you can use in the POM.
+  In fact, the first variable referenced is the project variable which is also
+  an implicit variable made available in the POM. The project variable provides
+  access to POM information.
+
+  The next three variable references are jdbc.url, jdbc.username, and
+  jdbc.password. These custom variables are defined in a properties file
+  src/main/filters/default.properties.
+
+            jdbc.url=jdbc:hsqldb:mem:mydb
+            jdbc.username=sa
+            jdbc.password=
+
+            <build>
+                <filters>
+                    <filter>src/main/filters/default.properties</filter>
+                </filters>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+
+- Configuring Additional Resource Directories. 
+
+            <build>
+                ...
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/xml</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/images</directory>
+                    </resource>
+                </resources>
+                ...
+            </build>
+
+  When you are building a project that produces a console application or a
+  command-line tool, you’ll often find yourself writing simple shell scripts
+  that need to reference the JAR produced by a build. When you are using the
+  assembly plugin to produce a distribution for an application as a ZIP or TAR,
+  you might place all of your scripts in a directory like src/main/command. 
+
+        <resource>
+            <filtering>true</filtering>
+            <directory>${basedir}/src/main/command</directory>
+            <includes>
+                <include>run.bat</include>
+                <include>run.sh</include>
+            </includes>
+            <targetPath>${basedir}</targetPath>
+        </resource>
+
+  If you run mvn process-resources in this project, you will end up with two
+  files, run.sh and run.bat, in ${basedir}.
+
+- Compile
+
+  Most lifecycles bind the Compiler plugin’s compile goal to the compile phase.
+  This phase calls out to compile:compile which is configured to compile all of
+  the source code and copy the bytecode to the build output directory. If you
+  haven’t customized the values defined in the Super POM, compile:compile is
+  going to compile everything from src/main/java to target/classes.
+
+
+- Overriding the Default Source Directory. 
+
+  <build>
+      ...
+      <sourceDirectory>src/java</sourceDirectory>
+      <outputDirectory>classes</outputDirectory>
+      ...
+  </build>
+
+- Test Compile
+
+  The test-compile phase is almost identical to the compile phase. The only
+  difference is that test-compile is going to invoke compile:testCompile to
+  compile source from the test source directory to the test build output
+  directory.
+
+- Test
+
+  Most lifecycles bind the test goal of the Surefire plugin to the test phase.
+  The Surefire plugin is Maven’s unit testing plugin, the default behavior of
+  Surefire is to look for all classes ending in *Test in the test source
+  directory and to run them as JUnit tests. The Surefire plugin can also be
+  configured to run TestNG unit tests.
+
+- Install
+
+  The install goal of the Install plugin is almost always bound to the install
+  lifecycle phase. This install:install goal simply installs a project’s main
+  artifact to the local repository.
+
+- Deploy
+
+  The deploy goal of the Deploy plugin is usually bound to the deploy lifecycle
+  phase. This phase is used to deploy an artifact to a remote Maven repository,
+  this is usually required to update a remote repository when you are performing
+  a release. The deployment procedure can be as simple as copying a file to
+  another directory or as complex as transferring a file over SCP using a public
+  key. Deployment settings usually involve credentials to a remote repository,
+  and, as such, deployment settings are usually not stored in a pom.xml.
+  Instead, deployment settings are more frequently found in an individual user’s
+  ~/.m2/settings.xml. For now, all you need to know is that the deploy:deploy
+  goal is bound to the deploy phase and it takes care of transporting an
+  artifact to a published repository and updating any repository information
+  which might be affected by such a deployment.
+
+
+
+
+* Build Profiles
+
+  Profiles allow for the ability to customize a particular build for a
+  particular environment; profiles enable portability between different build
+  environments.
+
+  What do we mean by different build environments? Two example build
+  environments are production and development. When you are working in a
+  development environment, your system might be configured to read from a
+  development database instance running on your local machine while in
+  production, your system is configured to read from the production database.
+  Maven allows you to define any number of build environments (build profiles )
+  which can override any of the settings in the pom.xml. You could configure
+  your application to read from your local, development instance of a database
+  in your "development" profile, and you can configure it to read from the
+  production database in the "production" profile. Profiles can also be
+  activated by the environment and platform, you can customize a build to run
+  differently depending the Operating System or the installed JDK version.
+  Before we talk about using and configuring Maven profiles, we need to define
+  the concept of Build Portability.
+
+
+- Organizational (In-House) Portability
+
+  The center of this level of portability is a project’s requirement that only a
+  select few may access internal resources such as source control or an
+  internally-maintained Maven repository. A project at a large corporation may
+  depend on a database available only to in-house developers, or an open source
+  project might require a specific level of credentials to publish a web site
+  and deploy the products of a build to a public repository.
+
+  If you attempt to build an in-house project from scratch outside of the
+  in-house network (for example, outside of a corporate firewall ), the build
+  will fail. It may fail because certain required custom plugins are
+  unavailable, or project dependencies cannot be found because you don’t have
+  the appropriate credentials to retrieve dependencies from a custom remote
+  repository. Such a project is portable only across environments in a single
+  organization.
+
+- Wide (Universal) Portability
+
+  Anyone may download a widely portable project’s source, compile, and install
+  it without customizing a build for a specific environment. This is the highest
+  level of portability; anything less requires extra work for those who wish to
+  build your project. This level of portability is especially important for open
+  source projects, which depend on the ability for would-be contributors to
+  easily download and build from source.
+
+
+
+
+- Portability through Maven Profiles
+
+  A profile in Maven is an alternative set of configuration values which set or
+  override default values. Using a profile, you can customize a build for
+  different environments. Profiles are configured in the pom.xml and are given
+  an identifier. Then you can run Maven with a command-line flag that tells
+  Maven to execute goals in a specific profile. The following pom.xml uses a
+  production profile to override the default settings of the Compiler plugin.
+
+
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>3.8.1</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+        <profiles> (1)
+                <profile>
+                    <id>production</id> (2)
+                        <build> (3)
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-compiler-plugin</artifactId>
+                                        <configuration>
+                                            <debug>false</debug> (4)
+                                                <optimize>true</optimize>
+                                        </configuration>
+                                    </plugin>
+                                </plugins>
+                        </build>
+                </profile>
+        </profiles>
+
+
+
+  (1)
+
+  The profiles element is in the pom.xml, it contains one or more profile
+  elements. Since profiles override the default settings in a pom.xml, the
+  profiles element is usually listed as the last element in a pom.xml.
+
+  (2)
+
+  Each profile has to have an id element. This id element contains the name
+  which is used to invoke this profile from the command-line. A profile is
+  invoked by passing the -P<profile_id> command-line argument to Maven. 
+
+  (3)
+
+  A profile element can contain many of the elements which can appear under the
+  project element of a POM XML Document. In this example, we’re overriding the
+  behavior of the Compiler plugin and we have to override the plugin
+  configuration which is normally enclosed in a build and a plugins element. 
+
+  (4)
+
+  We’re overriding the configuration of the Maven Compiler plugin. We’re making
+  sure that the bytecode produced by the production profile doesn’t contain
+  debug information and that the bytecode has gone through the compiler’s
+  optimization routines. 
+
+
+
+
+  To execute mvn install under the production profile, you need to pass the
+  -Pproduction argument on the command-line. To verify that the production
+  profile overrides the default Compiler plugin configuration, execute Maven
+  with debug output enabled (-X)
+
+
+- Overriding a Project Object Model
+
+  While the previous example showed you how to override the default
+  configuration properties of a single Maven plugin, you still don’t know
+  exactly what a Maven profile is allowed to override. The short-answer to that
+  question is that a Maven profile can override almost everything that you would
+  have in a pom.xml. The Maven POM contains an element under project called
+  profiles containing a project’s alternate configurations, and under this
+  element are profile elements which define each profile. Each profile must have
+  an id, and other than that, it can contain almost any of the elements one
+  would expect to see under project. The following XML document shows all of the
+  elements, a profile is allowed to override.
+
+
+- Elements Allowed in a Profile. 
+
+            <project>
+                <profiles>
+                    <profile>
+                        <build>
+                            <defaultGoal>...</defaultGoal>
+                            <finalName>...</finalName>
+                            <resources>...</resources>
+                            <testResources>...</testResources>
+                            <plugins>...</plugins>
+                        </build>
+                        <reporting>...</reporting>
+                        <modules>...</modules>
+                        <dependencies>...</dependencies>
+                        <dependencyManagement>...</dependencyManagement>
+                        <distributionManagement>...</distributionManagement>
+                        <repositories>...</repositories>
+                        <pluginRepositories>...</pluginRepositories>
+                        <properties>...</properties>
+                    </profile>
+                </profiles>
+            </project> 
+
+  A profile can override an element shown with ellipses. A profile can override
+  the final name of a project’s artifact in a profile, the dependencies, and the
+  behavior of a project’s build via plugin configuration. A profile can also
+  override the configuration of distribution settings depending on the profile;
+  for example, if you need to publish an artifact to a staging server in a
+  staging profile, you would create a staging profile which overrides the
+  distributionManagement element in a profile.
+
+
+
+
+- Profile Activation
+
+  What happens when you need to provide customizations based on variables like
+  operating systems or JDK version? Maven provides a way to "activate" a profile
+  for different environmental parameters, this is called profile activation.
+
+
+
+  When someone runs mvn install with a Java 6 JDK, you want the build to include
+  the simple-script project’s build, when they are running in Java 5, you would
+  like to skip the simple-script project build. If you failed to skip the
+  simple-script project build in Java 5, your build would fail because Java 5
+  does not have the ScriptEngine on the classpath. Let’s take a look at the
+  library project’s pom.xml:
+
+
+  Dynamic Inclusion of Submodules Using Profile Activation. 
+
+
+        <profiles>
+            <profile>
+                <id>jdk16</id>
+                <activation> (1)
+                        <jdk>1.6</jdk>
+                </activation>
+                <modules> (2)
+                        <module>simple-script</module>
+                </modules>
+            </profile>
+        </profiles>
+
+
+
+
+  Activations can contain one of more selectors including JDK versions,
+  Operating System parameters, files, and properties. A profile is activated
+  when all activation criteria has been satisfied. For example, a profile could
+  list an Operating System family of Windows, and a JDK version of 1.4, this
+  profile will only be activated when the build is executed on a Windows machine
+  running Java 1.4. If the profile is active then all elements override the
+  corresponding project-level elements as if the profile were included with the
+  -P command-line argument. The following example, lists a profile which is
+  activated by a very specific combination of operating system parameters,
+  properties, and a JDK version.
+
+
+        <profiles>
+            <profile>
+                <id>dev</id>
+                <activation>
+                    <activeByDefault>false</activeByDefault> (1)
+                        <jdk>1.5</jdk> (2)
+                            <os>
+                                <name>Windows XP</name> (3)
+                                    <family>Windows</family>
+                                    <arch>x86</arch>
+                                    <version>5.1.2600</version>
+                            </os>
+                            <property>
+                                <name>customProperty</name> (4)
+                                    <value>BLUE</value>
+                            </property>
+                            <file>
+                                <exists>file2.properties</exists> (5)
+                                    <missing>file1.properties</missing>
+                            </file>
+                </activation>
+                ...
+            </profile>
+        </profiles>
+
+- Activating Profiles in the Absence of a Property. 
+
+            <project>
+                ...
+                <profiles>
+                    <profile>
+                        <id>development</id>
+                        <activation>
+                            <property>
+                                <name>!environment.type</name>
+                            </property>
+                        </activation>
+                    </profile>
+                </profiles>
+            </project>
+
+- Listing Active Profiles
+
+  Maven profiles can be defined in either pom.xml, profiles.xml,
+  ~/.m2/settings.xml, or ${M2_HOME}/conf/settings.xml. With these four levels,
+  there’s no good way of keeping track of profiles available to a particular
+  project without remembering which profiles are defined in these four files.
+
+  mvn help:active-profiles
+
+
+
+
+
+  Tips and Tricks:
+
+  http://www.sonatype.com/books/mvnref-book/reference/profiles-sect-tips-tricks.html
+
+
+
+* Maven command line options
+
+- Defining Properties
+
+  -D, --define <arg>
+      Defines a system property 
+
+  This is the option most frequently used to customized the behavior of Maven
+  plugins. Some examples of using the -D command line argument:
+
+              $ mvn help:describe -Dcmd=compiler:compile
+              $ mvn install -Dmaven.test.skip=true
+
+
+- help
+
+  -h
+
+
+- activate profiles
+
+  -P, --activate-profiles <arg> 
+
+
+
+
+- offline mode
+
+
+  -o
+
+  If you ever need to use Maven without having access to a network, you should
+  use the following option to prevent any attempt to check for updates to
+  plugins or dependencies over a network:
+
+
+
+
+  -f, --file <file>
+      Forces the use of an alternate POM file 
+
+  -s,--settings <arg>
+       Alternate path for the user settings file 
+
+   -gs, --global-settings <file>
+        Alternate path for the global settings file 
+
+
+
+
+- Dealing with failures
+
+  -fae, --fail-at-end
+      Only fail the build afterwards; allow all non-impacted builds to continue 
+
+   -ff, --fail-fast
+       Stop at first failure in reactorized builds 
+
+    -fn, --fail-never
+        NEVER fail the build, regardless of project result 
+
+
+- Controlling Maven’s Verbosity
+
+  -e, --errors
+      Produce execution error messages 
+
+  -X, --debug
+      Produce execution debug output 
+
+  -q, --quiet
+      Quiet output - only show errors
+
+  The -q option only prints a message to the output if there is an error or a
+  problem.
+
+  The -X option will print an overwhelming amount of debugging log messages to
+  the output. This option is primarily used by Maven developers and by Maven
+  plugin developers to diagnose problems with Maven code during development.
+  This -X option is also very useful if you are attempting to diagnose a
+  difficult problem with a dependency or a classpath.
+
+  The -e option will come in handy if you are a Maven developer, or if you need
+  to diagnose an error in a Maven plugin. If you are reporting an unexpected
+  problem with Maven or a Maven plugin, you will want to pass both the -X and -e
+  options to your Maven process.
+
+
+- Batch Mode
+
+  -B, --batch-mode
+      Run in non-interactive (batch) mode
+
+
+  Batch mode is essential if you need to run Maven in a non-interactive,
+  continuous integration environment. When running in non-interactive mode,
+  Maven will never stop to accept input from the user. Instead, it will use
+  sensible default values when it requires input.
+
+
+- Downloading and Verifying Dependencies
+
+  -C, --strict-checksums
+      Fail the build if checksums don’t match 
+
+  -c, --lax-checksums
+      Warn if checksums don’t match 
+
+  -U, --update-snapshots
+      Forces a check for updated releases and snapshots on remote
+      repositories 
+
+
+
+- Controlling Plugin Updates.
+
+  -npu, --no-plugin-updates
+      Suppress upToDate check for any relevant registered plugins. Providing
+      this option will have the affect of stabilizing Maven on all of the
+      plugins versions that are currently available in a local Maven repository.
+      With -npu active, Maven will not consult the remote repository for newer
+      Maven versions. 
+
+  -cpu, --check-plugin-updates
+      Force upToDate check for any relevant registered plugins. Forces Maven to
+      check for the latest released version of a Maven plugin. Not that this
+      will not affect your build if you are explicitly specifying versions for
+      Maven plugins in your project’s POM. 
+
+  -up, --update-plugins
+      Synonym for cpu. 
+
+  -npr, --no-plugin-registry
+      Don’t use ~/.m2/plugin-registry.xml for plugin versions. 
+
+
+- Non-recursive builds
+
+  There will be times when you simply want to run a Maven build without having
+  Maven descend into all of a project’s submodules. You can do this by using the
+  following command line option:
+
+
+  -N, --non-recursive
+      Prevents Maven from building submodules. Only builds the project contained
+      in the current directory.
+
+
+
+
+- Using Advanced Reactor Options
+
+  Starting with the Maven 2.1 release, there are new Maven command line options
+  which allow you to manipulate the way that Maven will build multimodule
+  projects. These new options are:
+
+
+  -rf, --resume-from
+      Resume reactor from specified project 
+
+  -pl, --projects
+      Build specified reactor projects instead of all projects 
+
+  -am, --also-make
+      If project list is specified, also build projects required by the list 
+
+  -amd, --also-make-dependents
+      If project list is specified, also build projects that depend on projects
+      on the list 
+
+  
+- Using the Maven Help Plugin
+
+  help:active-profiles
+      Lists the profiles (project, user, global ) which are active for the
+      build. 
+
+  help:effective-pom
+      Displays the effective POM for the current build, with the active profiles
+      factored in. 
+
+  help:effective-settings
+      Prints out the calculated settings for the project, given any profile
+      enhancement and the inheritance of the global settings into the user-level
+      settings. 
+
+  help:describe
+      Describes the attributes of a plugin. This need not run under an existing
+      project directory. You must at least give the groupId and artifactId of
+      the plugin you wish to describe. 
+
+
+            mvn help:describe -Dplugin=help
+
+
+* Maven Configuration
+
+- Plugin Configuration Parameters
+
+    mvn help:describe -Dcmd=compiler:compile
+
+    mvn help:describe -Dcmd=compiler:compile -Ddetail
+
+    mvn help:describe -Dplugin=compiler
+
+    mvn help:describe -Dplugin=org.apache.maven.plugins:maven-compiler-plugin
+
+
+
+- Adding Plugin Dependencies
+
+  If you need to configure a plugin to use specific versions of dependencies,
+  you can define these dependencies under a dependencies element under plugin.
+  When the plugin executes, it will execute with a classpath that contains these
+  dependencies. Adding Dependencies to a Plugin is an example of a plugin
+  configuration that overrides default dependency versions and adds new
+  dependencies to facilitate goal execution.
+
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.9</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>4.5</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.fop</groupId>
+                        <artifactId>fop-pdf-images</artifactId>
+                        <version>1.3</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.fop</groupId>
+                        <artifactId>fop-pdf-images-res</artifactId>
+                        <version>1.3</version>
+                        <classifier>res</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>pdfbox</groupId>
+                        <artifactId>pdfbox</artifactId>
+                        <version>0.7.4-dev</version>
+                        <classifier>dev</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+- Setting Global Plugin Parameters
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+
+- Setting Execution Specific Parameters
+
+        <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <echo>${PATH}=${env.PATH}</echo>
+                            <echo>User's Home Directory: ${user.home}</echo>
+                            <echo>Project's Base Director: ${basedir}</echo>
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+  You can configure plugin parameters for specific executions of a plugin goal.
+
+
+- Setting Default Command Line Execution Parameters
+
+  Starting with Maven 2.2.0, you can now supply configuration parameters for
+  goals which are executed from the command-line. To do this, use the special
+  execution id value of "default-cli".
+
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>assemble-binary</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>src/main/assembly/bin.xml</descriptor>
+                        </descriptors>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>default-cli</id>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+- Setting Parameters for Goals Bound to Default Lifecycle
+
+  Starting with Maven 2.2.0, if you need to customize the behavior of a goal
+  which is already bound to the default lifecycle, you can use the execution id
+  "default-<goal>"
+
+
+        <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>default-jar</id>
+                    <configuration>
+                        <excludes>
+                            <exclude>**/somepackage/*</exclude>
+                        </excludes>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>special-jar</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                    <configuration>
+                        <includes>
+                            <include>**/sompackage/*</include>
+                        </includes>
+                        <classifier>somepackage</classifier>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+  Setting Two Default Goal Plugin Configuration Parameters.
+
+
+        <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>default-resources</id>
+                    <configuration>
+                        <includeEmptyDirs>false</includeEmptyDirs>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>default-testResources</id>
+                    <configuration>
+                        <includeEmptyDirs>true</includeEmptyDirs>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+
+
+* Maven Assemblies
+
+  There are any number of reasons why you may want to build custom archives for
+  your project. Perhaps the most common is the project distribution
+
+  In most cases, the Assembly plugin is ideally suited to the process of
+  building project distributions. However, assemblies don’t have to be
+  distribution archives; assemblies are intended to provide Maven users with the
+  flexibility they need to produce customized archives of all kinds.
+
+
+  Before we go any further, it’s best to take a minute and talk about the two
+  main goals in the Assembly plugin: assembly:assembly, and the single mojo. I
+  list these two goals in different ways because it reflects the difference in
+  how they’re used. The assembly:assembly goal is designed to be invoked
+  directly from the command line, and should never be bound to a build lifecycle
+  phase. In contrast, the single mojo is designed to be a part of your everyday
+  build, and should be bound to a phase in your project’s build lifecycle.
+
+  The main reason for this difference is that the assembly:assembly goal is what
+  Maven terms an aggregator mojo; that is, a mojo which is designed to run at
+  most once in a build, regardless of how many projects are being built. It
+  draws its configuration from the root project - usually the top-level POM or
+  the command line. When bound to a lifecycle, an aggregator mojo can have some
+  nasty side-effects. It can force the execution of the package lifecycle phase
+  to execute ahead of time, and can result in builds which end up executing the
+  package phase twice.
+
+  Because the assembly:assembly goal is an aggregator mojo, it raises some
+  issues in multi-module Maven builds, and it should only be called as a
+  stand-alone mojo from the command-line. Never bind an assembly:assembly
+  execution to a lifecycle phase. assembly:assembly was the original goal in the
+  Assembly plugin, and was never designed to be part of the standard build
+  process for a project. As it became clear that assembly archives were a
+  legitimate requirement for projects to produce, the single mojo was developed.
+
+  This mojo assumes that it has been bound to the correct part of the build
+  process, so that it will have access to the project files and artifacts it
+  needs to execute within the lifecycle of a large multi-module Maven project.
+  In a multi-module environment, it will execute as many times as it is bound to
+  the different module POMs. Unlike assembly:assembly, single will never force
+  the execution of another lifecycle phase ahead of itself.
+
+
+- Predefined Assembly Descriptors
+
+  While many people opt to create their own archive recipes - called assembly
+  descriptors - this isn’t strictly necessary. The Assembly plugin provides
+  built-in descriptors for several common archive types that you can use
+  immediately without writing a line of configuration. The following assembly
+  descriptors are predefined in the Maven Assembly plugin:
+
+
+   bin
+       The bin descriptor is used to bundle project LICENSE, README, and NOTICE
+       files with the project’s main artifact, assuming this project builds a
+       jar as its main artifact. Think of this as the smallest possible binary
+       distribution for completely self-contained projects. 
+
+   jar-with-dependencies
+       The jar-with-dependencies descriptor builds a JAR archive with the
+       contents of the main project jar along with the unpacked contents of all
+       the project’s runtime dependencies. Coupled with an appropriate
+       Main-Class Manifest entry (discussed in “Plugin Configuration” below ),
+       this descriptor can produce a self-contained, executable jar for your
+       project, even if the project has dependencies. 
+
+   project
+       The project descriptor simply archives the project directory structure as
+       it exists in your file-system and, most likely, in your version control
+       system. Of course, the target directory is omitted, as are any
+       version-control metadata files like the CVS and .svn directories we’re
+       all used to seeing. Basically, the point of this descriptor is to create
+       a project archive that, when unpacked, can be built using Maven. 
+
+   src
+       The src descriptor produces an archive of your project source and pom.xml
+       files, along with any LICENSE, README, and NOTICE files that are in the
+       project’s root directory. This precursor to the project descriptor
+       produces an archive that can be built by Maven in most cases. However,
+       because of its assumption that all source files and resources reside in
+       the standard src directory, it has the potential to leave out
+       non-standard directories and files that are nonetheless critical to some
+       builds. 
+
+ 
+- Building an assembly
+
+  The Assembly plugin can be executed in two ways: you can invoke it directly
+  from the command line, or you can configure it as part of your standard build
+  process by binding it to a phase of your project’s build lifecycle. Direct
+  invocation has its uses, particularly for one-off assemblies that are not
+  considered part of your project’s core deliverables. In most cases, you’ll
+  probably want to generate the assemblies for your project as part of its
+  standard build process. Doing this has the effect of including your custom
+  assemblies whenever the project is installed or deployed into Maven’s
+  repositories, so they are always available to your users.
+
+  As an example of the direct invocation of the Assembly plugin, imagine that
+  you wanted to ship off a copy of your project which people could build from
+  source. Instead of just deploying the end-product of the build, you wanted to
+  include the source as well. You won’t need to do this often, so it doesn’t
+  make sense to add the configuration to your POM. Instead, you can use the
+  following command:
+
+        mvn -DdescriptorId=project assembly:single
+
+  
+
+  Imagine you want to produce an executable JAR from your project. If your
+  project is totally self-contained with no dependencies, this can be achieved
+  with the main project artifact using the archive configuration of the JAR
+  plugin. However, most projects have dependencies, and those dependencies must
+  be incorporated in any executable JAR. In this case, you want to make sure
+  that every time the main project JAR is installed or deployed, your executable
+  JAR goes along with it.
+
+  Assuming the main class for the project is org.sonatype.mavenbook.App, the
+  following POM configuration will create an executable JAR:
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-2</version>
+                <executions>
+                    <execution>
+                        <id>create-executable-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>
+                                    jar-with-dependencies
+                                </descriptorRef>
+                            </descriptorRefs>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.sonatype.mavenbook.App</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+  There are two things to notice about the configuration above. First, we’re
+  using the descriptorRefs configuration section instead of the descriptorId
+  parameter we used last time. This allows multiple assembly types to be built
+  from the same Assembly plugin execution, while still supporting our use case
+  with relatively little extra configuration. Second, the archive element under
+  configuration sets the Main-Class manifest attribute in the generated JAR.
+  This section is commonly available in plugins that create JAR files, such as
+  the JAR plugin used for the default project package type.
+
+
+- Assemblies as Dependencies
+
+  When you generate assemblies as part of your normal build process, those
+  assembly archives will be attached to your main project’s artifact. This means
+  they will be installed and deployed alongside the main artifact, and are then
+  resolvable in much the same way. Each assembly artifact is given the same
+  basic coordinates (groupId, artifactId, and version ) as the main project.
+  However, these artifacts are attachments, which in Maven means they are
+  derivative works based on some aspect of the main project build.
+
+
+  Since assemblies are (normally) attached artifacts, each must have a
+  classifier to distinguish it from the main artifact, in addition to the normal
+  artifact coordinates. By default, the classifier is the same as the assembly
+  descriptor’s identifier. When using the built-in assembly descriptors, as
+  above, the assembly descriptor’s identifier is generally also the same as the
+  identifier used in the descriptorRef for that type of assembly.
+
+
+  [continue maven assembly:
+  http://www.sonatype.com/books/mvnref-book/reference/assemblies-sect-overview-descriptor.html
+  ]
+
+
+
+* Properties and Resource Filtering
+
+   project.*
+       Maven Project Object Model (POM). You can use the project.* prefix to
+       reference values in a Maven POM. 
+
+   settings.*
+       Maven Settings. You use the settings.* prefix to reference values from
+       your Maven Settings in ~/.m2/settings.xml. 
+
+   env.*
+       Environment variables like PATH and M2_HOME can be referenced using the
+       env.* prefix. 
+
+   System Properties
+       Any property which can be retrieved from the System.getProperty() method
+       can be referenced as a Maven property. 
+
+
+
+   project.groupId and project.version 
+
+   project.artifactId
+
+   project.name and project.description 
+
+
+
+   project.build.*
+
+    project.build.sourceDirectory
+    project.build.scriptSourceDirectory
+    project.build.testSourceDirectory
+    project.build.outputDirectory
+    project.build.testOutputDirectory
+    project.build.directory
+
+- User-defined Properties
+
+        <project>
+            ...
+            <properties>
+                <arbitrary.property.a>This is some text</arbitrary.property.a>
+                <hibernate.version>3.3.0.ga</hibernate.version>
+            </properties>
+            ...
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate</artifactId>
+                    <version>${hibernate.version}</version>
+                </dependency>
+            </dependencies>
+            ...
+        </project>
+
+
+  User-defined Properties in a Profile in a POM.
+
+        <project>
+            ...
+            <profiles>
+                <profile>
+                    <id>some-profile</id>
+                    <properties>
+                        <arbitrary.property>This is some text</arbitrary.property>
+                    </properties>
+                </profile>
+            </profiles>
+            ...
+        </project>
+
+
+- Defining Variables and Activating Resource Filtering. 
+
+        <project>
+            ...
+            <properties>
+                <jdbc.driverClassName>
+                    com.mysql.jdbc.Driver</jdbc.driverClassName>
+                <jdbc.url>jdbc:mysql://localhost:3306/development_db</jdbc.url>
+                <jdbc.username>dev_user</jdbc.username>
+                <jdbc.password>s3cr3tw0rd</jdbc.password>
+            </properties>
+            ...
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+            ...
+            <profiles>
+                <profile>
+                    <id>production</id>
+                    <properties>
+                        <jdbc.driverClassName>oracle.jdbc.driver.OracleDriver</jdbc.driverClassName>
+                        <jdbc.url>jdbc:oracle:thin:@proddb01:1521:PROD</jdbc.url>
+                        <jdbc.username>prod_user</jdbc.username>
+                        <jdbc.password>s00p3rs3cr3t</jdbc.password>
+                    </properties>
+                </profile>
+            </profiles>
+        </project>
+
+ [ continued: Site Generation ]

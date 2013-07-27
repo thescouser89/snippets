@@ -1,0 +1,560 @@
+Maven incorporates this concept by providing sensible default behavior for
+projects. Without customization, source code is assumed to be in
+${basedir}/src/main/java and resources are assumed to be in
+${basedir}/src/main/resources. Tests are assumed to be in ${basedir}/src/test,
+and a project is assumed to produce a JAR file. Maven assumes that you want the
+compile byte code to ${basedir}/target/classes and then create a distributable
+JAR file in ${basedir}/target.
+
+Maven’s strength comes from the fact that it is "opinionated", it has a defined
+life-cycle and a set of common plugins that know how to build and assemble
+software. If you follow the conventions, Maven will require almost zero effort -
+just put your source in the correct directory, and Maven will take care of the
+rest.
+
+One side-effect of using systems that follow "convention over configuration" is
+that end-users might feel that they are forced to use a particular methodology
+or approach. While it is certainly true that Maven has some core opinions that
+shouldn’t be challenged, most of the defaults can be customized. For example,
+the location of a project’s source code and resources can be customized, names
+of JAR files can be customized, and through the development of custom plugins,
+almost any behavior can be tailored to your specific environment’s requirements.
+If you don’t care to follow convention, Maven will allow you to customize
+defaults in order to adapt to your specific requirements.
+
+Before Maven, when you wanted to check out a project like Apache ActiveMQ or
+Apache ServiceMix from Subversion and build it from source, you really had to
+set aside about an hour to figure out the build system for each particular
+project. What does the project need to build? What libraries do I need to
+download? Where do I put them? What goals can I execute in the build? In the
+best case, it took a few minutes to figure out a new project’s build, and in the
+worst cases (like the old Servlet API implementation in the Jakarta Project ), a
+project’s build was so difficult it would take multiple hours just to get to the
+point where a new contributor could edit source and compile the project. These
+days, you check it out from source, and you run mvn install.
+
+When you see that a project like Apache ActiveMQ uses Maven, you can assume that
+you’ll be able to check it out from source and build it with mvn install without
+much hassle. You know where the ignition keys goes, you know that the gas pedal
+is on the right-side, and the brake is on the left.
+
+- Universal Reuse through Maven Plugins
+
+  Central Maven Repository. This is more than just a trick to minimize the
+  download size of the Maven distribution, this is behavior which allows you to
+  upgrade a plugin to add capability to your project’s build. The fact that
+  Maven retrieves both dependencies and plugins from the remote repository
+  allows for universal reuse of build logic.
+
+  The Maven Surefire plugin is the plugin that is responsible for running unit
+  tests. Somewhere between version 1.0 and the version that is in wide use today
+  someone decided to add support for the TestNG unit testing framework in
+  addition to the support for JUnit. This upgrade happened in a way that didn’t
+  break backwards compatibility. If you were using the Surefire plugin to
+  compile and execute JUnit 3 unit tests, and you upgraded to the most recent
+  version of the Surefire plugin, your tests continued to execute without fail.
+  But, you gained new functionality, if you want to execute unit tests in TestNG
+  you now have that ability. You also gained the ability to run annotated JUnit
+  4 unit tests. You gained all of these capabilities without having to upgrade
+  your Maven installation or install new software. Most importantly, nothing
+  about your project had to change aside from a version number for a plugin a
+  single Maven configuration file called the Project Object Model (POM).
+
+  It is this mechanism that affects much more than the Surefire plugin. Maven
+  has plugins for everything from compiling Java code, to generating reports, to
+  deploying to an application server. Maven has abstracted common build tasks
+  into plugins which are maintained centrally and shared universally. 
+
+Maven maintains a model of a project. You are not just compiling source code
+into bytecode, you are developing a description of a software project and
+assigning a unique set of coordinates to a project. You are describing the
+attributes of the project. What is the project’s license? Who develops and
+contributes to the project? What other projects does this project depend upon? 
+
+- A Sample Maven pom.xml. 
+
+    <project>
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>org.sonatype.mavenbook</groupId>
+        <artifactId>my-project</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </project>
+
+  That’s all you need in your pom.xml. Running mvn install from the command line
+  will process resources, compile source, execute unit tests, create a JAR, and
+  install the JAR in a local repository for reuse in other projects. Without
+  modification, you can run mvn site and then find an index.html file in
+  target/site that contains links to JavaDoc and a few reports about your source
+  code.
+
+  Admittedly, this is the simplest possible example project containing nothing
+  more than some source code and producing a simple JAR. It is a project which
+  closely follows Maven conventions and doesn’t require any dependencies or
+  customization.
+
+  Maven has built-in intelligence about common project tasks in the form of
+  Maven plugins. If you wanted to write and execute unit tests, all you would
+  need to do is write the tests, place them in ${basedir}/src/test/java, add a
+  test-scoped dependency on either TestNG or JUnit, and run mvn test. If you
+  wanted to deploy a web application and not a JAR, all you would need to do is
+  change your project type to war and put your docroot in
+  ${basedir}/src/main/webapp.
+
+
+Maven’s download measures in at roughly 1.5 MiB, it has attained such a slim
+download size because the core of Maven has been designed to retrieve plugins
+and dependencies from a remote repository on-demand.
+
+
+Once you start using Maven extensively, you’ll notice that Maven has created
+some local user-specific configuration files and a local repository in your home
+directory. In ~/.m2 there will be:
+
+  ~/.m2/settings.xml 
+
+  A file containing user-specific configuration for authentication,
+  repositories, and other information to customize the behavior of Maven.
+
+
+  ~/.m2/repository/ 
+
+  This directory contains your local Maven repository. When you download a
+  dependency from a remote Maven repository, Maven stores a copy of the
+  dependency in your local repository. 
+
+
+
+To start a new Maven project, use the Maven Archetype plugin from the command
+line. Run the archetype:generate goal, select archetype #77, and then enter "Y"
+to confirm and generate the new project:
+
+Note: At the time of publication, the default "maven-archetype-quickstart" was
+item #77 in a list of 284 available archetypes. As more and more projects
+release Maven archetypes, this list will change and the number for the default
+archetype may change. Don’t be surprised if you need to select a different
+number. When you run archetype:generate as shown below, the default
+maven-archetype-quickstart will be selected by default.
+
+mvn is the Maven 2 command. archetype:generate is called a Maven goal. If you
+are archetype is defined as “an original model or type after which other similar
+things are patterned; a prototype.” A number of archetypes are available in
+Maven for anything from a simple Swing application to a complex web application,
+and the archetype:generate offers a list of approximately 40 archetypes to
+choose from. In this chapter, we are going to use the most basic archetype to
+create a simple skeleton starter project. The plugin is the prefix archetype,
+and the goal is generate.
+
+
+    Our project’s source code and resources are placed under src/main. In the
+    case of our simple Java project this will consist of a few Java classes and
+    some properties file. In another project, this could be the document root of
+    a web application or configuration files for an application server. In a
+    Java project, Java classes are placed in src/main/java and classpath
+    resources are placed in src/main/resources. 
+
+This pom.xml file is the most basic POM you will ever deal with for a Maven
+project, usually a POM file is considerably more complex: defining multiple
+dependencies and customizing plugin behavior. The first few elements—groupId,
+artifactId, packaging, version—are what is known as the Maven coordinates which
+uniquely identify a project. name and url are descriptive elements of the POM
+providing a human readable name and associating the project with a web site. The
+dependencies element defines a single, test-scoped dependency on a unit testing
+framework called JUnit.
+
+Maven always executes against an effective POM, a combination of settings from
+this project’s pom.xml, all parent POMs, a super-POM defined within Maven,
+user-defined settings, and active profiles. All projects ultimately extend the
+super-POM, which defines a set of sensible default configuration settings. While
+your project might have a relatively minimal pom.xml, the contents of your
+project’s POM are interpolated with the contents of all parent POMs, user
+settings, and any active profiles. To see this "effective" POM, run the
+following command in the simple project’s base directory.
+
+    mvn help:effective-pom
+
+When you run this, you should see a much larger POM which exposes the default
+settings of Maven. This goal can come in handy if you are trying to debug a
+build and want to see how all of the current project’s ancestor POMs are
+contributing to the effective POM.
+
+ You then executed Maven with a lifecycle phase as an argument, which prompted
+ Maven to execute a series of Maven plugin goals. Lastly, you installed a Maven
+ artifact into your local repository. Wait? What is a "lifecycle"? What is a
+ "local repository"? The following section defines some of Maven’s central
+ concepts.
+
+- Maven Plugins and Goals
+
+  To execute a single Maven plugin goal, we used the syntax mvn
+  archetype:generate, where archetype is the identifier of a plugin and generate
+  is the identifier of a goal. When Maven executes a plugin goal, it prints out
+  the plugin identifier and goal identifier to standard output
+
+  A Maven Plugin is a collection of one or more goals. Examples of Maven plugins
+  can be simple core plugins like the Jar plugin, which contains goals for
+  creating JAR files, Compiler plugin, which contains goals for compiling source
+  code and unit tests, or the Surefire plugin, which contains goals for
+  executing unit tests and generating reports. Other, more specialized Maven
+  plugins include plugins like the Hibernate3 plugin for integration with the
+  popular persistence library Hibernate, the JRuby plugin which allows you to
+  execute ruby as part of a Maven build or to write Maven plugins in Ruby. Maven
+  also provides for the ability to define custom plugins.
+
+  A goal is a specific task that may be executed as a standalone goal or along
+  with other goals as part of a larger build. A goal is a “unit of work” in
+  Maven. Examples of goals include the compile goal in the Compiler plugin,
+  which compiles all of the source code for a project, or the test goal of the
+  Surefire plugin, which can execute unit tests. Goals are configured via
+  configuration properties that can be used to customize behavior. For example,
+  the compile goal of the Compiler plugin defines a set of configuration also
+  passed the package parameter to the generate goal as org.sonatype.mavenbook.
+  If we had omitted the packageName parameter, the package name would have
+  defaulted to org.sonatype.mavenbook.simple.
+
+
+- Maven Lifecycle
+
+  The second command we ran in the previous section Maven lifecycle, which
+  begins with a phase to validate the basic integrity of the project and ends
+  with a phase that involves deploying a project to production. Lifecycle phases
+  are intentionally vague, defined solely as validation, testing, or deployment,
+  and they may mean different things to different projects. For example, in a
+  project that produces a Java archive, the package phase produces a JAR; in a
+  project that produces a web application, the package phase produces a WAR.
+
+  Plugin goals can be attached to a lifecycle phase. As Maven moves through the
+  phases in a lifecycle, it will execute the goals attached to each particular
+  phase. Each phase may have zero or more goals bound to it. In the previous
+  section, when you ran mvn install, you might have noticed that more than one
+  goal was executed. Examine the output after running mvn install and take note
+  of the various goals that are executed. When this simple example reached the
+  package phase, it executed the jar goal in the Jar plugin. Since our simple
+  Quickstart project has (by default ) a jar packaging type, the jar:jar goal is
+  bound to the package phase.
+
+  We know that the package phase is going to create a JAR file for a project
+  with jar packaging. But what of the goals preceding it, such as
+  compiler:compile and surefire:test? These goals are executed as Maven steps
+  through the phases
+
+  To summarize, when we executed mvn install, Maven executes all phases up to
+  the install phase, and in the process of stepping through the lifecycle phases
+  it executes all goals bound to each phase.
+
+
+Maven coordinates define a set of identifiers which can be used to uniquely
+identify a project, a dependency, or a plugin in a Maven POM.
+
+We’ve highlighted the Maven coordinates for this project: the groupId,
+artifactId, version and packaging.
+
+
+
+- Maven Repositories
+
+  Often you will be writing a project which depends on libraries that are
+  neither free nor publicly distributed. In this case you will need to either
+  setup a custom repository inside your organization’s network or download and
+  install the dependencies manually. The default remote repositories can be
+  replaced or augmented with references to custom Maven repositories maintained
+  by your organization. There are multiple products available to allow
+  organizations to manage and maintain mirrors of the public Maven repositories.
+
+
+  The standard for a Maven repository is to store an artifact in the following
+  directory relative to the root of the repository:
+
+
+    /<groupId>/<artifactId>/<version>/<artifactId>-<version>.<packaging>
+
+  Maven downloads artifacts and plugins from a remote repository to your local
+  machine and stores these artifacts in your local Maven repository. Once Maven
+  has downloaded an artifact from the remote Maven repository it never needs to
+  download that artifact again as Maven will always look for the artifact in the
+  local repository before looking elsewhere.
+
+  When you build a project like the simple project you created in the previous
+  section, the install phase executes a goal which installs your project’s
+  artifacts in your local Maven repository.
+
+  Maven uses the local repository to share dependencies across local projects.
+  If you develop two projects—project A and project B—with project B depending
+  on the artifact produced by project A, Maven will retrieve project A’s
+  artifact from your local repository when it is building project B. Maven
+  repositories are both a local cache of artifacts downloaded from a remote
+  repository and a mechanism for allowing your projects to depend on each other.
+
+
+- Maven Dependency Management
+
+  If you have been following this chapter’s examples, there will be a file named
+  junit-3.8.1.jar and a junit-3.8.1.pom file in addition to a few checksum files
+  which Maven uses to verify the authenticity of a downloaded artifact. Note
+  that Maven doesn’t just download the JUnit JAR file, Maven also downloads a
+  POM file for the JUnit dependency. The fact that Maven downloads POM files in
+  addition to artifacts is central to Maven’s support for transitive
+  dependencies.
+
+  When you install your project’s artifact in the local repository, you will
+  also notice that Maven publishes a slightly modified version of the project’s
+  pom.xml file in the same directory as the JAR file. Storing a POM file in the
+  repository gives other projects information about this project, most
+  importantly what dependencies it has. If Project B depends on Project A, it
+  also depends on Project A’s dependencies. When Maven resolves a dependency
+  artifact from a set of Maven coordinates, it also retrieves the POM and
+  consults the dependencies POM to find any transitive dependencies. These
+  transitive dependencies are then added as dependencies of the current project.
+
+  A dependency in Maven isn’t just a JAR file; it’s a POM file that, in turn,
+  may declare dependencies on other artifacts. These dependencies of
+  dependencies are called transitive dependencies, and they are made possible by
+  the fact that the Maven repository stores more than just bytecode; it stores
+  metadata about artifacts.
+
+  Maven also provides for different dependency scopes. The simple project’s
+  pom.xml contains a single dependency—junit:junit:jar:3.8.1+—with a scope of
+  +test. When a dependency has a scope of test, it will not be available to the
+  compile goal of the Compiler plugin. It will be added to the classpath for
+  only the compiler:testCompile and surefire:test goals.
+
+  When you create a JAR for a project, dependencies are not bundled with the
+  generated artifact; they are used only for compilation. When you use Maven to
+  create a WAR or an EAR file, you can configure Maven to bundle dependencies
+  with the generated artifact, and you can also configure it to exclude certain
+  dependencies from the WAR file using the provided scope. The provided scope
+  tells Maven that a dependency is needed for compilation, but should not be
+  bundled with the output of a build.
+
+
+- Site Generation and Reporting
+
+  Another important feature of Maven is its ability to generate documentation
+  and reports. In your simple project’s directory, execute the following
+  command:
+
+    mvn site
+
+  this lifecycle is concerned solely with processing site content under the
+  src/site directories and generating reports. After this command executes, you
+  should see a project web site in the target/site directory. Load
+  target/site/index.html and you should see a basic shell of a project site.
+  This shell contains some reports under “Project Reports” in the lefthand
+  navigation menu, and it also contains information about the project, the
+  dependencies, and developers associated with it under “Project Information.”
+  The simple project’s web site is mostly empty, since the POM contains very
+  little information about itself beyond its Maven coordinates, a name, a URL,
+  and a single test dependency.
+
+  Maven provides a full range of configurable reports, such as the Clover report
+  that examines unit test coverage, the JXR report that generates
+  cross-referenced HTML source code listings useful for code reviews, the PMD
+  report that analyzes source code for various coding problems, and the JDepend
+  report that analyzes the dependencies between packages in a codebase. You can
+  customize site reports by configuring which reports are included in a build
+  via the pom.xml file.
+
+
+- Adding Organizational, Legal, and Developer Information to the pom.xml
+
+       <url>http://www.sonatype.com</url>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>Sonatype</name>
+        <url>http://www.sonatype.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>jason</id>
+            <name>Jason Van Zyl</name>
+            <email>jason@maven.org</email>
+            <url>http://www.sonatype.com</url>
+            <organization>Sonatype</organization>
+            <organizationUrl>http://www.sonatype.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>-6</timezone>
+        </developer>
+    </developers> 
+
+
+- Exploring Your Project Dependencies
+
+  mvn dependency:resolve
+
+  mvn dependency:tree
+
+
+
+
+A test-scoped dependency is a dependency that is available on the classpath only
+during test compilation and test execution. If your project has war or ear
+packaging, a test-scoped dependency would not be included in the project’s
+output archive. To add a test-scoped dependency, add the dependency element to
+your project’s dependencies section
+
+
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+            <scope>test</scope>
+        </dependency>
+
+
+- Executing Unit Tests
+
+  mvn test
+
+
+
+
+  You will often find yourself developing on a system that has failing unit
+  tests. If you are practicing Test-Driven Development (TDD), you might use test
+  failure as a measure of how close your project is to completeness. If you have
+  failing unit tests, and you would still like to produce build output, you are
+  going to have to tell Maven to ignore build failures. When Maven encounters a
+  build failure, its default behavior is to stop the current build. To continue
+  building a project even when the Surefire plugin encounters failed test cases,
+  you’ll need to set the testFailureIgnore configuration property of the
+  Surefire plugin to true.
+
+        <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+  This expression can be set from the command line using the -D parameter:
+
+    mvn test -Dmaven.test.failure.ignore=true
+
+
+- Skipping Unit Tests
+
+  mvn install -Dmaven.test.skip=true
+
+  Another way to configure Maven to skip unit tests is to add this configuration
+  to your project’s pom.xml.
+
+
+
+
+The Maven Assembly plugin is a plugin you can use to create arbitrary
+distributions for your applications. You can use the Maven Assembly plugin to
+assemble the output of your project in any format you desire by defining a
+custom assembly descriptor.
+
+To configure the Maven Assembly Plugin, we need to add the following plugin
+configuration to our existing build configuration in the pom.xml.
+
+        <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+Once you’ve added this configuration, you can build the assembly by running the
+assembly:assembly goal.
+
+Once our assembly is assembled in
+target/'simple-weather-1.0-jar-with-'dependencies.jar, we can run the Main class
+again from the command line. 
+
+The jar-with-dependencies format creates a single JAR file that includes all of
+the bytecode from the simple-weather project as well as the unpacked bytecode
+from all of the dependencies. This somewhat unconventional format produces a 9
+MiB JAR file containing approximately 5,290 classes, but it does provide for an
+easy distribution format for applications you’ve developed with Maven.
+
+
+- Attaching the Assembly Goal to the Package Phase
+
+  The following plugin configuration configures the Maven Assembly plugin to
+  execute the attached goal during the package phase of the Maven default build
+  lifecycle.
+
+     <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>simple-command</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+  Once you have this configuration in your POM, all you need to do to generate
+  the assembly is run mvn package.
+
+
+
+- Multi-module project
+
+  A multi-module project is defined by a parent POM referencing one or more
+  submodules. In the simple-parent/ directory, you will find the parent POM
+  (also called the top-level POM) in simple-parent/pom.xml.
+
+        <modules>
+            <module>simple-weather</module>
+            <module>simple-webapp</module>
+        </modules>
+
+  In weather module:
+
+        <parent>
+            <groupId>org.sonatype.mavenbook.multi</groupId>
+            <artifactId>simple-parent</artifactId>
+            <version>1.0</version>
+        </parent> 
+
+
+  When you run Maven from the command line you’ll frequently want to specify the
+  clean lifecycle phase before any other lifecycle stages. When you specify
+  clean, you make sure that Maven is going to remove old output before it
+  compiles and packages an application. 
+
+
+- Optimizing Dependencies
+
+  dependency versions defined in modules will override the ones in the parent
+  pom.xml
+
+
+    mvn dependency:analyze
