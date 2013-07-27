@@ -1,3 +1,65 @@
+<nav id="insert_nav_document">
+<h1>Table Of Contents</h1>
+<ul>
+  <li><a href="#css-notes">CSS Notes</a></li>
+  <ul>
+    <li><a href="#applying-css">Applying CSS</a></li>
+    <li><a href="#selectors-properties-and-values">Selectors, properties, and values</a></li>
+    <ul>
+      <li><a href="#length-and-percentage">Length and Percentage</a></li>
+    </ul>
+    <li><a href="#colors">Colors</a></li>
+    <li><a href="#text">Text</a></li>
+    <li><a href="#the-box-model">The Box Model</a></li>
+    <li><a href="#class-and-id-selectors">Class and ID selectors</a></li>
+    <li><a href="#grouping">Grouping</a></li>
+    <li><a href="#nesting">Nesting</a></li>
+    <li><a href="#pseudo-classes">Pseudo Classes</a></li>
+    <ul>
+      <li><a href="#links">Links</a></li>
+      <li><a href="#dynamic-pseudo-classes">Dynamic Pseudo Classes</a></li>
+      <li><a href="#first-children">First children</a></li>
+    </ul>
+    <li><a href="#shorthand-properties">Shorthand Properties</a></li>
+    <ul>
+      <li><a href="#margin-and-padding">Margin and Padding</a></li>
+      <li><a href="#borders">Borders</a></li>
+      <li><a href="#fonts">Fonts</a></li>
+      <li><a href="#background-image">Background Image</a></li>
+    </ul>
+    <li><a href="#specificity">Specificity</a></li>
+    <li><a href="#display">Display</a></li>
+    <ul>
+      <li><a href="#inline">Inline</a></li>
+      <li><a href="#block">Block</a></li>
+      <li><a href="#none">None</a></li>
+      <li><a href="#tables">Tables</a></li>
+      <li><a href="#other-display-types">Other display types</a></li>
+    </ul>
+    <li><a href="#pseudo-elements">Pseudo Elements</a></li>
+    <ul>
+      <li><a href="#first-letters-and-first-lines">First letters and first lines</a></li>
+      <li><a href="#before-and-after-content">Before and After Content</a></li>
+    </ul>
+    <li><a href="#page-layout">Page Layout</a></li>
+    <ul>
+      <li><a href="#positioning">Positioning</a></li>
+      <li><a href="#floating">Floating</a></li>
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+    <li><a href="#rounded-corners">Rounded Corners</a></li>
+    <ul>
+      <li><a href="#ellipses">Ellipses</a></li>
+    </ul>
+    <li><a href="#shadows">Shadows</a></li>
+    <ul>
+      <li><a href="#box-shadows">Box shadows</a></li>
+      <li><a href="#inner-shadows">Inner Shadows</a></li>
+      <li><a href="#text-shadows">Text Shadows</a></li>
+    </ul>
+  </ul>
+</ul>
+</nav>
 # CSS Notes
 
 ## Applying CSS
