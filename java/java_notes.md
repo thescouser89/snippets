@@ -1,3 +1,174 @@
+<nav id="insert_nav_document">
+<h1>Table Of Contents</h1>
+<ul>
+  <li><a href="#random-notes">Random Notes</a></li>
+  <li><a href="#introduction-to-objects">Introduction to Objects</a></li>
+  <ul>
+    <li><a href="#terminology">Terminology</a></li>
+    <li><a href="#where-storage-lives">Where storage lives</a></li>
+    <li><a href="#java-se5-autoboxing">Java SE5 autoboxing</a></li>
+    <li><a href="#static-keyword">Static keyword</a></li>
+    <li><a href="#first-compilation">First compilation</a></li>
+    <li><a href="#comments-and-embedded-documentation">Comments and embedded documentation</a></li>
+    <ul>
+      <li><a href="#syntax">Syntax</a></li>
+      <li><a href="#embedded-html">Embedded HTML</a></li>
+      <li><a href="#tags">Tags</a></li>
+      <li><a href="#some-example-tags">Some example tags</a></li>
+    </ul>
+  </ul>
+  <li><a href="#operators">Operators</a></li>
+  <ul>
+    <li><a href="#auto-incrememnt-and-decrement">Auto Incrememnt and Decrement</a></li>
+    <li><a href="#beware-of-equals">Beware of equals</a></li>
+    <li><a href="#short-circuiting">Short-circuiting</a></li>
+    <li><a href="#literals">Literals</a></li>
+    <li><a href="#exponential-notation">Exponential notation</a></li>
+    <li><a href="#shifts">Shifts</a></li>
+    <li><a href="#ternary-if-else-operator">Ternary if-else operator</a></li>
+    <li><a href="#controlling-execution">Controlling Execution</a></li>
+  </ul>
+  <li><a href="#initialization-and-cleanup">Initialization and Cleanup</a></li>
+  <ul>
+    <li><a href="#method-overloading">Method overloading</a></li>
+    <ul>
+      <li><a href="#distinguishing-overloaded-methods">Distinguishing overloaded methods</a></li>
+      <ul>
+        <li><a href="#overloading-with-primitives">Overloading with primitives</a></li>
+        <li><a href="#overloading-on-return-values">Overloading on return values</a></li>
+      </ul>
+      <li><a href="#this">this</a></li>
+      <li><a href="#fluent-api">Fluent API</a></li>
+      <li><a href="#calling-constructors-from-constructors">Calling constructors from constructors</a></li>
+    </ul>
+    <li><a href="#cleanup-finalization-and-garbage-collection">Cleanup: finalization and garbage collection</a></li>
+    <ul>
+      <li><a href="#the-termination-condition">The termination condition</a></li>
+    </ul>
+    <li><a href="#member-initialization">Member Initialization</a></li>
+    <ul>
+      <li><a href="#specifying-initialization">Specifying initialization</a></li>
+      <li><a href="#constructor-initialization">Constructor initialization</a></li>
+      <li><a href="#order-of-initialization">Order of initialization</a></li>
+    </ul>
+    <li><a href="#static-data-initialization">static data initialization</a></li>
+    <ul>
+      <li><a href="#explicit-static-initialization">Explicit static initialization</a></li>
+      <li><a href="#non-static-instance-initialization">Non-static instance initialization</a></li>
+    </ul>
+    <li><a href="#array-initialization">Array initialization</a></li>
+    <li><a href="#variable-argument-lists">Variable argument lists</a></li>
+    <li><a href="#enumerated-types">Enumerated types</a></li>
+  </ul>
+  <li><a href="#access-control">Access Control</a></li>
+  <ul>
+    <ul>
+      <li><a href="#collision">Collision</a></li>
+    </ul>
+    <li><a href="#static-import">Static import</a></li>
+    <li><a href="#package-access">Package access</a></li>
+    <li><a href="#inheritance">Inheritance</a></li>
+    <ul>
+      <li><a href="#initializing-the-base-class">Initializing the base class</a></li>
+    </ul>
+    <li><a href="#overriding">Overriding</a></li>
+    <li><a href="#upcasting">Upcasting</a></li>
+    <li><a href="#final-keyword">Final keyword</a></li>
+    <ul>
+      <li><a href="#blank-finals">Blank finals</a></li>
+      <li><a href="#final-arguments">Final arguments</a></li>
+      <li><a href="#final-methods">Final methods</a></li>
+      <li><a href="#final-and-private">Final and private</a></li>
+    </ul>
+  </ul>
+  <li><a href="#polymorphism">Polymorphism</a></li>
+  <ul>
+    <ul>
+      <li><a href="#method-call-binding">Method-call binding</a></li>
+      <li><a href="#pitfall-fields-and-static-methods">Pitfall: fields and static methods</a></li>
+    </ul>
+    <li><a href="#constructors-and-polymorphism">Constructors and polymorphism</a></li>
+    <li><a href="#inheritance-and-cleanup">Inheritance and cleanup</a></li>
+    <li><a href="#behaviour-of-polymorphic-methods-inside-constructors">Behaviour of polymorphic methods inside constructors</a></li>
+    <li><a href="#covariant-return-types">Covariant return types</a></li>
+    <li><a href="#abstract">Abstract</a></li>
+  </ul>
+  <li><a href="#interfaces">Interfaces</a></li>
+  <ul>
+    <li><a href="#extending-an-interface-with-inheritance">Extending an interface with inheritance</a></li>
+    <li><a href="#inner-class">Inner Class</a></li>
+    <ul>
+      <li><a href="#the-link-to-the-outer-class">The link to the outer class</a></li>
+      <li><a href="#using-the-.this-and-.new">Using the .this and .new</a></li>
+      <li><a href="#inner-classes-and-upcasting">Inner classes and upcasting</a></li>
+    </ul>
+    <li><a href="#anonymous-inner-classes">Anonymous Inner classes</a></li>
+    <li><a href="#nested-class">Nested class</a></li>
+    <ul>
+      <li><a href="#reaching-outward-from-a-multiply-nested-class">Reaching outward from a multiply-nested class</a></li>
+    </ul>
+    <li><a href="#why-inner-classes?">Why inner classes?</a></li>
+    <li><a href="#closures-and-callbacks">Closures and Callbacks</a></li>
+    <li><a href="#can-inner-classes-be-overridden?">Can inner classes be overridden?</a></li>
+    <ul>
+      <li><a href="#local-inner-classes">Local Inner classes</a></li>
+      <li><a href="#inner-class-identifiers">Inner class identifiers</a></li>
+    </ul>
+  </ul>
+  <li><a href="#holding-your-objects">Holding your objects</a></li>
+  <ul>
+    <li><a href="#generics-and-type-safe-containers">Generics and type-safe containers</a></li>
+    <li><a href="#basic-concepts">Basic Concepts</a></li>
+    <li><a href="#adding-groups-of-elements">Adding groups of elements</a></li>
+    <ul>
+      <li><a href="#printing-containers">Printing containers</a></li>
+    </ul>
+    <li><a href="#list">List</a></li>
+    <li><a href="#iterator">Iterator</a></li>
+    <ul>
+      <li><a href="#linked-list">Linked list</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#set">Set</a></li>
+      <li><a href="#map">Map</a></li>
+      <li><a href="#queue">Queue</a></li>
+      <li><a href="#priority-queue">Priority Queue</a></li>
+    </ul>
+    <li><a href="#foreach-and-iterators">foreach and iterators</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+  <li><a href="#error-handling-with-exceptions">Error Handling with Exceptions</a></li>
+  <ul>
+    <li><a href="#catching-an-exception">Catching an exception</a></li>
+    <li><a href="#creating-your-own-exceptions">Creating your own exceptions</a></li>
+    <li><a href="#the-exception-specification">The exception specification</a></li>
+    <li><a href="#catching-any-exception">Catching any exception</a></li>
+    <li><a href="#the-stack-trace">The Stack Trace</a></li>
+    <li><a href="#rethrowing-an-exception">Rethrowing an Exception</a></li>
+    <li><a href="#exception-chaining---keep-the-information-about-the-originating-exception---">Exception chaining - Keep the information about the originating exception --</a></li>
+    <li><a href="#standard-java-exceptions">Standard Java exceptions</a></li>
+    <li><a href="#runtime-exception">Runtime Exception</a></li>
+    <li><a href="#performing-cleanup-with-finally">Performing Cleanup with finally</a></li>
+    <li><a href="#pitfall--the-lost-exception">Pitfall -the lost exception</a></li>
+    <li><a href="#exception-restrictions">Exception Restrictions</a></li>
+  </ul>
+  <li><a href="#strings">Strings</a></li>
+  <ul>
+    <li><a href="#overloading-'+'-vs-stringbuilder">Overloading '+' vs StringBuilder</a></li>
+    <li><a href="#formatting-output">Formatting output</a></li>
+    <li><a href="#the-formatter-class">The Formatter class</a></li>
+    <ul>
+      <li><a href="#format-specifiers">Format Specifiers</a></li>
+    </ul>
+    <li><a href="#regular-expressions">Regular Expressions</a></li>
+    <ul>
+      <li><a href="#basics">Basics</a></li>
+      <li><a href="#quantifiers">Quantifiers</a></li>
+      <li><a href="#pattern-and-matcher">Pattern and Matcher</a></li>
+    </ul>
+  </ul>
+  <li><a href="#type-information">Type Information</a></li>
+</ul>
+</nav>
 # Random Notes
 - [need to work on Closures callbacks and framework thingy]
 - Fields and static methods are resolved at runtime, whereas normal methods at
