@@ -38,3 +38,4 @@ Tiny snippets of code for my memory...
 
 ### Ruby
 - The Ruby Programming Language
+- https://github.com/bbatsov/ruby-style-guide

@@ -417,7 +417,7 @@ e.g
     <p><input type="radio" name="areyou" value="female"> Female</p>
     <p><input type="radio" name="areyou" value="hermaphrodite">e</p>
     <p><input type="radio" name="areyou" value="asexual">Asexual</p>
-<form>
+</form>
 ```
 
 When the form is submitted, the value of the selected option will be sent. This
