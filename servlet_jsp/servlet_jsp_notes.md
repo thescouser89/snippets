@@ -122,4 +122,178 @@ for some other kind of view.
 ## MVC
 The servlet is the controller, the view is JSP, and the model holds the real
 business logic and state. The model knows the rules for getting and updating the
-state.pg 88
+state.
+
+A shopping cart contents and rules for what to do with it would be part of the
+Model in the MVC. It's the only part of the system that talks to the database.
+
+The view is responsible for the presentation. It gets the state of the model
+from the controller. It's also the part that gets the user input that goes back
+to the controller.
+
+The controller takes user input from the request and figures out what it means
+to the model. It tells the model to update itself, and makes the new model state
+available from the view. (servlet)
+
+
+A fully-compliant J2EE application server must have both a web container and an
+EJB container.
+
+
+## Time to create and deploy an MVC web app
+Build a web application that gives beer advice.
+
+The servlet receives the request, gets infro from the model,, generate the
+result page and gives it to the user.
+
+```html
+<html><body>
+<form method="POST" action="SelectBeer.do">
+Color:
+<select name="color" size="1">
+    <option value="light">light</option>
+    <option value="amber">amber</option>
+    <option value="brown">brown</option>
+    <option value="dark">dark</option>
+</select>
+<input type="submit">
+</form>
+</body></html>
+```
+
+SelectBeer.do is a logical name, not an actual name. It's simply the name we
+want the client to use. We'll use the XML Deployment Descriptor (web.xml) to map
+from what the client requests to an actual servlet class.
+
+In web.xml:
+```xml
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/wep-app_2_4.xsd"
+         version="2.4">
+
+<servlet>
+    <servlet-name>Ch3 Beer</servlet-name>
+    <servlet-class>com.example.web.BeerSelect</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>Ch3 Beer</servlet-name>
+    <url-pattern>/SelectBeer.do</url-pattern>
+</servlet-mapping>
+
+</web-app>
+```
+
+Servlet code:
+```java
+public void doPost (.. request, .. response) throws Exception {
+    response.setContentType("text/html");
+    PrintWriter out = response.getWriter();
+    out.println("Beer Selection Advice");
+    String c = request.getParameter("color");
+    BeerExpert be = new BeerExpert();
+    List result = be.getBrands(c);
+
+    for (String s : result) {
+        out.print("try: " + s);
+    }
+}
+```
+
+Model:
+```java
+public class BeerExpert {
+    public List getBrands(String color) {
+        List brands = new ArrayList();
+        if (color.equals("amber")) {
+            brands.add("Jack Amber");
+            brands.add("Red Moose");
+        } else {
+            brands.add("Jail Pale Ale");
+            brands.add("Gout Stout");
+        }
+        return brands;
+    }
+}
+```
+
+We could use a jsp code (result.jsp):
+```xml
+<%@ page import="java.util.*" %>
+<html>
+<body>
+<%
+    List styles = (List) request.getAttribute("styles");
+    for (String s : styles) {
+        out.print("try: " + s);
+    }
+%>
+</body>
+</html>
+```
+
+Servlet code that uses JSP:
+```java
+...
+List result = be.getBrands(c);
+requet.setAttribute("styles", result);
+RequestDispatcher view = request.getRequestDispatcher("result.jsp");
+```
+
+## Being a servlet
+The init() method in the servlet will be called when it is instantiated only
+once. The service() method is used to handle client requests. It calls doGet()
+or doPost(). Then the destroy() method is called when it is cleaned up.
+
+Override init() if you have some initialization code (like a database connection).
+
+It's very unlikely that you will override the service() method.
+
+YOu will always override the doGet() and doPost() methods.
+
+Each request runs in a separate thread. The container runs multiple threads to
+process multiple requests to a single servlet.
+
+## ServletConfig
+- One ServletConfig object per servlet.
+- Use it to pass deploy-time information to the servlet (database)
+- Use it to acces the ServletContext
+- Parameters are configres in the Deployment Descriptor.
+
+## ServletContext
+- One ServletContext per web app
+- Use it to access web app parameters (in the DD)
+- Use it as a kind of application bulletin-board, where you can put up messages
+  that other parts of the application can access
+- Use it to get server info
+
+ServletConfig and ServletContext only exit to support your servlet's job of
+handling client requests.
+
+If the HTTP metod is a GET, the service() method calls doGet(). If the HTTP
+request Method is a POST, the service() method calls doPost().
+
+## Request object
+You can get:
+- browser info
+```java
+String client = request.getHeader("User-Agent");
+```
+- cookies
+```java
+Cookie[] cookies = request.getCookies();
+```
+- session
+```java
+HttpSession session = request.getSession();
+```
+- HTTP Method of the request
+```java
+String theMethod = request.getMethod();
+```
+- InputStream
+```java
+InputStream input = request.getInputStream();
+```
+
