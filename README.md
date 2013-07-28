@@ -14,6 +14,7 @@ Tiny snippets of code for my memory...
 
 ### Javascript
 - http://htmldog.com/guides/javascript/
+- http://stackoverflow.com/questions/5853787/script-does-not-work-when-on-head
 
 ### CMake
 - http://www.cmake.org/cmake/help/cmake_tutorial.html
