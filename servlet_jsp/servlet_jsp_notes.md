@@ -258,8 +258,8 @@ process multiple requests to a single servlet.
 ## ServletConfig
 - One ServletConfig object per servlet.
 - Use it to pass deploy-time information to the servlet (database)
-- Use it to acces the ServletContext
-- Parameters are configres in the Deployment Descriptor.
+- Use it to access the ServletContext
+- Parameters are configured in the Deployment Descriptor.
 
 ## ServletContext
 - One ServletContext per web app
@@ -297,3 +297,90 @@ String theMethod = request.getMethod();
 InputStream input = request.getInputStream();
 ```
 
+## Return something other than html
+```java
+public void doGet(...) {
+    response.setContentType("application/jar");
+    ServletContext ctx = getServletContext();
+    InputStream is = ctx.getResourceAsStream("/bookCode.jar");
+
+    int read= 0;
+    byte[] bytes = new byte[1024];
+
+    OutputStream os = response.getOutputStream();
+    while ((read = is.read(bytes)) != -1) {
+        os.write(bytes, 0, read);
+    }
+    os.flush();
+    os.close();
+}
+```
+Where was the "bookCode.jar" located?
+The getResourceAsStream() requires you to start with a forward slash which
+represents the root of your web app.
+
+## Redirect
+You can choose to have something else handle the response for your request. You
+can either redirect the request (sendRedirect(String)) or dispatch the request
+to some other component in your web app (Typically a JSP)
+
+You can use full url or relative paths for sendRedirect.
+
+Redirect does the work on the client, Dispatch does the work on the server side.
+
+Dispatch:
+```java
+RequestDispatcher view = request.getRequestDispatcher("result.jsp");
+view.forward(request, response);
+```
+
+## Adding info into web.xml
+```xml
+<servlet>
+    ...
+    <init-param>
+        <param-name>adminEmail</param-name>
+        <param-value>haha@redhat.com</param-value>
+    </init-param>
+</servlet>
+```
+Notice that the init-param is inside this servlet only!
+
+In the servlet code:
+```java
+out.println(getServletConfig().getInitParameter("adminEmail"));
+```
+
+You can't use servlet init parameters until the servlet is initialized.
+
+The container reads the DD for this servlet, then creates a new ServletConfig
+instance for this servlet.
+
+We could use `request.setAttribute()` to pass the init-param to JSP. The
+disadvantage is that this is per servlet, not per web application.
+
+For that, use context-param.
+
+In web.xml:
+```xml
+<servlet>
+    ...
+</servlet>
+<context-param>
+    <param-name>adminEmail</param-name>
+    <param-value>haha@redhat.com</param-value>
+</context-param>
+```
+```java
+out.println(getServletContext().getInitParameter("adminEmail"));
+```
+
+ServletConfig is one per servlet, ServletContext is one per web app.
+
+A ServletContext is a JSP or servlet's connection to both the container and the
+other parts of the web app.
+
+What if you want an app init parameter that's a database Datasource?
+Context parameters can't be anything except Strings.
+
+## Attributes and listeners
