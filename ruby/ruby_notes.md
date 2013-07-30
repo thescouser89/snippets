@@ -1,13 +1,10 @@
 * The structure and execution of Ruby programs
 
 # Lexical Structure
-
 The Ruby interpreter parses a program as a sequence of tokens. Tokens include
 comments, literals, punctuation, identifiers, and keywords.
 
-
 ## Comments
-
 Comments in Ruby begin with a # character and continue to the end of the line.
 The Ruby interpreter ignores the # character and any text that follows it (but
 does not ignore the newline character, which is meaningful whitespace and may
@@ -30,7 +27,6 @@ Ruby has no C-style /*...*/ comment. THere is no way to embed a comment in the
 middle of a line of code
 
 ### Embedded documents
-
 Ruby supports another style of multiline comment known as an embedded document.
 
 These start on a line that begin =begin and continue until (and include) a line
@@ -92,7 +88,6 @@ out the "rdoc".)
 # [item 2] This is a description of item 2
 ```
 ## Identifiers
-
 An identifier is simply a name. Ruby uses identifiers to name variables,
 methods, classes, and so forth.
 
