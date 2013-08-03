@@ -1,52 +1,10 @@
 # JSF notes
-login/web/index.xhtml
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html xmlns="" >
-<h:head>
-    <title>Welcome</title>
-</h:head>
-<h:body>
-    <h:form>
-        <h3>Please enter your name and password</h3>
-        Name:
-        <h:inputText value="#{user.name}"/>
-
-        Pasword:
-        <h:inputSecret value="#{user.password}"/>
-        <h:commandButton value="Login" action="welcome"/>
-```
-When the user clicks the "Login" button, the welcome.xhtml file is displayed, as
-specified in the action attribute of the h:commandButton tag.
-
-login/web/welcome.xhml
-```xml
-<h:body>
-<h3>Welcome to JSF, #{user.name}!</h3>
-</h:body>
-```
-
 Ingredients:
 - pages that define the login and welcome screens.
 - A bean that manages the user data.
 - Configuration files web.xml and beans.xml that are needed to keep the
   application server happy
 
-```java
-@Named("user")
-@SessionScoped
-public class UserBean implements Serializable {
-    private String name;
-    private String password;
-
-    public String getName() {return name;}
-    public void setName(String newValue) {name = newValue;}
-
-    public String getPassword() { return password; }
-    public void setPassword(String newValue) { password = newValue; }
-}
-```
 Web applications have 2 parts: the presentation layer and the business logic.
 The business logic determines the behaviour of the application.
 
@@ -73,25 +31,8 @@ The second line declares the h: prefix for the JSF html tags.
 xmlns:f="http://java.sun.com/jsf/core"
 ```
 
-## Servlet configuration
-in WEB-INF/web.xml
-```xml
-<servlet>
-    <servlet-name>Faces Servlet</servlet-name>
-    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>Faces Servlet</servlet-name>
-    <url-pattern>/faces/*</url-pattern>
-</servlet-mapping>
-<welcome-file-list>
-    <welcome-file>faces/index.xhtml</welcome-file>
-</welcome-file-list>
-<context-param>
-    <param-name>javax.faces.PROJECT_STAGE</param-name>
-    <param-value>Development</param-value>
-</context-param>
-```
+The URL has to be  http://localhost:8080/login/faces/index.xhtml. This mapping
+rules activate the Faces servlet.
 
 All JSF pages are passed to the Faces servlet that is a part of the JSF
 implementation code.
@@ -184,6 +125,9 @@ When the component tree for the form is built, the getAnswerComponent method of
 the backing bean is called, but it returns null. As a result, an ouput component
 is constructed and installed into the backing bean with a call to setAnswerComponent.
 ```
+
+[ Equivalent to render in rails? ]
+
 ## CDI Beans
 These beans are bound by conext. CDI uses @Named. Note that session-scoped CDI
 beans must implement the Serializable interface.
@@ -214,4 +158,51 @@ currentScore=Your current score is {0}
     <f:param value="#{quizBean.score}" />
 </h:outputFormat>
 ```
-43
+
+```xml
+currentScore=Your current score is {0,choice,0#zero points|1#one point|2#{0} points}
+```
+
+So if the param is 1, then it will print: "Your current score is one point"
+
+Setting the application locale: pg 43
+
+# Bean Scope
+- Session scope (@SessionScoped)
+- Request scope (@RequestScoped)
+- Application scope (@ApplicationScoped)
+
+Request scopes are short-lived. It starts when an HTTP request is submitted and
+ends after the response is sent back to the client. A new instance is created
+with each request.
+
+Application scopes  persist for the entire duration of the web application. Use
+it if a single bean should be shared among all instances of a web application.
+
+If an application scoped bean is marked as eager, then it must be constructed
+before the first page of the application is displayed. Use
+```java
+@ManagedBean(eager=true)
+```
+
+Conversation scope ranges over a set of related pages. Provides data persistence
+until a set of goals is achieved, without having to store the data for the
+entire duration. Use it for persistence if a user opens multiple tabs of the
+same page. Both the pages get synchronized. pg 55 for more details.
+
+# Injecting CDI beans
+```java
+clas EditBean {
+    @Inject private UserBean currentUser;
+}
+```
+
+When the EditBean is constructed, the userBean in the current session is located
+and injected.
+
+# Bean Life Cycle Annotations
+Using the @PostConstruct and @PreDestroy, you can specify bean methods that are
+automatically called just after a bean has been constructed and just before a
+bean goes out of scope.
+
+# Navigation
