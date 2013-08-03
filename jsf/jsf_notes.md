@@ -206,3 +206,108 @@ automatically called just after a bean has been constructed and just before a
 bean goes out of scope.
 
 # Navigation
+How to configure the navigation of your web application.
+
+When a form is submitted, the web app analyzes the user input and must decide
+which JSF page to use for rendering the response. The navigation handler is
+responsible for selecting the next JSF page.
+
+Simple example:
+```xml
+<h:commandButton label="login" action="welcome"/>
+```
+
+## Dynamic Navigation
+Submitting a login page can be successful or fail. So we have to generate the
+outcome dynamically.
+
+```xml
+<h:commandButton label="login" action="#{loginController.verifyUser}"
+```
+
+```java
+String verifyUser() {
+    if (...)
+        return "success";
+    else
+        return "failure";
+}
+```
+An action method may return null to indicate that the same view should be
+redisplayed.
+
+JSF provides a way to map logical outcomes, such as success and failure, to
+actual web pages.
+
+In faces-config.xml
+```xml
+<navigation-rule>
+    <from-view-id>/index.xhtml</from-view-id>
+    <navigation-case>
+        <from-outcome>success</from-outcome>
+        <to-view-id>/welcome.xhtml</to-view-id>
+    </navigation-case>
+</navigation-rule>
+```
+
+## Redirection
+Redirect a new view. Without redirection, the original URL is unchanged when the
+user moves from the /index.xhtml page to /success.xhtml page.
+If you don't use navigation rules, add the string ?faces-redirect=true
+
+```xml
+<h:commandButton label="Login" action="welcome?faces-redirect=true"/>
+```
+
+Or you can add a navigation-rule:
+```xml
+<navigation-rule>
+    <from-view-id>/index.xhtml</from-view-id>
+    <navigation-case>
+        <from-outcome>success</from-outcome>
+        <to-view-id>/success.xhtml</to-view-id>
+        <redirect/>
+    </navigation-case>
+</navigation-rule>
+```
+
+### Redirection and the Flash
+To minimize session scope bloat, it makes sense to use request scope as much as
+possible. Without the redirect element, you can use request scoped beans for
+data that are shown in the next view.
+
+Since with a redirect, the request scoped bean will be deleted, JSF 2 provides a
+flash object that can be populated in one request and used in the next.
+
+```java
+ExternalContext.getFlash().put("message", "Your password is about to expire");
+```
+
+In a JSF page, you reference the Flash object with the flash variable.
+```xml
+#{flash.message}
+```
+
+The expression #{flash.keep.message} yields the value of the message key in the
+flash and adds it back for another request scope.
+
+### Restful navigation and bookmarkable urls
+Links should be bookmarkable. Pages should be cacheable.
+
+e.g GET request:
+http://myserver.com/catalog?item=1729
+
+An item id is supplied as a query parameter. When the request is received, the
+parameter value must be transferred to an appropriate bean. You can use view
+parameters for this purpose.
+
+```xml
+<f:metadata>
+<f:viewParam name="item" value="#{catalog.currentItem}"/>
+</f:metadata>
+```
+
+When the request is processed, the value of the item query parameter is passed
+to the setCurrentItem method of the catalog item.
+
+## GET request link
