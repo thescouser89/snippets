@@ -311,3 +311,54 @@ When the request is processed, the value of the item query parameter is passed
 to the setCurrentItem method of the catalog item.
 
 ## GET request link
+You use the h:button and h:link tags to issue GET requests. h:commandButton and
+h:commandLink generate POST requests.
+
+```xml
+<h:button value="Skip" outcome-"#{quizBean.skipOutcome}"/>
+```
+There is an essential difference between the action attribute in h:commandButton
+and the outcome attribute in h:button. In the latter, the attribute is evaluated
+before the page is rendered; the action attribute is only evaluated if the user
+actually clicked on the command button.
+
+### Specifying request parameters
+```xml
+<h:link outcome="index?q=1" value="Skip"/>
+```
+or
+```xml
+<h:link outcome="index?q=#{quizBean.currentProblem + 1}" value="Skip"/>
+```
+
+Shortcut to include all view parameters in the query string:
+
+```xml
+<h:link outcome="index" includeViewParams="true" value="Skip"/>
+```
+
+To override view params:
+```xml
+<h:link outcome="index" includeViewParams="true" value="Skip">
+    <f:param name="q" value="#{quizBean.currentProblem + 1}"/>
+</h:link>
+```
+
+Redirect link:
+```xml
+<h:commandLink action="index?faces-redirect=true&amp;includeViewParams=true"
+               value="Skip"/>
+```
+
+If you specify navigation rules in the XML,
+```xml
+<redirect include-view-params=true>
+    <view-param>
+        <name>q</name>
+        <value>#{quizBean.currentProblem + 1}</value>
+    </view-param>
+</redirect>
+```
+Advanced Navigation rules pg 96
+
+
