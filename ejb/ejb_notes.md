@@ -274,3 +274,113 @@ Session bean alternative is Spring.
 
 # Session beans: the basics
 ## Anatomy
+Each session bean implementation has two distinct parts - one or more bean
+interfaces and a bean implementation class.
+
+All session beans must be divided into these two parts. This is because clients
+cannot have access to the bean implementation class directly. Instead, they must
+use session beans through a business interface.
+
+Session beans must have a no-argument constructor in the bean class.
+
+A session bean class can subclass another session bean or any other POJO.
+
+```java
+@Stateless
+public BidManagerBean extends PlaceBidBean implements BidManager {
+    ...
+}
+```
+The bean type annotation @Stateless or @Stateful specified in the PlaceBidBean
+superclass will be ignored when you deploy the BidManagerBean.
+
+Method names must not start with 'ejb'.
+
+## Bean lifecycle callbacks
+A session bean has a lifecycle. The most obvious two events of a bean lifecycle
+are creation and destruction.
+
+The following steps occur when a bean is initialized:
+- The container invokes the newInstance method on the bean object.
+- All dependencies on resourcces and other beans are injected into the newly
+  created bean instance
+
+Lifecycle callbacks are bean methods that the container class to notify the bean
+about a lifecycle transition, or event.
+
+Callback methods are bean methods that are marked with metadata annotations such
+as @PostConstruct and @PreDestroy.
+
+A PostConstruct callback is invoked just after a bean instance is created. A
+PreDestroy callback is invoked just befor ethe bean is destroyed and is helpful
+for cleaning up resources.
+
+Stateful resources have two additional ones: PrePassivate and PostActivate.
+
+PrePassivate -> container may decide to deactivate a stateful bean instance
+temporarily when not in use
+
+PostActivate -> container activates the bean instance again when the client
+needs it.
+
+The BidManagerBean contains methods for adding, viewing, and canceling bids.
+
+The single parameter of @Stateless, name, specifies the name of the bean
+(@Stateless(name="BidManager")). Some containers use this parameter to bind the
+EJB to the global JNDI tree. Recall that JNDI is essentially the application
+server's managed resource registry.
+
+If the name parameter is omitted, the container assigns the name of the class to
+the bean. In this case, the container assumes the bean name is BidManager - Bean.
+
+## Types of interfaces
+A local interface is designed for clients of stateless session beans collocated
+in the same container (JVM) instance.
+
+Clients residing outside the EJB container's JVM instance must use some kind of
+remote interface.
+
+Callbacks must follow the pattern of void <method>(). They cannot throw checked
+exceptions.
+
+## BidderAccountCreatorBean example
+Account creation is implemented as a multistep process. At each step of the
+workflow, the would-be bidder entres digestible units of data.
+
+The ActionBazaar bidder account creation process is broken up into multiple
+steps: entering username/password, entering biographical information, entering
+billing information, and finally creating the account.
+
+Each step of the workflow is implemented as a method of the BidderAccountCreatorBean.
+Either calling the cancelAccountCreation or createAccount method ends the workflow.
+
+```java
+@Stateful
+public class ... {
+    private LoginInfo loginInfo;
+    private BioInfo bioInfo;jo
+    private BillingInfo billingInfo;
+
+    public void addLoginInfo(LoginInfo logInfo) {
+    }
+    // same for BioInfo and BillingInfo
+
+    @PrePassivate
+    @PreDestroy
+    public void cleanup() {}
+
+    @Remove
+    public void cancelAccountCreation() {}
+
+    @Remove
+    public void createAccount() {}
+}
+
+@Remote
+public interface ... {
+}
+```
+
+# Session bean clients
+A seesion bean works for a client and may either be invoked by local clients
+collocated in the same JVM or by a remote client outside the JVM.
