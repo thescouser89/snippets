@@ -80,6 +80,59 @@
 # shift
 # echo "$@"    # 3 4 5
 
+# String length:
+# stringZ=abcABC123ABCabc
+# echo ${#stringZ}                 # 15
+
+# stringZ=abcABC123ABCabc
+#       0123456789.....
+#       0-based indexing.
+
+# echo ${stringZ:0}                            # abcABC123ABCabc
+# echo ${stringZ:1}                            # bcABC123ABCabc
+# echo ${stringZ:7}                            # 23ABCabc
+# echo ${stringZ:7:3}                          # 23A
+#
+# echo ${*:2}          # Echoes second and following positional parameters.
+# echo ${@:2}          # Same as above.
+# echo ${*:2:3}        # Echoes three positional parameters, starting at second.
+
+#stringZ=abcABC123ABCabc
+#       |----|          shortest
+#       |----------|    longest
+#
+# echo ${stringZ#a*C}      # 123ABCabc
+# Strip out shortest match between 'a' and 'C'.
+# echo ${stringZ##a*C}     # abc
+# Strip out longest match between 'a' and 'C'.
+#
+# stringZ=abcABC123ABCabc
+#                    ||     shortest
+#        |------------|     longest
+#
+# echo ${stringZ%b*c}      # abcABC123ABCa
+# Strip out shortest match between 'b' and 'c', from back of $stringZ.
+#
+# echo ${stringZ%%b*c}     # a
+# Strip out longest match between 'b' and 'c', from back of $stringZ.
+
+# var1=1
+# var2=2
+# var3 is unset.
+# echo ${var1-$var2}   # 1
+# echo ${var3-$var2}   # 2
+# ${parameter-default} and ${parameter:-default} are almost equivalent. The
+# extra : makes a difference only when parameter has been declared, but is null.
+# The default parameter construct finds use in providing "missing" command-line
+# arguments in scripts.
+
+# for planet in Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune Pluto
+# do
+#   echo $planet  # Each planet on a separate line.
+# done
+
+# until [ condition-is-true ] ; do
+
 # from http://tldp.org/LDP/abs/html/colorizing.html
 black='\E[30;1m'
 red='\E[31;1m'
