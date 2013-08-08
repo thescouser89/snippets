@@ -382,5 +382,56 @@ public interface ... {
 ```
 
 # Session bean clients
-A seesion bean works for a client and may either be invoked by local clients
+A session bean works for a client and may either be invoked by local clients
 collocated in the same JVM or by a remote client outside the JVM.
+
+```java
+@Stateless
+public class GoldBidderBean implements GoldBiddermanager {
+    @EJB
+    private BidManager bidManager;
+
+    public void addMassBids(List<Bid> bids) {
+        for (Bid bid : bids) {
+            bidmanager.addBid(bid);
+        }
+    }
+}
+```
+This code uses DI throught the @javax.ejb.EJB annotation. It is intended for
+injecting session beans into client code. This annotation only works inside
+another EJB, in components registered with the web container (servlet or JSF
+backing bean).
+
+# Messaging
+Synchronous communication also means that the invoker must wait for the target
+to complete the request for service before proceeding.
+
+Message-oriented middleware is software that enables asyncrhonous messages
+between system components. When a message is sent, the software stores the
+message in a location specified by the sender and acknowledges receipt
+immediately.
+
+Message sender -> Producer
+Location where message stored -> destination
+
+At a later point in time, any software component interested in messages at that
+particular destination can retrieve currently stored messages. The software
+components receiving the messages are called the message consumers.
+
+## Messaging model
+A messaging model is simply a way of messaging when a number of senders and
+consumers are involved.
+
+### Point to point (PTP)
+A single message travels from a single producer to a single consumer. PTP
+message destinations are called queues. Also, if more than one potential
+receiver exists for a message, a random receiver is chosen.
+
+### Publish-subscribe (pub-sub)
+Single producer produces a message that is received by any number of consumers
+who happen to be connected to the destination at that time. Message destination
+is called a topic and a consumer is called a subscriber.
+
+### Request-reply
+We give the message receiver enough information so that they might call us back.
