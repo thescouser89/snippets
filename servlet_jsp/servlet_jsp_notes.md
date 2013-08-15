@@ -384,3 +384,77 @@ What if you want an app init parameter that's a database Datasource?
 Context parameters can't be anything except Strings.
 
 ## Attributes and listeners
+Code that always run before any servlets or JSPs => wants to listen for a
+context initialization event so that one can get the context init parameters and
+run some code before the rest of the app can service a client.
+
+YOu need some kind of Java object whose sole purpose in life is to initialize
+the app. => Use a ServletContextListener -> It listens for the two key events in
+a ServletContext's life - initialization (creation) and destruction.
+
+```java
+import javax.servlet.*;
+
+public class MyServletContextListener implements ServletContextListener {
+
+    public void contextInitialized(ServletContextEvent event) {
+        ServletContext sc = event.getServlet();
+        String dogBreed = sc.getInitParameter("breed");
+        Dog d = new Dog(dogBreed);
+        sc.setAttribute("dog", d);
+    }
+    public void contextDestroyed(ServletContextEvent event) {
+        //code to clode database connection
+    }
+}
+```
+Put a <listener> element in the DD
+```xml
+<listener>
+    <listener-class>
+        com.example.MyServletContextListener
+    </listener-class>
+</listener>
+```
+
+In servlet code...
+```java
+Dog dog = (Dob) getServletContext().getAttribute("dog");
+```
+The servlet now has access to a shared application object.  THe container
+creates a new ServletContext for this application, that all parts of the app
+will share. Container creates a new instance of the MyServletContextListener
+class.
+
+You could also listen for attribute events (when someone add or replaces a Dog).
+
+## Attributes are not parameters
+Yep, they are not. Why? ...
+You can set and get attributes. YOu can only get parameters.
+
+
+Context scope isn't thread-safe. Multiple servlets means you might hav multiple
+threads. You need the lock on the context.
+
+```java
+synchronized(getServletContext()) {
+    getServletContext().setAttribute("bar", "42");
+}
+```
+
+Also sync protect your HttpSession!
+A session is an object used to maintain conversational state with a client. The
+session presists across multiple requests from the same client.
+```java
+HttpSession session = request.getSession();
+
+synchronized(session) {
+
+}
+```
+Instance variables are not thread-safe inside the servlet code.
+
+# Conversational State
+292
+
+
