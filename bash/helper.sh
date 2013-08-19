@@ -142,7 +142,7 @@ blue='\E[34;1m'
 magenta='\E[35;1m'
 cyan='\E[36;1m'
 white='\E[37;1m'
-alias Reset="tput sgr0" # Reset text attributes to normal
+Reset="tput sgr0" # Reset text attributes to normal
 
 # Usage: cecho "hello world" $red
 cecho () {
@@ -150,9 +150,13 @@ cecho () {
 
     local message=${1:-$default_msg}   # Defaults to default message.
     local color=${2:-$black}           # Defaults to black, if not specified.
+    echo $PS1
+    # if [ -z $PS1 ]; then
+        # echo ${message}
+    # fi
 
     echo -e "${color}${message}"
-    Reset                              # Reset to normal.
+    $Reset                              # Reset to normal.
 }
 
 # Usage: max_val=$(max 3 2 1)
@@ -196,3 +200,4 @@ check_if_file_exists() {
         echo 'file exists'
     fi
 }
+cecho "haha" $blue
