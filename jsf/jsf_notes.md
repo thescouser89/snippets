@@ -359,6 +359,68 @@ If you specify navigation rules in the XML,
     </view-param>
 </redirect>
 ```
-Advanced Navigation rules pg 96
+## Advanced Navigation rules
 
+### Wildcards
+```xml
+<navigation-rule>
+    <from-view-id>/secure/*</from-view-id>
+    <navigation-case>
+    ...
+    </navigation-case>
+</navigation-rule>
+```
 
+### Using from-action
+```xml
+<navigation-rule>
+    <navigation-case>
+        <from-action>#{quizBean.answerAction}</from-action>
+        <from-view-id>/secure/*</from-view-id>
+        <to-view-id>...</to-view-id>
+    </navigation-case>
+
+    <navigation-case>
+        <from-action>#{quizBean.startOverAction}</from-action>
+        <from-view-id>/secure/*</from-view-id>
+        <to-view-id>...</to-view-id>
+    </navigation-case>
+</navigation-rule>
+```
+
+action allows you to use server side logic to decide what next page to render,
+outcome is just a link.
+
+### Conditional navigation case
+```xml
+<navigation-case>
+    <from-outcome>previous</from-outcome>
+    <if>#{quizBean.currentQuestion != 0}</if>
+    <to-view-id>...</to-view-id>
+</navigation-case>
+```
+
+### Dynamic target view id
+```xml
+<navigation-rule>
+    <from-view-id>/secure/*</from-view-id>
+    <navigation-case>
+        <to-view-id>#{quizBean.nextViewId}</to-view-id>
+    </navigation-case>
+</navigation-rule>
+```
+
+# Standard JSF Tags
+JSF have 6 libraries with over 100 tags. pg 101
+
+Most of the core tags represent objects you add to components, such as the
+following:
+- Attributes
+- Parameters
+- Facets
+- Listeners
+- Converters
+- Validators
+- Selection items
+
+104
