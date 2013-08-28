@@ -214,7 +214,7 @@ println(pair._1)
 println(pair._2)
 ```
 
-The type is `Tuple2[Int, String]`. Actual type depends on number of items. 
+The type is `Tuple2[Int, String]`. Actual type depends on number of items.
 
 Why you can't use pair(0) to access elements: the apply method always return the
 same type, but for a tuple, each element might be of a different type. Tuples
@@ -306,7 +306,7 @@ Classes in Scala cannot have static members. Instead, Scala has singleton object
 object Haha {
     private val cache = Map[String, Int]()
 
-    def calculate(s: String): Int = 
+    def calculate(s: String): Int =
         if (cache.contains(s))
             cache(s)
         else {
@@ -458,7 +458,7 @@ implicit keyword tells the compiler to apply it to a number of situations.
 ## Built-in control structures
 
 ```scala
-def haha(x: Long, y: Long): Long = 
+def haha(x: Long, y: Long): Long =
     if (y == 0) x else haha(y, x % y)
 ```
 
@@ -481,5 +481,212 @@ Nested Iterations
 ```scala
 for (file <- fileshere if <condition>; line <- fileLines(file if <condition>)) // notice the lack of ()
 ```
-168 explain use of curly braces {} in for, and continue with trimeed variable
-thingy
+
+If you prefer, you can use curly braces instead of parantheses to surround the
+generators and filters. One advantage to using curly braces is that you can
+leave off some of the semicolons that are needed when you use parantheses.
+
+
+### Mid stream variable bindings
+```scala
+for {
+    file <- filesHere
+    if file.getName.endsWith(".scala")
+    line <- filesLines(file)
+    trimmed = line.trim
+    if trimmed.matches(pattern)
+} println(file +": "+ trimmed)
+```
+
+### Producing a new collection
+```scala
+def scalaFiles =
+for {
+    file <- filesHere
+    if file.getName.endsWith(".scala")
+} yield file
+```
+
+scalaFiles will be Array[File]
+
+## Exception Handling
+### Throw exceptions
+```scala
+throw new IllegalArgumentException
+```
+throw is an expression that has a result type.
+
+```scala
+val half =
+ if (n%2 == 0)
+     n/2
+ else
+     throw new RuntimeException("n must be even")
+```
+
+A throw has type Nothing.
+
+### Catching exceptions
+```scala
+import java.io.FileReader
+import java.io.FileNotFoundException
+import java.io.IOException
+
+try {
+    val f = FileReader("input")
+} catch {
+    case ex: FileNotFoundException => // handle missing file
+    case ex: IOException => // handle IO exception
+} finally {
+    f.close()
+}
+```
+
+## Match exceptions
+```scala
+val firstArg = if (args.length > 0) args(0) else ""
+
+val friend =
+firstArg match {
+    case "salt" => "booo"
+    case "chips" => "haha"
+    case _ => "huh"
+}
+```
+
+No breaks and continue in Scala.
+However, if you really want it,
+```scala
+import scala.util.control.Breaks._
+breakable {
+    while(true) {
+        ...
+        if(...) break
+    }
+}
+```
+
+Notes on for:
+
+for () yield { <lots> of expression and last item is the return value } or
+for () yield <variable> or
+for {} yield {}
+for {} yield <variable>
+
+
+## Functions and Closures
+You can nest functions, just like in Python.
+
+### Function literal
+```scala
+val increase = (x: Int) => x + 1
+increase(3)
+```
+
+Short form:
+```scala
+someNumbers.filter((x) => x > 0) // you can leave off the parameter type
+// or
+someNumbers.filter(x => x > 0) // you can leave off the parameter type
+```
+
+### Placeholder syntax
+To make a function literal even more concise, you can use underscores as
+placeholders.
+```scala
+someNumbers.filter(_ > 0)
+
+val f = (_: Int) + (_: Int)
+
+someNumbers.foreach(println _)
+```
+
+### Partially applied functions
+someNumbers.foreach(println _)
+
+A partially applied function is an expression in which you don't supply all the
+arguments needed by the function.
+```scala
+def sum(a: Int, b: Int, c: Int) = a + b + c
+val a = sum _
+
+a(1,2 ,3) // equivalent to a.apply(1, 2, 3)
+
+val  b = sum(1, _: Int, 3)
+
+b(2)
+```
+
+The scala compiler instantiates a function value that takes the three integer
+parameters missing from the partially applied function expression, sum _, and
+assigns a reference to the new function value.
+
+### Closures
+```scala
+var more = 1
+val addMore = (x: Int) => x + more
+```
+
+```scala
+val someNumbers = List(1, 2, 3)
+var sum = 0
+
+someNumbers.foreach(sum += _)
+```
+
+```scala
+// a function that returns another function
+def makeIncreasr(more: Int) = (x: Int) => x + more
+
+val x = makeIncreasr(10)
+
+x(5) // returns 15
+```
+
+## Special function call forms
+varargs
+```scala
+def echo(args: String*) =
+    for (arg <- args) println(arg)
+
+echo("hello", "hi", "hi")
+
+val arr = Array("hello", "world")
+
+echo(arr: _*) // splat in ruby
+```
+
+Named arguments
+```scala
+def speed(distance: Float, time: Float): Float = 
+    distance / time
+
+speed(distance = 100, time = 5)
+```
+
+Default parameter values
+```scala
+def printTime(out: java.io.PrintStream = Console.out) =
+    out.println("time = "+ System.currentTimeMillis())
+```
+
+## Tail recursion
+Functions which call themselves as their last action are tail recursive. Scala
+compiler detects that and replaces it with a jump back to the beginning of the
+function, after updating the function parameters with new values.
+
+```scala
+// not tail recursion
+def boom(x: Int) = 
+    if ...
+    else boom(x - 1) + 1
+
+
+// tail recursion
+def boom(x: Int) = 
+    if ...
+    else boom(x - 1) 
+```
+
+## Control Abstraction
+pg 207
