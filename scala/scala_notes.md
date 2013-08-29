@@ -689,4 +689,138 @@ def boom(x: Int) =
 ```
 
 ## Control Abstraction
-pg 207
+Higher Order functions: functions that take functions as parameters.
+
+```scala
+def filesMatching(query: String,
+        matcher: (String, String) => Boolean) = {
+            for(file <- filesHere; if matcher(file.getName, query))
+                yield file
+}
+
+def filesEnding(query: String) =
+    filesMatching(query, _.endsWith(_))
+
+
+def filesContaining(query: String) =
+    filesMatching(query, _.contains(_))
+
+def filesRegex(query: String) =
+    filesMatching(query, _.matches(_))
+```
+
+(fileName: String, query: String) => fileName.endsWith(query_)
+
+
+```scala
+// shorter form
+def filesMatching(query: String,
+        matcher: String => Boolean) = {
+            for(file <- filesHere; if matcher(file.getName))
+                yield file
+}
+
+def filesEnding(query: String) =
+    filesMatching(_.endsWith(query))
+
+
+def filesContaining(query: String) =
+    filesMatching(_.contains(query))
+
+def filesRegex(query: String) =
+    filesMatching(_.matches(query))
+```
+
+## Simplifying client code
+```scala
+def containsNeg(nums: List[Int]) = nums.exists(_ < 0)
+def containsOdd(nums: List[Int]) = nums.exist (_ % 2 == 1)
+```
+
+## Currying
+```scala
+def curriedSum(x: Int)(y: Int) = x + y
+
+def curriedSum2(x: Int) = (y: Int) => x + y
+
+curriedSum(1)(2)
+
+val onePlus = curriedSum(1)_
+onePlus(2)
+```
+
+## Writing new control structures
+```scala
+def twice(op: Double => Double, x: Double) = op(op(x))
+
+twice(_ + 1, 5)
+// answer is 7.0
+```
+
+In any method invocation in Scala in which you're passing in exactly one
+argument, you can opt to use curly braces to surround the argument instead of
+parentheses.
+
+```scala
+println{ "hello" }
+```
+
+Purpose is to be able to write this:
+```scala
+def withPrintWriter(file: File)(op: PrintWriter => Unit) {
+    val writer = new PrintWriter(file)
+    try {
+        op(writer)
+    } finally {
+        writer.close()
+    }
+}
+
+val file = new File("date.txt")
+
+withPrintWriter(file) {
+    writer => writer.println(new java.util.Date)
+}
+```
+
+## By-name parameters
+```scala
+val assertionsEnabled = true
+
+// use that syntax instead of:
+def boolAssert(predicate: => Boolean) =
+    if(assertionsEnabled && !predicate)
+        throw new AssertionError
+
+boolAssert(5 > 3)
+
+// instead of that:
+def boolAssert2(predicate: () => Boolean) =
+    if(assertionsEnabled && !predicate)
+        throw new AssertionError
+
+boolAssert2(() => 5 > 3)
+
+
+def boolAssert3(predicate: Boolean) =
+    if(assertionsEnabled && !predicate)
+        throw new AssertionError
+```
+
+
+difference between boolAssert and boolAssert3:
+
+For boolAssert3(5 > 3), condition 5 > 3 is evaluated `before` the call to
+boolAssert3.
+
+By contrast, the condition is not evaluated before the call.
+
+So running:
+```scala
+boolAssert(x/0 == 0) // that won't yield an exception
+boolAssert3(x/0 == 0) // will throw and exception
+
+// pg 221
+```
+
+
