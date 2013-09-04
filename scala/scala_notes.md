@@ -819,8 +819,228 @@ So running:
 ```scala
 boolAssert(x/0 == 0) // that won't yield an exception
 boolAssert3(x/0 == 0) // will throw and exception
+```
 
-// pg 221
+# Composition and Inheritance
+
+Composition means one class hold a reference to another.
+
+e.g Create a library for building and rendering 2D layout elements. Each element
+will represent a rectangle filled with text. For convenience, the library will
+provide factory methods named "elem" that construct new  elements from passed
+data.
+
+```scala
+elem(s: String): Element
+```
+
+```scala
+val column1 = elem("hello") above elem("***")
+val column2 = elem("***") above elem("world")
+column1 besides column2
+
+// prints
+// hello ***
+// *** world
+```
+
+## Abstract class
+```scala
+abstract class Element {
+    def contents: Array[String]
+    def height: Int = contents.length
+    def width: Int = if (height == 0) 0 else contents(0).length
+}
+
+// Note.
+// Instead of
+def height(): Int
+// we use
+def height: Int
+```
+
+## Extending classes
+```scala
+class ArrayElement(conts: Array[String]) extends Element {
+    def contents: Array[String] = conts
+}
+```
+scala.AnyRef == java.lang.Object
+
+
+### Overriding methods and fields
+Fields and methods belong to the same namespace. In Scala it is forbidden to
+define a field and a method with the same name in the same class.
+
+### Defining parametric fields
+You can combine parameter and field in a single parametric field definition:
+
+```scala
+//Instead of:
+class ArrayElement(conts: Array[String]) extends Element {
+    val contents: Array[String] = conts
+}
+
+class ArrayElement (
+    val contents: Array[String]
+) extends Element {}
+```
+
+### Invoking superclass constructors
+```scala
+class LineElement(s: String) extends ArrayElement(Array(s)) {
+    override def width = s.length
+    override def height = 1
+}
+```
+
+### Using override modifiers
+Scala requires such a modifier for all members that override a concrete member
+in a parent class. Modifier is optional if a member implements an abstract
+member with the same name.
+
+Rule provides useful information for the compiler that helps avoid hard-to-catch
+errors and make systems evolution safer.
+
+### Declaring final members
+Same as in java...
+
+### Implementing above, beside, and toString
+```scala
+def above(that: Element): Element =
+    new ArrayElement(this.contents ++ that.contents)
+```
+
+`++` operation concatenates two arrays.
+
+
+# Scala Hierarchy
+Every class inherits from a common superclass named `Any`. Methods defined in
+Any are universal methods. Scala also defines Null and Nothing.
+
+Value classes are defined as abstract and final. You cannot instantiate them
+(new Int).
+
+Unit corresponds to Java's void type.
+
+
+## Int
+```scala
+43 max 45
+1 until 5
+1 to 5
+3.abs
+(-3).abs
+```
+
+Methods min, max, until, to, and abs are all defined in a class
+scala.Runtime.RichInt, and there is implicit conversion from class Int to RichInt.
+
+The other subclass of the root class Any is AnyRef.  This is the base class of
+all reference classes in Scala. AnyRef is in fact just an alias for class
+java.lang.Object.
+
+Scala classes are different from Java classes in that they all inherit from a
+special marker trait called ScalaObject.
+
+## How primitives are implemented
+Scala integers are stored in the same way as Java: 32 bit words. Scala uses the
+backup class java.lang.Integer whenever an Integer needs to be seen as a Java object.
+(toString)
+
+Integers of type Int are converted transparently to 'boxed integers' of type
+java.lang.Integer whenever necessary.
+
+
+Java '==' (compare if two objects point to the same object), is equal to 'eq'
+
+```scala
+x eq y
+x neq y
+```
+
+## Bottom types
+scala.Null and scala.Nothing
+
+They handle some corner cases of Scala's object-oriented type system in a
+uniform way.
+
+Class Null is the type of the `null` reference. Null is not compatible with
+value types. (no val i: Int = null) Null is a subclass of every reference class
+(every class that itself inherits from AnyRef).
+
+One use of Nothing is that it signals abnormal termination.
+
+```scala
+def error(message: String): Nothing = 
+    throw new RuntimeException(message)
+```
+
+Because Nothing is a subtype of every other type, you can use methods like error
+in very flexible ways.
+
+```scala
+def divide(x: Int, y: Int): Int = 
+ if (y != 0) x/y
+ else error("Can't divide by zero")
 ```
 
 
+# Traits
+A trait encapsulates method and field definitions, which can then be reused by
+mixing them into classes. Unlike class inheritance, in which each class must
+inherit from just one superclass, a class can mix in any number of traits.
+
+Two common ways they are useful:
+- Widening thin interfaces to rich ones
+- Defining stackable modifications
+
+```scala
+trait Philosophical {
+    def philosophize() {
+        println("haha")
+    }
+}
+```
+
+It has the default superclass of AnyRef. Once a trait is defined, it can be
+mixed in to a class using either `extends` or `with` keywords. Scala programmers
+mix in rather than inherit from them.
+
+```scala
+class Frog extends Philosophical {
+    override def toString = "green"
+}
+```
+
+You can use the extends keyword to mix in a trait; in that case you implicitly
+inherit the trait's superclass. Methods inherited from a trait can be used just
+like methods inherited from a superclass.
+
+A trait also defines a type.
+
+```scala
+val phil: Philosophical = frog
+```
+
+If you wish to mix traits with superclass:
+```scala
+class Animal
+trait HasLegs
+
+class Frog extends Animal with Philosophical with HasLegs {
+    override def toString = "green"
+}
+```
+
+You can do anything in a trait definition that you can do in a class definition,
+with only two exceptions.
+
+- A trait cannot has class parameters, parameters passed to the primary
+  constructor of a class
+
+- In classes, super is statically bounded, in traits, they are dynamically
+  bounded.
+
+## Thin versus rich interfaces
+pg 261
