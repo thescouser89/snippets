@@ -1043,4 +1043,112 @@ with only two exceptions.
   bounded.
 
 ## Thin versus rich interfaces
-pg 261
+One major use of traits is to automatically add methods to a class in terms of
+methods the class already has. Traits enrich a thin interface, making it into a
+rich interface.
+
+Java interfaces are more often thin than rich.
+
+To enrich an interface using traits, simply define a trait with a small number
+of abstract methods - the thin part of the trait's interface - and a potentially
+large number of concrete methods, all implemented in terms of abstract methods.
+Then you can mix the thin portion of the interface, and end up with a class that
+has all of the rich interface available.
+
+
+## The Ordered trait
+```scala
+class Rational(n: Int, d: Int) extends Ordered[Rational] {
+    // ...
+    def compare(that: Rational) = 
+        (this.numer * that.denom) - (that.numer * this.denom)
+}
+```
+
+This version of Rational mixes in the Ordered trait. You need to define a
+compare method for comparing two objects.
+
+## Traits as stackable modifications
+Traits let you modify the methods of a class, and they do so in a way that
+allows you to stack those modifications with each other.
+
+```scala
+trait Doubling extends IntQueue {
+    abstract override def put(x: Int) { super.put(2 * x) }
+}
+
+val queue = new IntQueue with Doubling
+```
+
+## To trait or not to trait
+If behaviour will not be reused, then make it a concrete class.
+
+If it might be reused in multiple, unrelated objects, make it a trait.
+
+If you want to inherit from it in *Java* code, use an abstract class.
+
+If you plan to distribute it in compiled form, you might lean towards an
+abstract class. Issue is that when a trait gains or loses a member, any classes
+that inherit from it must be recompiled.
+
+
+# Packages and Imports
+## Putting code in packages
+You can place code into named packages in Scala in 2 ways. First, you can place
+the contents of an entire file into a package by putting a package clause at
+the top of the file.
+
+```scala
+package haha.hoho
+class Navigator
+```
+
+Other way:
+```scala
+package haha.hoho {
+    class Navigator
+}
+```
+
+You can part different parts of a file in different packages.
+
+## Concise access
+```scala
+package haha {
+    package hoho {
+
+        class Navigator {
+            val map = new StarMap
+        }
+
+        class StarMap
+
+
+            package tests {
+                class NavigatorSuite
+            }
+    }
+    class Ship {
+        val nav =  new hoho.Navigator
+    }
+
+    package fleets {
+        class Fleet {
+            def addShip() { new Ship }
+        }
+    }
+}
+```
+
+## Imports
+```scala
+import haha._ // same as in java import haha.*
+import haha.ImportantClass._ // static import in java
+```
+
+We don't use * since * is a valid operator in scala.
+
+In scala, imports may appear anywhere, may refer to objects, and let you rename
+and hide some of the imported members.
+
+284
