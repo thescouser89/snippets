@@ -1151,4 +1151,51 @@ We don't use * since * is a valid operator in scala.
 In scala, imports may appear anywhere, may refer to objects, and let you rename
 and hide some of the imported members.
 
-284
+```scala
+import Fruits.{Apple, Orange} 
+// import just members Apple and Orange from object Fruits
+
+import Fruits.{Apple => McIntosh, Orange}
+// import 2 members Apple and Orange, rename Apple to McIntosh
+// original name => new name
+
+import Fruits.{Pear => _, _}
+// import all members of Fruits except Pear
+```
+
+## Implicit imports
+```scala
+import java.lang._
+import scala._
+import Predef._
+```
+
+Predef contains many definitions of types, methods, and implicit coversions that
+are commonly used on Scala programs.
+
+## Access modifiers
+Private members are treated similarly to Java.
+
+Every member not labeled private or protected is public. There is no explicit
+modifier for public members.
+
+
+### Scope of protection
+A modifier of the form `private[X]` or `protected[X]` means that access is
+private or protected 'up to' X, where X designates some enclosing package, class
+or singleton object.
+
+Finally, Scala also has an access modifier that is even more restrictive than
+private. A definition labeled private[this] is accessible only from within the
+same object htat contains the definition. Such a definition is called object-private.
+
+??
+
+## Package objects
+Each package is allowed to have one package object. ???
+
+
+[ Skipped assertions and unit testing ]
+
+# Case classes and Pattern matching
+
