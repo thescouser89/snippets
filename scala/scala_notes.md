@@ -55,7 +55,7 @@ while (i < args.length) {
 ```
 println()
 
-## Interate with foreach
+## Integrate with foreach
 ```scala
 args.foreach(arg => println(arg))
 ```
@@ -1198,4 +1198,264 @@ Each package is allowed to have one package object. ???
 [ Skipped assertions and unit testing ]
 
 # Case classes and Pattern matching
+
+Pattern Matching:
+
+e.g you need to write a library that manipulates arithmetic expressions
+
+First step to tackle this problem is the definition of the input data. We'll
+concentrate on arithmetic expressions consisting of variables, numbers and unary
+and binary operations.
+
+```scala
+abstract class Expr
+case class Var(name: String) extends Expr
+case class Number(name: String) extends Expr
+case class UnOp(operator: String, arg: Expr) extends Expr
+case class BinOp(operator: String, left: Expr, right: Expr) extends Expr
+```
+
+Each subclass has a `case` modifier. Using this modifier makes the Scala
+compiler add some syntactic conveniences to your class.
+
+First it adds a factory method with the name of the class. This means you can do:
+
+```scala
+val v = Var("x")
+
+//instead of
+val y = new Var("x")
+```
+
+The factory methods are particularly nice when you nest them. Because there are
+no noisy new keywords sprinkled throughout the code, you can take in the
+expression's structure at a glance:
+
+```scala
+val op = BinOp("+", Number(1), v)
+```
+
+Second syntactic convenience is that all arguments in the parameter list of a
+case class implicitly get a val prefix, so they are maintained as fields:
+
+```scala
+v.name
+op.left
+```
+
+
+Third, the compiler adds "natural" implementations of methods `toString`,
+`hashCode`, and `equals` in your class. They will print, hash, and compare a
+whole tree consisting of the class and recursively all its arguments. Since ==
+in Scala always delegates to equals, this means that elements of case classes
+are always compared structurally:
+
+```scala
+op.right == Var("x") // return true
+```
+
+Finally, the compiler adds a copy method to your class for making modified
+copies. This method is useful for making a new instance of the class that is the
+same as another one except that one or two attributes are different.
+
+The method works by using named and default parameters. You specify the changes
+you'd like to make by using named parameters. For any parameter you don't
+specify, the value from the old object is used.
+
+```scala
+op.copy(operator = "-")
+```
+
+
+## Pattern Matching
+```scala
+// just serve as illustration
+// so since --e === e, then simplify that expression
+UnOp("-", UnOp("-", e))  => e
+BinOp("+", e, Number(0)) => e
+BinOp("*", e, Number(1)) => e
+```
+
+Using pattern matching, these rules can be taken almost as they are to form the
+core of a simplification function in Scala. The function, `simplifyTop`, can be
+used like this:
+
+```scala
+simplifyTop(UnOp("-", UnOp("-", Var("x"))))
+
+
+// it knows that e is an Expr because of the case class definition that we did 
+def simplifyTop(expr: Expr): Expr = expr match {
+        case UnOp("-", UnOp("-", e)) => e
+        case BinOp("+", e, Number(0)) => e
+        case BinOp("*", e, Number(1)) => e
+        case _ => expr
+}
+```
+
+selector match { alternatives }
+
+
+## Kinds of patterns
+
+Wildcard: _ matches any object whatsoever.
+
+It can also be used to ignore parts of an object that you do not care about.
+
+```scala
+expr match {
+    case BinOp(_, _, _) => println(expr)
+}
+```
+
+Constant patterns:
+Variable patterns
+
+```scala
+x match {
+    case 5 => "five"
+    case "hello" => "hi"
+    case somethingElse => "haha"
+}
+```
+
+Constructor patterns:
+
+Sequence Patterns:
+```scala
+expr match {
+    case List(0, _, _) => "found it" // check for 3 element list starting with 0
+
+    case List(0, _*) => "boo" // check for list without knowing how long it will be
+}
+```
+
+Tuple Patterns:
+
+```scala
+expr match {
+    case (a, b, c) => "boo"
+    case _ => 
+}
+```
+
+
+Typed patterns
+
+```scala
+expr match {
+    case s: String => s.length
+}
+
+expr.isInstanceOf[String]
+
+//to cast
+expr.asInstanceOf[String]
+```
+
+Type Erasure
+
+```scala
+case m: Map[Int, Int] => true
+// interpreter emitted an "unchecked warning"
+```
+
+THis is because no information about type arguments is maintained at runtime.
+
+
+Variable Binding
+
+```scala
+expr match {
+    case UnOp("abs", e @ UnOp("abs", _)) => e
+}
+```
+
+UnOp("abs", \_) part is made available as variable e.
+
+
+## Pattern Guards
+
+```scala
+case BinOp("+", x, x) => BinOp("*", x, Number(2))
+
+// This will fail since scala restricts patterns to be linear, 
+// a pattern variable may only appear once in a pattern
+
+// you can reformulate it as this:
+
+case BinOp("+", x, y) if x == y => BinOp("*", x, Number(2))
+```
+
+
+## Sealed classes
+A sealed class cannot have any new subclasses added except the ones in the same
+file. This is very useful for pattern matching, because it means you only need
+to worry about the subclasses you already know about.
+
+That will help the compiler warn you when you haven't covered the full case
+class in your match 'block', and you didn't have case _ =>
+
+You can also do:
+```scala
+def describe(e: Expr): String = (e: @unchecked) match {
+    case Number(_) => "a number"
+    case Var(_) => "variable"
+}
+```
+
+## The options type
+Scala has a standard type named Option for optional values. It can be of 2 forms:
+Some(x) where x is the actual value. Or it can be a None object, which
+represents  a missing value.
+
+Optional values are produced by some of the standard operations on Scala's
+collections. For instance, the `get` method of Scala's Map produces Some(value)
+if a value corresponding to a given key has been found, or none if the given key
+is not defined in a Map. 
+
+```scala
+val capitals = Map("France" -> "Paris", "Japan" -> "Tokyo")
+
+capitals get "France" // returns Option[String] = Some(Paris)
+capitals get "North Pole" // returns None
+```
+
+Most common way to take optional values apart is through a pattern match:
+
+```scala
+x match = {
+    case Some(s) => s
+    case None => "?"
+}
+```
+
+Scala encourages the use of Option to indicate an optional value. More obvious
+to readers that the returned value is optional instead of string.
+
+
+# Patterns everywhere
+
+```scala
+val myTuple = (123, "abc")
+
+val (number, string) = myTuple
+```
+
+Patterns in for loop
+
+```scala
+// capitals is a map
+for ((country, city) <- capitals) {}
+
+
+val results = List(Some("apple"), None, Some("orange"))
+
+for (Some(fruit) <- results) println(fruit)
+// generated values that do not match the patterns are discarded
+```
+
+
+# Working with lists
+
 
