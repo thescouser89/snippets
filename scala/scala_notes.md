@@ -658,7 +658,7 @@ echo(arr: _*) // splat in ruby
 
 Named arguments
 ```scala
-def speed(distance: Float, time: Float): Float = 
+def speed(distance: Float, time: Float): Float =
     distance / time
 
 speed(distance = 100, time = 5)
@@ -677,15 +677,15 @@ function, after updating the function parameters with new values.
 
 ```scala
 // not tail recursion
-def boom(x: Int) = 
+def boom(x: Int) =
     if ...
     else boom(x - 1) + 1
 
 
 // tail recursion
-def boom(x: Int) = 
+def boom(x: Int) =
     if ...
-    else boom(x - 1) 
+    else boom(x - 1)
 ```
 
 ## Control Abstraction
@@ -972,7 +972,7 @@ value types. (no val i: Int = null) Null is a subclass of every reference class
 One use of Nothing is that it signals abnormal termination.
 
 ```scala
-def error(message: String): Nothing = 
+def error(message: String): Nothing =
     throw new RuntimeException(message)
 ```
 
@@ -980,7 +980,7 @@ Because Nothing is a subtype of every other type, you can use methods like error
 in very flexible ways.
 
 ```scala
-def divide(x: Int, y: Int): Int = 
+def divide(x: Int, y: Int): Int =
  if (y != 0) x/y
  else error("Can't divide by zero")
 ```
@@ -1060,7 +1060,7 @@ has all of the rich interface available.
 ```scala
 class Rational(n: Int, d: Int) extends Ordered[Rational] {
     // ...
-    def compare(that: Rational) = 
+    def compare(that: Rational) =
         (this.numer * that.denom) - (that.numer * this.denom)
 }
 ```
@@ -1152,7 +1152,7 @@ In scala, imports may appear anywhere, may refer to objects, and let you rename
 and hide some of the imported members.
 
 ```scala
-import Fruits.{Apple, Orange} 
+import Fruits.{Apple, Orange}
 // import just members Apple and Orange from object Fruits
 
 import Fruits.{Apple => McIntosh, Orange}
@@ -1284,7 +1284,7 @@ used like this:
 simplifyTop(UnOp("-", UnOp("-", Var("x"))))
 
 
-// it knows that e is an Expr because of the case class definition that we did 
+// it knows that e is an Expr because of the case class definition that we did
 def simplifyTop(expr: Expr): Expr = expr match {
         case UnOp("-", UnOp("-", e)) => e
         case BinOp("+", e, Number(0)) => e
@@ -1335,7 +1335,7 @@ Tuple Patterns:
 ```scala
 expr match {
     case (a, b, c) => "boo"
-    case _ => 
+    case _ =>
 }
 ```
 
@@ -1379,7 +1379,7 @@ UnOp("abs", \_) part is made available as variable e.
 ```scala
 case BinOp("+", x, x) => BinOp("*", x, Number(2))
 
-// This will fail since scala restricts patterns to be linear, 
+// This will fail since scala restricts patterns to be linear,
 // a pattern variable may only appear once in a pattern
 
 // you can reformulate it as this:
@@ -1412,7 +1412,7 @@ represents  a missing value.
 Optional values are produced by some of the standard operations on Scala's
 collections. For instance, the `get` method of Scala's Map produces Some(value)
 if a value corresponding to a given key has been found, or none if the given key
-is not defined in a Map. 
+is not defined in a Map.
 
 ```scala
 val capitals = Map("France" -> "Paris", "Japan" -> "Tokyo")
@@ -1458,4 +1458,93 @@ for (Some(fruit) <- results) println(fruit)
 
 # Working with lists
 
+```scala
+val fruit = List("apples", "oranges", "pears")
+val nums = List(1, 2, 3, 4)
+
+val diag3 =
+List(
+    List(1,0),
+    List(0,1)
+    )
+val empty = List()
+```
+
+Note that the empty list has type List[Nothing]. Because lists are covariant, it
+follows that List[Nothing] is a subtype of List[T], for any type T.
+
+So list of type List[Nothing] can also be seen as an object of every other list
+type of form List[T].
+
+### Basic operaionts on lists
+```
+head
+tail
+isEmpty
+```
+### List patterns
+Lists can also be taken apart using pattern matching.
+
+```scala
+val fruit: List[String] = List("apples", "oranges", "pears")
+
+val List(a, b, c) = fruit
+// a = apples
+// b = oranges
+// c = pears
+
+a :: b :: rest = fruit
+// a = apples
+// b = oranges
+// rest = List(pears)
+```
+
+A method is first-order if it does not take any functions as arguments.
+- Concatenation
+- length
+- init
+- last
+- reverse
+- drop, take, and splitAt
+- flatten (takes a list of lists and flattens it out into a single list)
+- zip and unzip
+- toString and mkString
+
+Converting lists: iterator, toArray, copyToArray
+
+Higher-order methods:
+- map, flatMap, foreach
+- forall, exists
+
+etc...
+
+
+# Collections
+## Sequences
+Lists, arrays,
+
+
+list buffers (mutable object which can help build lists more
+efficiently when you need to append)
+
+```scala
+import scala.collection.mutable.ListBuffer
+
+val buf = new ListBuffer[Int]
+buf += 1
+```
+
+Array buffers
+
+An arraybuffer is like an array, except that you can additionally add and remove
+elements from the beginning and end of the sequence.
+
+Strings (via StringOps)
+
+Sets and maps
+
+etc....
+
+
+# Stateful Objects
 
