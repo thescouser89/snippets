@@ -791,10 +791,100 @@ The TransactionManagementType enumerated type defines BEAN and CONTAINER.
 ```java
 @Stateless
 @TransactionManagement(TransactionManagementType.BEAN)
-    public class ProjectServiceBean implements ProjectService {
-
-    }
+public class ProjectServiceBean implements ProjectService {}
 ```
 
 ### Container-Managed Transactions
-pg 57
+Most common way to demarcate transactions is to use container-managed
+transactions, which spare the application the effort and code to begin and
+commit transactions explicitely.
+
+Transaction requirements are determined by metadata on session and
+message-driven beans and are configurable at the granularity of method execution.
+
+For example, a session bean can declare that whenever any specific method on
+that bean gets involved, the container must ensure that a transaction is started
+before the method begins. Container would be responsible for commiting the
+transaction after the completion of the method.
+
+Transaction attributes choices:
+
+MANDATORY: transaction is expected to have already been started and be active
+when the method is called. Seldom used.
+
+REQUIRED: most common case is which a method is expected to be in a transaction.
+Container provides a guarantee that a transaction is active for the method. If
+one is already active, it is used; if one does not exist, a new transaction is
+created for the method execution.
+
+REQUIRES_NEW: when the method always need to be in its own transaction; method
+should be commited or rolled back independently of methods further up the call
+stack. It could lead to excessive transaction overhead.
+
+SUPPORTS: Methods marked with supports are not dependent on a transaction, but
+will tolerate running inside one if it exists. This is an indicator that no
+transactional resources are accessed in the method.
+
+NOT_SUPPORTED: cause the container to suspend the current transaction if one is
+active when the method is called. Implies that the method does not perform
+transactional operations, but might fail in other ways that could undesirably
+affect the outcone of a transaction. Not commonly used.
+
+NEVER: method marked to never support transactions will cause the container to
+throw an exception if a transaction is active when the method is called. Seldom
+used. Can be used in development to catch transaction demarcation errors.
+
+The transaction attribute for a method can be indicated by annotating a session
+or message driven bean with @TransactionAttribute annotation.
+
+Annotating the bean class will cause the transaction attribute to apply to all
+of business methods in the class.
+
+Default attribute of REQUIRED will be applied.
+
+```java
+@Stateful
+public class ShoppingCartBean implements ShoppingCart {
+    @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+        public void addItem(String item, Integer quantity) {
+            verifyItem(item, quantity);
+        }
+}
+```
+
+### Bean-Managed Transactions
+Bean class is assuming the responsibility to begin and commit the transactions
+whenever it deems it's necessary. Penalty is that they do not get propagated to
+methods called on another BMT bean. Generally not recomended.
+
+
+## MDB Sender
+
+```java
+@Stateless
+public class EmployeeServiceBean implements EmployeeService {
+    @Resource Queue destinationQueue;
+    @Resource QueueConnectionFactory factory;
+
+    public void generateReport() {
+        try {
+            QueueConnection connection = factory.createQueueConnection();
+            QueueSession session = connection.createQueueSession(false, 0);
+            QueuseSender sender = session.createSender(destinationQueue);
+
+            Message message = session.createTextMessage("12345");
+            message.setStringProperty("RECIPIENT", "ReportProcessor");
+
+            sender.send(message);
+            sender.close();
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+
+        }
+    }
+}
+```
+
+# Object-Relational Mapping
+pg 70
