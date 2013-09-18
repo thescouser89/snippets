@@ -1547,4 +1547,54 @@ etc....
 
 
 # Stateful Objects
+For a stateful object, the result of a method call or field access may depend on
+what oeprations were previously performed on the object. e.g is a bank account.
+
+```scala
+class BankAccount {
+    private var bal: Int = 0
+    def balance: Int = bal
+
+    def deposit(amount: Int) {
+        require(amount > 0)
+        bal += amount
+    }
+
+    def withdraw(amount: Int): Boolean =
+        if(amount > bal) false
+        else {
+            bal -= amount
+            true
+        }
+}
+
+account deposit 100
+account withdraw 80 // true
+account withdraw 80 // false
+```
+
+In Scala, every var that is a non-private member of some object implicitly
+defines a getter and a setter method with it.
+
+Getter of var x is just named "x" and setter is named "x\_="
+
+var hour = 12
+
+
+# Type Parameterization
+Type parameterization allows you to write generic classes and traits. For
+example, sets are generic and take a type parameter: they are defined as Set[T].
+
+Scala requires that you specify type parameters.
+
+Set[String] is a subtype of Set[AnyRef].
+
+## Queue
+
+head, tail, enqueue
+val q = Queue(1, 2, 3)
+
+skipped quite a few...
+
+# Implicit Conversions and Parameters
 
