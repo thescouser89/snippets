@@ -887,4 +887,425 @@ public class EmployeeServiceBean implements EmployeeService {
 ```
 
 # Object-Relational Mapping
-pg 70
+Persistence annotations can be applied at 3 different levels: class, method, and
+field.
+
+The mapping annotations can be categorized as being in 2 categories: logical
+annotations and physical annotatoins.
+
+Logical -> Describe the entity model from an object modeling view.
+
+Physical -> concrete data model in the database. They deal with tables, columns,
+constraints, etc
+
+
+@Transient --> You don't want this field to be persistent
+
+You can explicitly mark the default access mode (field, property) for the class
+by using `@Access(AccessType.FIELD)`.
+
+### Mapping to a table
+```java
+@Entity
+@Table(name="EMP")
+public class ...
+```
+
+You can also name a database schema or catalog. The schema name is commonly used
+to differentiate one set of tables from another and is indicated by using the
+schema element.
+
+```java
+@Entity
+@Table(name="EMP", schema="HR")
+public class ...
+```
+
+Some databases support the notion of a catalog.
+
+```java
+@Entity
+@Table(name="EMP", catalog="HR")
+public class ...
+```
+
+### Mapping Simple types
+Primitive, wrapper classes of primitive java types.
+Byte and character array types 
+Large numeric types (BigInteger, BigDecimal)
+String
+Java temporal types: java.util.Date, java.util.Calendar
+JDBC temporal types: java.sql.Date, java.sql.Time, java.sql.Timestamp
+Enumerated types
+Serializable objects
+
+#### Column mappings
+
+```java
+@Entity
+public class ... {
+    @Column(name="EMP_ID")
+    private int id;
+}
+```
+
+#### Lazy Fetching
+LAZY means that the provider might defer loading the state for that attribute
+until it is referenced.
+The default is to load all basic mappings eagerly.
+
+```java
+@Entity
+public class ... {
+    @Basic(fetch=FetchType.LAZY)
+    @Column(name="EMP_ID")
+    private int id;
+}
+```
+
+#### Large objects
+objects that are very large (gigabyte range).
+
+Database columns that can store these types of large objects require special
+JDBC calls to be accessed from Java. To signal to the provider that it should
+use the LOB methods when passing and retrieving this data, addition annotation
+is added (@Lob)
+
+```java
+...
+@Lob @Column(name="PIC")
+private byte[] picture;
+```
+
+CLOB == character large objects
+BLOB == binary large object
+
+BLOB == byte[], Byte[],
+
+CLOB == char[], Character[]
+
+The provider is responsible for making this distinction based on the type of the
+attribute being mapped.
+
+#### Enumerated types
+```java
+public enum EmployeeType {
+    FULL_TIME_EMPLOYEE,
+    PART_TIME_EMPLOYEE,
+    CONTRACT_EMPLOYEE
+}
+
+@Entity
+public class ... {
+    private EmployeeType type;
+}
+```
+It will be mapped by their ordinal number.
+
+If an enumarated type changes however, we have  aproblem.
+Solution is to store the name of hte value as a string instead of storinng the
+ordianl. This would isolate us from any changes in declaration and allow us to
+add new types without having to worry about the existing data.
+
+We can do this by adding an @Enumerated annotation on the attribute, and
+specifying a value of STRING.
+
+```java
+...
+@Enumerated(EnumType.STRING)
+private EmployeeType type;
+```
+
+THis solution however wil leave the data vulnerable to changes in the name of
+the values.
+
+In general, storing the ordinal will be hte best and most efficient way to store
+enumerated types as long as the likelihood of additional values inserted in the
+middle is not high. New values could still be added on the end of the type
+without any negative consequences.
+
+#### Temporal types
+These types are the set of time-based types that can be used in persistent state
+mappings.
+
+The java.sql types are completely hassle-free. The 2 java.util however need
+additional metadata. This is done by annotating them with @Temporal and
+specifying the JDBC type as a value of the TemporalType enumerated type.
+DATE, TIME and TIMESTAMP
+
+```java
+@Entity
+public class Employee {
+    @Temporal(TemporalType.DATE)
+    private Date startDate;
+}
+```
+
+#### Transient state
+Attributes that are not intended to be persistent.
+
+### Mapping the primary key
+Identifier generation: Use @GeneratedValue to automatically generate an id.
+
+Four id generateion strategies: AUTO, TABLE, SEQUENCE, IDENTITY
+
+Book then talks about the strategies.
+
+
+### Relationships
+
+#### Directionality
+When each entity points to the other, the relationship is bidirectional. If only
+one entity has a pointer to hte other, the relationship is said to be
+unidirectional.
+
+A relationship from an employee to the project that they work would be bidirectional.
+
+An employee and its address would likely be modeled as a unidirectional
+relationship because the address is not expected to ever need to know its
+resident.
+
+In some cases, unidirectional relationships in the object model can pose a
+problem in the database model.
+
+When it comes to actually discussing it in concrete terms, it makes sense to
+think of every bidrectional relationship as a pair of unidirectional relationships.
+
+
+### Cardinality
+Employee Department example, many employees work in one department
+
+Many to one relationship
+
+Employee Project example, many employees work on many projects.
+
+Many to many
+
+### Ordinality
+A role can be further specified by determining whether or not it might be
+present at all. This is called the ordinality and serves to show whether the
+target entity needs to be specified when the source entity iscreated.
+
+
+Mappings:
+- Many to one
+- One to one
+- One to many
+- Many to many
+
+### Many to one mappings
+Employee Department example. Relationship is unidirectional. Employee has an
+attribute called department that will contain a reference to a single Department
+instance.
+
+```java
+@ManyToOne
+private Department department;
+```
+
+
+## Using join columns
+Holding a key of another key in another table is called a forein key.
+
+In JPA, we call them join columns, and the @JoinColumn annotation is the primary
+annotation used to configure these types of columns.
+
+One side will have the join column in the table. That side is called the owning
+side.
+
+@JoinColumn always defined on the owning side of the relationship.
+
+To specify the name of the join column, the name element is used.
+
+@JoinColumn(name="DEPT\_ID")
+
+If no @JoinColumn annotation accompanies the many-to-one mapping, a default
+column name will be assumed
+
+```java
+@ManyToOne
+@JoinColumn(name="DEPT_ID")
+private Department department;
+```
+
+### One-to-one mappings
+Employee and parking space example
+
+Almost the same as many to one mapping. Except that only one instance of the
+source entity can refer to the same target entity instance. That translates into
+a uniqueness constraint on the source foreign key column.
+
+```java
+@OneToOne
+@JoinColumn(name="PSPACE_ID")
+private ParkingSpace parkingSpace;
+```
+
+
+### Bidirecional one-to-one mapping
+Target has a relationship back to the source entity. 
+
+e.g Employee <-> Parking space
+
+```java
+// employee part covered on top ^^
+
+// parking space part
+@OneToOne(mappedBy="parkingSpace")
+private Employee employee;
+```
+
+mappedBy is needed to refer to the parkingSpace attribute in the Employee class.
+
+
+### One-to-many mappings
+Department <-> Employee
+
+When a relationship is bidirectional, there are always 2 mappings, one for each
+direction. A bidirectional one-to-many always implies a many-to-one mapping back
+to the source.
+
+When a source entity has an arbitrary number of target entities stored in its
+collection, there is no scalable way to store those references i nthe database
+table that it maps to. Instead, it must let the tables of the entities in the
+collection have foreign keys back to the source entity table. This is why the
+one-to-many associateion is almost always bidirectional and never the owning side.
+
+```java
+// Department class
+@OneToMany(mappedBy="department")
+private Collection<Employee> employees;
+```
+
+Failing to specify mappedBy element in the @OneToMany will cause the provider to
+treat it as a unidirectional one-to-many relationship that is defined to use a
+join table.
+
+### Many-to-Many mappings
+Employee and Project
+
+```java
+// employee class
+@ManyToMany
+private Collection<Project> projects;
+
+// project class
+@ManyToMany(mappedBy="projects")
+private Collection<Employee> employees;
+```
+
+For many-to-many, there are no join columns on either side of the relationship.
+The only way to implement a many-to-many relationship is with a separate join
+table. Consequence of not having any join columns in either of the entity tables
+is that there is no way to determine which side is the ownter of the
+relationship. We must pick one of the 3 entitites to be the owner.
+
+if we pick one side to be the owner, the inverse side must use the mappedBy
+element to identify the owning attribute.
+
+### Using Join tables
+A join table consists simply of 2 foreign key or join columns to refer to each
+of the 2 entity types in the relationship.
+
+#######################################################################################
+The join table for the relationship, if not defaulted, is specified on the owning side. 
+#######################################################################################
+
+All ManyToMany relationships require a JoinTable. The JoinTable is defined using
+the @JoinTable annotation and <join-table> XML element. The JoinTable defines a
+foreign key to the source object's primary key (joinColumns), and a foreign key
+to the target object's primary key (inverseJoinColumns). Normally the primary
+key of the JoinTable is the combination of both foreign keys.A
+
+```java
+@ManyToMany
+@JoinTable(name="EMP_PROJ",
+            joinColumns=@JoinColumn(name="EMP_ID"),
+            inverserJoinColumns=@JoinColumn(name="PROJ_ID"))
+private Collection<Project> projects;
+```
+
+In our example, we fully specified the names of the join table and its columns
+because this is the most common case. But if we were generating the database
+schema from the entities, we would not actually need to specify this information.
+
+When no @JoinTable annotation is specified on the owning side, then a default
+join table named <Owner>\_<inverse> is assumed.
+
+
+### Unidirectional collection mapping
+Unidirection one-to-many
+
+Employee -> Phone
+
+Similarly, when one side of a many-to-many relationship does not have a mapping
+to the other, it is a unidirectional relationship. The join table must still be
+used.
+
+```java
+// EMPLOYEE
+@OneToMany
+@JoinTable(name="EMP_PHONE",
+           joinColumns=@JoinColumn(name="EMP_ID"),
+           inverseJoinColumns=@JoinColumn(name="PHONE_ID"))
+private Collection<Phone> phones;
+```
+
+### Lazy Relationships
+At the relationship level, lazy loading can be a big boon to enhancing
+performance. It can reduce the amount of SQL that gets executed.
+
+Defaults:
+Single-valued relationship -> fetched eagerly
+Collection-valued relationship -> lazily loaded
+
+```java
+@OneToOne(fetch=FetchType.LAZY)
+private ParkingSpace parkingSpace;
+```
+
+### Embedded Objects
+An embedded object is one that is dependent on an entity for its identity. It
+has no identity on its own. but is merely part of the entity state that has been
+carved off and stored in a separate java object hanging off of the entity.
+
+The street, city, state and zip_code columns combine logically to form the
+address. In the object model, ths is an excellent candidate to be abstracted
+into a separate address embedded type instead of listing each attribute on the
+entity class.
+
+```java
+@Embeddable
+public class Address {
+    private String street;
+    private String city;
+    private String state;
+    private String zip;
+}
+
+@Entity
+public class Employee {
+    @Embedded private Address address;
+}
+```
+
+When the provider presists an instance of Employee, it will access the
+attributes of the Address object just as if they were present on the entity
+instance itself.
+
+
+An Address class could be reused in both Employee and Company entities. 
+
+How sharing will be possible if the 2 entity tables have different column names
+for the same field.
+
+```java
+public class Employee {
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name="state", column=@Column(name="PROVINCE"))
+        @AttributeOverride(name="zip", column=@Column(name="POSTAL_CODE"))
+    })
+    private Address address;
+}
+```
