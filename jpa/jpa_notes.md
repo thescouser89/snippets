@@ -1221,7 +1221,7 @@ key of the JoinTable is the combination of both foreign keys.A
 @ManyToMany
 @JoinTable(name="EMP_PROJ",
             joinColumns=@JoinColumn(name="EMP_ID"),
-            inverserJoinColumns=@JoinColumn(name="PROJ_ID"))
+            inverseJoinColumns=@JoinColumn(name="PROJ_ID"))
 private Collection<Project> projects;
 ```
 

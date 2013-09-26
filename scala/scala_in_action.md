@@ -102,4 +102,231 @@ toList("haha") // returns a list of string
 val array = new Array[String](3)
 ```
 
+### For comprehension
+The for comprehension comes in two flavours: imperative form (for loop does not
+return anything) and functional form.
+
+In functional form, you tend to work with values rather than execute statements,
+and it does return a value.
+
+```scala
+for {a <- aList; b <- bList } yield a + b
+```
+
+Instead of printing a + b, you are returning the value of the addition from the
+loop using the yield keyword. You are using the same aList and bList instances
+in the loop control, and it returns the result as a List.
+
+```scala
+val result = for {a <- aList; b <- bList } yield a + b
+```
+
+### Pattern Matching
+```scala
+val x = haha match {
+    case 1 => println("Boo")
+    case _ => println("default")
+}
+```
+
+```scala
+val x = haha match {
+    case s: String => println("String")
+    case l: List[_] => println("list")
+    case _ => println("default")
+}
+```
+
+
+```scala
+// infix style
+List(1, 2, 3, 4) match {
+   case f :: s :: rest => List(f, s)
+}
+```
+
+```scala
+// guard close
+num match {
+    case within10 if within10 <= 10 => println("within 0 to 10")
+    case within100 if within100 <= 100 => println("within 100")
+    case hundredTo200 if 100 to 200 contains hundredTo200 => println("yahoo")
+}
+```
+
+### Exception Handling
+```scala
+try {
+    //do something
+} catch {
+    case e: IllegalArgumentException => e.getMessage
+}
+```
+
+## OOP in Scala
+```scala
+class MongoClient(val host: String, val port: Int)
+
+
+val client = new MongoClient("127.0.0.1", 123)
+
+client.host
+client.port
+```
+
+```scala
+class Boo(
+    var address: String,
+    val haha: String
+)
+```
+
+When parameters are prefixed with var, Scala creates mutable instance variables.
+The val and var prefixes are optional, and when both of them are missing, they
+are treated as private instance values, not accessible to anyone outside the class.
+
+```scala
+class MongoClient(host: String, port: Int)
+
+
+val client = new MongoClient("127.0.0.1", 123)
+
+client.host // error
+client.port // error
+```
+
+Use private in the constructor so that scala does not generate accessors by
+default.
+
+```scala
+class MongoClient(private val _host: String) {
+    def host = _host
+}
+```
+
+val and var == getter method created
+var == setter method
+
+### Overload a constructor
+```scala
+class MongoClient(val host: String) {
+    def this() = this("127.0.0.1")
+}
+```
+To overload a constructor, name it this followed by parameters.
+
+Because of Scala's nature, you can write code inside the class like a script.
+
+```scala
+class MyScript(host: String) {
+    require(host != null, "Have to provide a hostname")
+}
+```
+
+### Adding setter methods
+```scala
+def age =  _age // getter
+def age_=(newAge: Int) = { _age = newAge } // setter
+
+p.age = 3
+```
+
+### Extending a class
+To extend or inherit a superclass, you have to use the extends keyword.
+
+```scala
+class MongoClient(val host: String, val port: Int) extends Mongo(host, port) {
+    require(host != null, "You have to provide a host name")
+    def this() = this("127.0.0.1", 27017)
+}
+```
+
+From that example, you can see that you can also inline the definition of the
+primary constructor of a superclass. Drawback is you can no longer validate the
+parameters of the primary constructor before handing it over to the superclass.
+
+### Packaging
+A package is a special object that defines a set of member classes and objects.
+
+```scala
+package com {
+    package huh {
+        class xxx
+}
+```
+
+But it's better to define a top level package to avoid confusion.
+
+Scala package declaration doesn't have to match the folder structure of your
+filesystem. You are free to declare multiple packages in the same file.
+
+### Scala imports
+To import everything:
+```scala
+import com.mongodb._
+```
+
+You can also use import anywhere. Advantage: lexically scoped inside the block
+it is defined.
+
+To import members of a class:
+```scala
+import java.lang.System._
+```
+
+Similar to static import in java.
+
+### Aside
+```scala
+package monads { class IOMonad }
+package io {
+    package monads {
+        // won't work since imports are relative
+        class Console { val m = new monads.IOMonad }
+
+        // will work
+        class Console { val m = new _root_.monads.IOMonad }
+    }
+}
+```
+
+e.g java.sql.Date and java.util.Date <== they are confusing
+
+```scala
+import java.util.Date
+import java.sql.{Date => SqlDate}
+```
+
+You can also hide a class using import with the help of an underscore:
+
+```scala
+import java.sql.{Date => _}
+```
+
+static is replaced by a singleton object.
+
+```scala
+object Boo {
+    def p(x: Any) = println(x)
+    def apply(x: Any) = println(x)
+}
+
+Boo.p(123)
+Boo(1234) // will call the apply method
+```
+
+In Scala, both a class and an object can share the same name. When an object
+shares a name with a class, it's called a companion object, and the class a
+companion class.
+
+```scala
+class DB private(val under: Any) {}
+object DB { def apply(x: Any) = new DB(123) }
+```
+
+private here makes the constructor private. Only the companion object can call
+that constructor.
+
+
+pg 69
 
