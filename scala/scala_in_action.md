@@ -328,5 +328,513 @@ private here makes the constructor private. Only the companion object can call
 that constructor.
 
 
-pg 69
+### Mixin with Scala traits
+A trait is like an abstract class meant to be added to other classes as a mixin.
 
+A mixin is a class that provides certain functionality that could be used by
+other classes. You can also view a trait as an interface with implemented methods.
+
+
+Abstract class: you can have constructor parameters
+Traits: can't take any constructor parameters.
+
+In Scala it is possible to declare abstract fields like abstract methods that
+need to be inherited by subclasses.
+
+```scala
+trait ReadOnly {
+    val underlying: MongoDBCollection
+
+    def name = underlying getName
+}
+
+trait Administrable extends ReadOnly {
+    def drop: Unit = underlying drop
+}
+
+trait Updatable extends ReadOnly {
+    def +=(doc:DBObject): Unit = underlying save doc
+}
+
+class DBCollection(override val underlying: MongoDBCollection)
+                    extends ReadOnly
+
+new DBCollection(xxx)
+new DBCollection(xxx) with Admistrable
+new DBCollection(xxx) with Administrable with Updatable
+```
+
+Traits and ruby modules are very similar. Trait mixin is checked at compile
+time.
+
+
+### Class linearization
+Diamond problem
+
+           Any
+
+         AnyRef
+
+        ReadOnly
+
+ Updatable    DBCollection
+
+    UpdatableCollection
+
+Invoking one of the find methods on UpdatableCollection will result in an
+ambigous class because you could reach the ReadOnly trait from 2 different
+paths. Scala solves this problem using class linearization. Linearization
+specifies a single linear path for all the ancestors of a class, including both
+the regular superclass chain and the traits.
+
+Resolves method invocation by first using right-first, depth-first search and
+then removing all but the last occurence of each class in the hierarchy.
+
+Linearization puts the trait first after the class because it's the rightmost
+element and then removes duplication.
+
+UpdatableCollection -> Updatable -> DBCollection -> ReadOnly -> AnyRef -> Any
+
+#### Stackable Traits
+Using with.
+
+When creating a trait you can't tell how your trait will get used and who will
+be above you. All you know is that it has to be of a type that your trait
+extends. The interpretation of super in traits is dynamically resolved in Scala.
+
+### Case Class
+When the Scala compiler sees a case class, it automatically gnerates boilerplate
+code so you don't have to do it.
+
+```scala
+case class Person(firstName: String, lastName: String)
+```
+
+What you'll get:
+- Scala prefixes all the parameters with val, and that will make them public value.
+- Both equals and hashCode are implemented for you based on the given parameters
+- Compiler implements toString -> returns class name and its parameters
+- Each case class has a method named copy that allows you to easily create a
+  modified copy of the class's instances
+- A companion object is created wit hthe appropriate apply method, which takes
+  the same arguments as declared in the class
+- Compiler adds a method called unapply, which allows the class name to be used
+  as an extractor for pattern matching
+- A default implementation is provided for serialization
+
+You're allowed to prefix the parameters to the case class with var if you want
+both accessors and mutators. Scala defaults it to val because it encourages
+immutability.
+
+A case class can extend other classes, including trait and case classes. When
+you declare an abstract case class, Scala won't generate the apply method in the
+companion object. makes sense since you can't create an instance of an abstract
+class.
+
+You can also create case objects that are singleton and serializable.
+
+```scala
+trait Boolean
+case object Yes extends Boolean
+case object No extends Boolean
+```
+
+```scala
+sealed trait QueryOption
+case object NoOption extends QueryOption
+
+case class Sort(sorting: DBObject, anotherOption: QueryOption)
+        extends QueryOption
+
+case class Skip(number: Int, anotherOption: QueryOption)
+        extends QueryOption
+
+case class Limit(limit: Int, anotherOption: QueryOption)
+        extends QueryOption
+```
+
+A sealed modifier stops everyone from extending the trait, except for classes
+that are in the same source file.
+
+```scala
+case class Query(q: DBObject, option: QueryOption = NoOption) {
+    def sort(sorting: DBObject) = Query(q, Sort(sorting, option))
+    def skip(skip: Int) = Query(q, Skip(skip, option))
+    def limit(limit: Int) = Query(q, Limit(limit, option))
+}
+```
+
+here each method creates a  new instance of a query object with an appropriate
+query option to provide a fluent itnerface:
+
+```scala
+var rangeQuery = // it's a DBOject
+var richQuery = Query(rangeQuery).skip(20).limit(10)
+```
+
+One of the most common reasons for creating case classes is the pattern-matching
+feature that comes free with case classes.
+
+```scala
+case class Person(firstName: String, lastname: String)
+
+val p = Person("Matt", "w")
+
+p match {
+    case Person(first, last) => println(">>> " + first + last)
+}
+```
+
+We have extracted the first and last names from the object using pattern
+matching. Under the hood, Scala handles this pattern matching using a method
+called unapply.
+
+If you had to handcode it:
+
+```scala
+object Person {
+    def apply(firstName: String, lastName: String) = {
+        new Person(firstname, lastName)
+    }
+    def unapply(p: Person): Option[(String, String)] =
+            Some[(p.firstName, p.lastName)]
+}
+```
+
+Sometimes instead of unapply, another method called unapplySeq could get
+generated if the case class parameters end with a repeated parameter (variable
+argument).
+
+You can also use pattern mathching in for comprehension
+
+```scala
+val people = List(// full of Person() objects)
+
+for(Person(first, last) <- people) yield first + ", " + last
+```
+
+When it comes to overload methods, you have to specify the return type;
+otherwise, the code won't compile. You have a similar limitation for recursive
+method calls.
+
+
+### Named and default arguments and copy constructors
+
+```scala
+// named
+val p = Person(lastName = "lastname", firstName = "firstname")
+```
+
+
+#### Named arguments and inheritance
+
+```scala
+trait Person { def grade(years: Int): String }
+class SalesPerson extends Person { def grade(yrs: Int) = "Senior" }
+
+val s = new SalesPerson
+s.grade(yrs=1) // pass
+s.grade(years=1) // fails
+```
+
+If you force the type variable to Person, then you can use years as a named argument.
+
+```scala
+val s: Person = new SalesPerson
+s.grade(years=1)
+
+
+// expression in named argument
+s.grade(years={val x = 10; x + 1})
+```
+
+#### Default arguments
+```scala
+def sort(haha: String = "boo") = "hihi"
+```
+
+One of the interesting uses of default arguments in Scala is in the copy method
+of case classes. Every case class has an additional method called copy to create
+a modified instance of the class. This method isn't generated if any member
+exists with the same name in the class or in one of its parent classes.
+
+```scala
+val skipOption = Skip(10, NoOption)
+
+val skipWithLimit = skipOption.copy(anotherOption = Limit(10, NoOption))
+
+case class Skip(number: Int, anotherOption: QueryOption) extends QueryOption {
+    def copy(number: Int = number, anotherOption: QueryOption = anotherOption) =
+    { Skip(number, anotherOption) }
+}
+```
+
+The copy method is using a named argument to specify the parameter that you'd
+like to change.
+
+You can pick and choose the parameter value you want to change during the copy.
+If no parameters are specified, copy will create another instance with the same
+values.
+
+== method same as calling the equals method.
+
+== defined in scala.Any
+
+### Modifiers
+private, protected
+
+private: only accessible in an enclosed class, its companion object, or a
+companion class.
+
+In Scala, you can qualify a modifier with a class or a package name.
+
+```scala
+package outerpkg.innerpkg
+
+class Outer {
+    class Inner {
+        private[Outer] def f() = "This is f"
+        private[innerpkg] def g() = "This is g"
+        private[outerpkg] def h() = "This is h"
+    }
+}
+```
+
+The f method can appear anywhere with the Outer class, but not outside it. The
+method g is accessible anywhere within the outerpkg.innerpkg. h method can
+appear anywhere within outerpkg and its subpackages. Useful for unit tests in
+the same pkg.
+
+
+Scala also lets you qualify the private modifier with this: private[this]. In
+this case, it means object private. And object private is only accessible to the
+object in which it is defined. (???)
+
+When members are marked with private without a qualifier, they are called
+class-private.
+
+The protected modifier is applicable to class member definitions. It's
+accessible to the defining class and its subclasses. Also accessible to a
+companion object of the defining class and companion objects of all the subclasses.
+
+Like private, you can qualify the protected modifier with class, package, and this.
+
+
+#### Overrride
+the override modifier is mandatory when you override a concrete member
+definition from the parent class. Can be combined with an abstract modifier ->
+means that the member in question must be mixed with a class that provides the
+concrete implementation.
+
+```scala
+trait DogMood {
+    def greet
+}
+
+trait AngryMood extends DogMood {
+    override def greet = {
+        println("Bark")
+        super.greet
+    }
+}
+```
+
+Problem with this code is super.greet. Can't invoke it since it's abstract. But
+super calls are important if you want your trait to be stackable so that it can
+get mixed in with other traits. In cases like these, you can mark a method with
+abstract override, which means it should be mixed in with some class that has
+the concrete definition of the greet method.
+
+```scala
+trait AngryMood extends DogMood {
+    abstract override def greet = {
+        println("bark")
+        super.greet
+    }
+}
+```
+
+#### sealed
+A little different from the final modifier, sealed can be overriden as long as
+the subclasses belong to the same source file. Common pattern when you want to
+create a defined set of subclasses but don't want others to subclass it.
+
+### Value classes: Objects on a diet
+Scala allows user-defined value classes that extend AnyVal. Value classes are a
+new mechanism to avoid runtime allocation of the objects.
+
+To create a value class you need to abide by some important rules:
+
+- Class must have exactly one val parameter (vars not allowed)
+- Parameter type may not be a value class
+- Class can not have any auxiliary constructors
+- class can only have def members, no vals or vars
+- Class cannot extend any traits, only universal traits
+
+Value classes allow you to add extension methods to a type without the runtime
+overhead of creating instances.
+
+```scala
+class Wrapper(val name: String) extends AnyVal {
+    def up() = name.toUpperCase
+}
+
+val w = new Wrapper("hey")
+w.up()
+```
+At runtime, the expression will be optimized to the equivalent of a method class
+on a static object Wrapper.up$extendion("hey").
+
+Behind the scenes the Scala compiler has generated a companion object for the
+value class and rerouted the w.up() calls to the up$extension method in the
+companion object.
+
+```scala
+// equivalent implementation
+object Wrapper {
+    def up$extension(_name: String) = _name.toUpperCase
+}
+```
+
+A value class can only extend a universal trait, one that extends Any. Universal
+traits can only have def members and no initialization code:
+
+```scala
+trait Printable extends Any {
+    def p() = println(this)
+}
+
+
+// OH HEY: you can even use with in constructor type!? who knew!
+case class Wrapper(val name: String) extends AnyVal with Printable {
+    def up() = name.toUpperCase
+}
+
+val w = Wrapper("Hey")
+w.p()
+```
+
+### Implicit Conversion with implicit classes
+Implicit conversion is a method that takes one type of parameter and returns
+another type.
+
+```scala
+val someInt: Int = 2.3 // fails
+implicit def double2Int(d: Double): Int = d.toInt
+val someInt: Int = 2.3 // succeeds
+```
+
+When the compiler encounters a type error, it doesn't immediately give up;
+instead, it looks for any implicit conversions that might fix the error. The
+compiler will also throw an error if there is ambiguity in an implicit
+resolution: more than one implicit conversion is found that matches the given
+criteria.
+
+
+One of the common uses of implicit conversion is to add extension methods to
+existing types.
+
+e.g
+
+```scala
+val oneTo10 = 1 to 10
+
+// what if we want to create a range of numbers using the --> method?
+val oneTo10 = 1 --> 10
+```
+
+This will fail since there is no --> method defined for Int. We can easily fix
+this by following 2 simple steps:
+
+- Create a type that has a --> method defined for the Int type.
+- Provide an implicit conversion
+
+```scala
+class RangeMaker(left: Int) {
+    def -->(right: Int) = left to right
+}
+
+val range: Range = new RangeMaker(1). -->(10)
+```
+
+Here the left operand becomes the constructor parameter and the right operand
+the parameter to the --> method.
+
+```scala
+implicit def int2RangeMaker(left: Int): Range = new RangeMaker(left)
+```
+
+By default, the Scala compiler always evaluates expressions from left to right.
+So the expression is translated to 1.-->(10). Since there is no --> method
+defined for Int, the Scala compiler will look for implicit conversion that can
+convert Int to some type that defines the --> method. In this case, the compiler
+will use the int2RangeMaker method by passing 1 as parameter, then 10 as
+parameter to the --> method.
+
+Since implicit conversions is so commonly used by libraries and applications,
+Scala provides implicit classes.
+
+It reduces boilerplate code.
+
+```scala
+implicit class RangeMaker(left: Int) {
+    def -->(right: Int): Range = left to right
+}
+```
+
+Behind the scenes, the compiler will "desugar" the implicit class into a simple
+class and an implicit conversion method, as we did earlier. Implicit classes
+must have a primary constructor with one argument.
+
+We can avoid runtime cost of creating an additional instance of RangeMaker by
+using value classes:
+
+```scala
+implicit class RangeMaker(val left: Int) extends AnyVal {
+    def -->(right: Int): Range = left to right
+}
+```
+
+Implicit conversion is a very powerful language feature, but overusing it can
+reduce the readability and maintenance of the code base.
+
+
+### Scala class hierarchy
+
+Root class is scala.Any
+
+Any defines AnyVal and AnyRef. All values that are represented by an object in
+the JVM are a subclass of AnyRef.
+
+Every user-defined scala class also inherits from a trait called
+scala.ScalaObject.
+
+AnyRef is mapped to java.lang.Ojbect in the JVM.
+
+Subclasses for AnyVal -> scala takes advantage of java primitive types for
+efficiency, but converts them to objects when required by the scala application.
+
+
+Views are implicit type converters that allow Scala to convert from Char to Int
+to Long and so on.
+
+Scala.Null is the subtype of all reference  types, and its only instance is the
+null reference.
+
+The only way to create an instance of Null is by assigning null to an instance.
+
+```scala
+val x: Null = null
+```
+
+Because it's subclassed from AnyRef, you can't assign null to any value type in
+Scala
+
+```scala
+val x: Int = null // will fail
+```
+
+scala.Nothing is at the bottom of the Scala hierarchy, and it's a subtype of
+everything in Scala. You can't create an instance of Nothing.
+
+pg 93
