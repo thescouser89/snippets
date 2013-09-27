@@ -837,4 +837,86 @@ val x: Int = null // will fail
 scala.Nothing is at the bottom of the Scala hierarchy, and it's a subtype of
 everything in Scala. You can't create an instance of Nothing.
 
-pg 93
+
+## Functional Data Structures
+Scala collections: immutable and mutable
+
+Option is a collection type in Scala. Option contains a maximum of one element.
+It represents one of two possible values: None and Some.
+
+None means no value and Some represents some value. By returning Option from a
+method, you can communicate that the method might not return a value at all
+times.
+
+You'll create a function that will return the index position of an element in a
+list. It also needs to work for all kinds of lists. The list could contain
+integers, longs or strings. How can you build a function that works for all
+types of lists.
+
+```scala
+def position[A](xs: List[A], value: A): Int = xs.indexOf(value)
+```
+
+Even though you can explcitly the type value for the type parameter, it's
+optional. Scala type inference determines the value of the type parameter based
+on the arguments passed to the function.
+
+Currently your position functions returns -1  when there's no matching element.
+Here, instead of returning the Int result, you'll return  a new type that
+clearly expresses the behaviour of hte method. You'll create a container called
+Maybe that will wrap the result.
+
+```scala
+def position[A](xs: List[A], value: A): Maybe[Int] = {
+    val index = xs.indexOf(value)
+    if(index != -1) Just(index) else Nil
+}
+
+sealed abstract class Maybe[+A] {
+    def isEmpty: Boolean
+    def get: A
+}
+
+final class Just[A](value: A) extends Maybe[A] {
+    def isEmpty = false
+    def get = value
+}
+
+case object Nil extends Maybe[Nothing] {
+    def isEmpty = true
+    def get =  throw new NoSuchElementException("Nil.get")
+}
+```
+
+### Type variance with covariance and contravariance
+When using type parameters for classes or traits, you can use a + sign along
+with the type parameter to make it covariant.
+
+Covariance allows subclasses to override and use narrower types than their
+superclass in covariant positions such as the return value. Here Nil is a
+subclass of Maybe.
+
+Because the A type of Maybe is covariant, you can return a narrower type from
+its subclasses.
+
+
+The opposite of covariance is contravariance. In the case of covariance, the
+subtyping can go downward, but in contraconvariance, subtypes go upward.
+
+e.g
+```java
+Object[] arr = new int[1];
+arr[0] = "hello, there!";
+```
+You can end up assigning  the string to an integer array. Java catches those
+errors at runtime, Scala does that at compile time.
+
+A  type parameter is invariant when it's neither covariant nor contravariant.
+
+Scala uses - to denote contravariance.
+
+```scala
+trait Function1[-P, +R] {...}
+
+// P: parameter, R: return
+```
