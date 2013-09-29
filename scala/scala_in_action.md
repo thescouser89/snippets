@@ -919,5 +919,215 @@ Scala uses - to denote contravariance.
 trait Function1[-P, +R] {...}
 
 // P: parameter, R: return
+
+val addOne: Function1[Any, Int] = {x: Int => x + 1}
 ```
-pg 98
+pg 98: still confusing, so read!
+
+
+### Lower and upper type bounds
+Type parameters may be constrained by type bound.
+
+e.g The position function in the following listing throws an exception if you
+invoke get method on the Nil object:
+
+```scala
+val xs = List("one", "two")
+
+position(xs, "two").get // returns 1
+
+position(List(), "two").get
+// throws exception
+```
+
+Better to pass a default value in case the element isn't found. You can add a
+new method to the Maybe abstract class that will take a default callback:
+
+```scala
+sealed abstract class Maybe[+A] {
+    def isEmpty: Boolean
+    def get: A
+    def getOrElse(default: A): A = {
+        if(isEmpty) default else get
+    }
+}
+```
+
+If you try to compile this code, you'll get a compiler error. Because A is a
+covariant type, Scala does not allow the covariant type as an input parameter.
+Same for contravariant.
+
+You could solve this problem in 2 ways: make the Maybe class an invariant and
+lose all the subtyping with Just and Nil, or use type bound.
+
+Scala provides 2 types of type bound: lower and upper. An upper type bound T <:
+A declares that type variable T is a bustype of type A, and A is the upper bound.
+
+```scala
+def defaultToNull[A <: Maybe[_]](p: A) = {
+    p.getOrElse(null)
+}
+```
+
+A is contrained to one of the subtyps of Maybe. Because Maybe takes a type
+parameter, you have to declare the type parameter when defining the upper type
+bound. If you don't care about the type parameter, you can use the _ placeholder
+as in the last example.
+
+```scala
+sealed abstract class Maybe[+A] {
+    def isEmpty: Boolean
+    def get: A
+    def getOrElse[B >: A](default: B): B = {
+        if(isEmpty) default else get
+    }
+}
+
+final case class Just[A](value: A) extends Maybe[A] {
+    def isEmpty = false
+    def get = value
+}
+
+case object Nil extends Maybe[scala.Nothing] {
+    def isEmpty = true
+    def get = throw new NoSuchElementException("Nil.get")
+}
+```
+
+The getOrElse method returns the value contained by Just or the default value
+when it's empty. Because the default value is taken as a parameter, you have to
+set the lower bound to A to satisfy the contravariant rule.
+
+Just and Nil are the 2 subclasses that represent success and error situations.
+
+```scala
+// position is just a method that return an object of type Maybe
+position(List(), "something").getOrElse(-1) // -1
+
+position(List("one", "two", "three"), "three").getOrElse(-1) // three
+```
+
+
+### Higher Order functions
+A function is called higher order if it takes a function as an argument or
+returns a function as a result.
+
+map: this method allows you to build a new list by applying a function to all
+     elements of a given list
+
+```scala
+List(1, 2, 3) map { (x: Int) => x + 1 }
+
+List(1, 2, 3) map { _ + 1 }
+
+def addOne(num: Int) = num + 1
+
+List(1, 2, 3) map addOne
+```
+
+In the first case, you are passing an anonymous function that takes x as a
+parameter and adds 1 to it.
+
+In the second case you are using a function literal, where a placeholder
+represents the parameter.
+
+In the last example, you are passing an existing function without referring to
+hte parameters that are passed between the map function and the addOne function.
+This is a good exaple of pointfree-style programming and functional composition.
+It is also an example of a call-by-name invocation, where the parameters of the
+function are wrapped inside another function.
+
+An example where a function returns another function.
+
+```scala
+def addOne(num: Int) = {
+    def ++ = (x: Int) => x + 1
+    ++(num)
+}
+```
+
+Here the nested function ++ returns another function that takes Int as a
+parameter and returns Int.
+
+How can you implement a function like map that works for any type of list? You
+have a couple of ways to implement the map function - one uses recursion and the
+other uses a for-comprehension.
+
+```scala
+def map[A, B]](xs: List[A], f: A => B): List[B] = {
+    xs match {
+        case List() => Nil
+        case head :: tail => f(head) :: map(tail, f)
+    }
+}
+```
+
+YOu could also use for-comprehension and yield.
+
+Another interesting method defined for List is flatMap. Method builds a new
+collection by applying a function to all elements of this list and concatenating
+the result.
+
+```scala
+class List[+A] { ...
+    def flatMap[B](f: A => GenTraversableOnce[B]): List[B]
+}
+```
+
+GenTraversableOnce represents all collection types that could be iterated either
+sequentially or in parallel.
+
+flatMap adds the ability to flatten a collection of collections into a single collection.
+
+e.g
+
+```scala
+List("one", "two", "") flatMap { _.toList }
+// List(o, n, e, t, w, o)
+
+List("one", "two", "") map { _.toList }
+// List[List[Char]] = List(List(o,n,e), List(t,w,o), List())
+```
+
+```scala
+def flatten[B](xss: List[List[B]]): List[B] = {
+    xss match {
+        case List() => Nil
+        case head :: tail => head ::: flatten(tail)
+    }
+}
+
+def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = {
+    flatten(map(xs, f))
+}
+```
+
+The ::: is another method defined for List that appends the contents of one List
+to another.
+
+Also:
+
+```scala
+def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B]
+```
+
+This is called currying.
+
+
+### Difference between a lambda and a closure
+A lambda is an anonymous function - a function without a name.
+
+Closure: Keeps track of the environment in which it's created.
+
+Downside of using a recursive solution is that it can throw a stack overflow
+error on large datasets. Alternative is to use tail recurstion.
+
+In tail recursion your perform your calculation first and then execute the
+recursive call by passing the result of the current step to the next step.
+
+
+### Using foldLeft and foldRight
+These 2 operations allow you to perform binary operations on all the elements of
+the List.
+
+pg 106
