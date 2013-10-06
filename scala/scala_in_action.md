@@ -1130,4 +1130,146 @@ recursive call by passing the result of the current step to the next step.
 These 2 operations allow you to perform binary operations on all the elements of
 the List.
 
-pg 106
+Avoid foldRight as much as possible as it uses recursion and can potentially
+throw a stack overflow error.
+
+The foldLeft method applies a binary operator to a start value and all elements
+of a List going from left to right.
+
+```scala
+List(1, 2, 3, 4).foldLeft(0) { _ + _ } \\ 10
+List(1, 2, 3, 4).foldLeft(0) { (a, b) => a + 1 } \\ 4
+
+
+def exists[A](xs: List[A], e: A) = xs.foldLeft(false)((a, x) => a || (x == e))
+```
+
+### Building your own function objects
+A function object is an object that you can use as a function. To treat an
+object as a function object, all you have to do is declare an apply method.
+
+<object>(<arguments>) === <object>.apply(<arguments>)
+
+When declaring function objects, it's a good idea to extend one of the Function
+traits defined in the Scala library. In Scala, you could for example use Function1.
+
+1 stands for "function with one parameter".
+
+```scala
+object ++ extends Functions1[Int, Int] {
+    def apply(p: Int): Int = p + 1:w
+}
+
+// equivalent to
+val ++ = (x: Int) => x + 1
+
+// can also use
+
+def ++ extends (Int => Int) {
+    def apply(p: Int): Int = p + 1
+}
+```
+(Int => Int) is the shorthand notation of Function1.
+
+```scala
+map(List(10, 20, 30), ++)
+```
+
+When passing an existing function as a parameter, Scala creates a new anonymous
+function object with an apply method, which invokes the original function. This
+is called eta-expansion.
+
+Function traits also lets you compose 2 functions to create a new function.
+
+```scala
+val addOne: Int => Int = x => x + 1
+val addTwo: Int => Int = x => x + 2
+val addThree = addOne compose addTwo
+// addOne(addTwo(x))
+```
+
+### Scala Collection Hierarchy
+Part of scala.collection.
+scala.collection.mutable
+scala.collection.immutable
+
+Scala automatically import immutable collections, but you have to explicitly
+import mutable collection types.
+
+Iterable trait provides the implementation of foreach that you learned in the
+last section and it exposes a new abstract method called iterator.
+
+```scala
+Iterable(1, 2, 3, 4, 5) dropRight 2 // List(1, 2, 3)
+Iterable(1, 2, 3, 4, 5) takeRight 2 // List(4, 5)
+```
+
+### Working with List and ListBuffer
+Elements in a sequence are indexed, and they are indexed from 0 to length - 1,
+where length is the number of elements in the sequence collection.
+
+If the sequence is mutable like ListBuffer, then along with the apply method it
+offers an update method. As assignment is turned into an update method call.
+
+```scala
+import scala.collection.mutable.ListBuffer
+val buf = ListBuffer(1.2, 3.4, 5.6)
+buf.update(2, 20)
+```
+
+#### Working with Set and SortedSet
+```scala
+val frameworks = Set("Lift", "Akka", "Scalaz")
+frameworks contains "Lift" // true
+frameworks("Lift") // true
+```
+
+To add or remove elements to or from an immutable Set, use + or -. Using this
+for a mutable Set will also create a new Set. A better way to change mutable
+Sets is using the  += and -= methods.
+
+One interesting subtrait of Set is SortedSet.
+
+#### Working with Map and Tuple
+Unlike other collections, a Tuple is a heterogeneous collection where you can
+store various types of elements.
+
+```scala
+val m = Map((1, "1st"), (2, "2nd"))
+
+m(1)
+m(3) // error
+```
+
+The better way to retrieve a value associated with a key is to use the get
+method defined in Map. Instead of returning the value, it wraps the value in a
+container called Option.
+
+Option : => List with one element.
+
+#### Under the hood of for-comprehension
+pg 118
+
+#### Working with lazy collections: views and streams
+
+Converint a strict collection to a nonstrict collection with views.
+
+```scala
+List(1, 2, 3, 4, 5).view.map(_ + 1).head
+```
+
+Calculation is deferred until you invoke head on it.
+
+The nonstrict method of processing collection elements is a useful and handy way
+to improve performance, especially when the operation is time-consuming.
+
+Class Stream implements lazy lists in Scala where elements are evaluated only
+when they are needed. Stream is like a list, in which elements are stored in 2
+parts, head and tail. The tail for Stream isn't computed until it's needed.
+
+```scala
+List("zero", "one").zip(Stream.from(0))
+```
+
+
+## Functional Programming
