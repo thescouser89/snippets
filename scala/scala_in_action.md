@@ -319,6 +319,9 @@ In Scala, both a class and an object can share the same name. When an object
 shares a name with a class, it's called a companion object, and the class a
 companion class.
 
+A companion object is an object with the same name as a class or trait and is
+defined in the same source file as the associated file or trai
+
 ```scala
 class DB private(val under: Any) {}
 object DB { def apply(x: Any) = new DB(123) }
@@ -403,7 +406,7 @@ be above you. All you know is that it has to be of a type that your trait
 extends. The interpretation of super in traits is dynamically resolved in Scala.
 
 ### Case Class
-When the Scala compiler sees a case class, it automatically gnerates boilerplate
+When the Scala compiler sees a case class, it automatically generates boilerplate
 code so you don't have to do it.
 
 ```scala
@@ -416,7 +419,7 @@ What you'll get:
 - Compiler implements toString -> returns class name and its parameters
 - Each case class has a method named copy that allows you to easily create a
   modified copy of the class's instances
-- A companion object is created wit hthe appropriate apply method, which takes
+- A companion object is created with the appropriate apply method, which takes
   the same arguments as declared in the class
 - Compiler adds a method called unapply, which allows the class name to be used
   as an extractor for pattern matching
